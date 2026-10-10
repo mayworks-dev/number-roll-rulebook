@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — PLAYABLE RULEBOOK</title>
+<title>NUMBER ROLL — WALL & SPIKE LAB Ver.0.5</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -39,13 +39,24 @@ body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 2
 .calibration-tools .width-label{color:#b9dbed;white-space:nowrap}
 .calibration-tools .calibration-reset{font-size:10px;padding:0 10px;white-space:nowrap}
 .calibration-hint{color:#90b6ca;font-size:10px}
+.wall-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 13px;min-height:40px;padding:5px 9px;background:#0e2940;border-bottom:1px solid #396782;font-size:11px}
+.wall-tools[hidden]{display:none}
+.wall-tools .set{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.wall-tools strong{font-variant-numeric:tabular-nums;min-width:60px;text-align:center;font-size:11px;color:#d7f4ff}
+.wall-tools .adjust{font-weight:900;min-width:29px;height:28px;border-radius:6px;border:1px solid #5b99b7;background:#143d56;color:#fff;font-size:16px}
+.wall-tools .reset{border-radius:6px;border:1px solid #587993;background:#183750;color:#fff;font-size:10px;height:28px;padding:0 9px}
+.wall-tools .wall-kind{font-weight:900;padding:4px 8px;border-radius:5px}
+.wall-tools .wall-kind.safe{background:#143b52;color:#b3efff;border:1px solid #5dc9f7}
+.wall-tools .wall-kind.deadly{background:#3b1c2d;color:#ffafbc;border:1px solid #ff718d}
+@media(max-width:650px){.wall-tools{gap:4px 7px;font-size:10px;padding:3px 5px}.wall-tools strong{min-width:55px;font-size:10px}.wall-tools .adjust{height:25px;min-width:25px;padding:0}.wall-tools .reset{height:25px;padding:0 6px}}
+@media(max-height:390px) and (orientation:landscape){.wall-tools{min-height:28px;gap:3px 9px;padding:2px 6px}.wall-tools .adjust,.wall-tools .reset{height:23px}.wall-tools .wall-kind{padding:2px 5px}}
 @media(max-width:700px){.calibration-tools{gap:6px;padding:4px 5px;font-size:10px;min-height:32px}.calibration-label{font-size:10px}.calibration-tools button{min-width:26px;height:26px;padding:0 5px}.calibration-tools .calibration-reset{padding:0 5px;font-size:9px}.calibration-hint{display:none}}
 @media(max-height:390px) and (orientation:landscape){.calibration-tools{padding:2px 5px;min-height:27px}.calibration-tools button{height:23px}}
 </style>
 </head>
 <body>
 <main id="app">
-  <div class="top"><div><div class="brand">NUMBER ROLL / LEARNING MODE</div><h1>PLAYABLE RULEBOOK</h1><div class="sub">障害物の特徴を読み、実際に挑戦しよう / 下部の目盛りで幅と距離を確認</div></div><div class="progress">CLEAR<strong id="bookProgress">0 / 14</strong></div></div>
+  <div class="top"><div><div class="brand">NUMBER ROLL / LEARNING MODE</div><h1>PLAYABLE RULEBOOK</h1><div class="sub">障害物の特徴を読み、実際に挑戦しよう / 下部の目盛りで幅と距離を確認</div></div><div class="progress">CLEAR<strong id="bookProgress">0 / 22</strong></div></div>
   <section class="book" aria-label="プレイ型障害物図鑑">
     <div class="book-title"><div class="nameblock"><div class="chapter" id="number">01</div><div><div class="jp" id="jp">単体トゲ</div><div class="en" id="en">SINGLE SPIKE</div></div></div><div class="tip"><strong>攻略のヒント</strong><span id="tip"></span></div></div>
     <div class="calibration-tools" id="calibrationTools" hidden>
@@ -57,6 +68,12 @@ body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 2
       <button type="button" class="calibration-reset" id="spikeDefault">基準に戻す</button>
       <span class="calibration-hint">変更後は最初から再挑戦</span>
     </div>
+    <div class="wall-tools" id="wallTools" hidden>
+      <span class="wall-kind safe" id="wallKind">青枠：着地可能</span>
+      <span class="set">高さ <button type="button" class="adjust" id="wallHeightMinus" aria-label="壁の高さを減らす">−</button><strong id="wallHeight">—</strong><button type="button" class="adjust" id="wallHeightPlus" aria-label="壁の高さを増やす">＋</button></span>
+      <span class="set">横幅 <button type="button" class="adjust" id="wallWidthMinus" aria-label="壁の幅を減らす">−</button><strong id="wallWidth">—</strong><button type="button" class="adjust" id="wallWidthPlus" aria-label="壁の幅を増やす">＋</button></span>
+      <button type="button" class="reset" id="wallDefault">基準に戻す</button>
+    </div>
     <div class="stage" id="stage"><canvas id="game" aria-label="プレイ画面。タップかスペースキーでジャンプ"></canvas>
       <div class="stage-hud"><div class="stats-left"><div class="stat"><label>上の数字</label><b id="face">1</b></div><div class="stat"><label>ジャンプ残り</label><b id="jumps">1 / 1</b></div></div><div class="stats-right"><div class="stat slim"><label>進行</label><b id="distance">0%</b></div><div class="game-buttons"><button type="button" id="reset" class="game-icon" aria-label="リトライ">↻</button><button type="button" id="pause" class="game-icon" aria-label="一時停止">Ⅱ</button></div></div></div>
       <div class="bottom-controls"><div class="hint"><b id="actionHint">画面をタップしてスタート</b><span>タップ / Space / ↑：ジャンプ</span></div><button id="jump" class="jump" type="button">▶ スタート</button></div>
@@ -65,8 +82,8 @@ body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 2
     <div class="details"><div class="description" id="description"></div><div class="specs" id="specs"></div></div>
   </section>
   <nav class="footer"><button id="prev" class="nav" type="button">◀ 前の障害物</button><div class="center"><button id="catalogButton" class="nav" type="button">☷ 一覧</button><button id="ruleButton" class="nav" type="button">？ 操作</button></div><button id="next" class="nav" type="button">次の障害物 ▶</button></nav>
-  <div class="note">Ver.0.4 トゲ検証｜1マス＝四角1個分（64単位）。各ページのサイズは仮。ゴールでクリア記録を保存。</div>
-  <div class="overlay" id="overlay"><div class="overlay-head"><h2 id="overlayTitle">障害物一覧</h2><button class="close" id="close" type="button">✕ 戻る</button></div><div class="catalog" id="catalog"></div><div id="rules" style="display:none;overflow:auto;touch-action:pan-y;color:#d1e5f3;line-height:1.75;font-size:14px;padding:6px 4px"><p><b>自動で右に進む四角形</b>をジャンプで操作します。画面のどこかをタップするか、Space・↑・Wキーでジャンプします。</p><p>ジャンプするたびに四角形は<b>時計回りに90°回転</b>し、上の数字が1→2→3→4→1の順に変わります。数字ごとに色も変わります。</p><p><b>着地した時の数字</b>が、次の着地までに使えるジャンプ回数です。空中で数字が変わっても、途中で回数の上限は変わりません。</p><p>最初の4ページはトゲ1 / 5 / 9 / 13個から検証できます。トゲ数を調整するとその場でコースを作り直します。トゲ・壁などへの衝突、穴への落下は失敗。青く光る<b>GOAL</b>を通ればクリア。失敗したら「リトライ」で何度でも練習できます。</p><p>操作：タップ / Space / ↑ / W = ジャンプ、R = リトライ、P = 一時停止、← / → = ページ移動。数字の色は <span style="color:#4fc3f7">1 青</span>・<span style="color:#94df84">2 緑</span>・<span style="color:#ffbc68">3 オレンジ</span>・<span style="color:#be9bff">4 紫</span>。</p></div></div>
+  <div class="note">Ver.0.5 トゲ＋壁の検証｜1マス＝64単位｜青枠は着地可・赤枠は上も危険｜サイズは調整中。</div>
+  <div class="overlay" id="overlay"><div class="overlay-head"><h2 id="overlayTitle">障害物一覧</h2><button class="close" id="close" type="button">✕ 戻る</button></div><div class="catalog" id="catalog"></div><div id="rules" style="display:none;overflow:auto;touch-action:pan-y;color:#d1e5f3;line-height:1.75;font-size:14px;padding:6px 4px"><p><b>自動で右に進む四角形</b>をジャンプで操作します。画面のどこかをタップするか、Space・↑・Wキーでジャンプします。</p><p>ジャンプするたびに四角形は<b>時計回りに90°回転</b>し、上の数字が1→2→3→4→1の順に変わります。数字ごとに色も変わります。</p><p><b>着地した時の数字</b>が、次の着地までに使えるジャンプ回数です。空中で数字が変わっても、途中で回数の上限は変わりません。</p><p>最初の4ページはトゲ1 / 5 / 9 / 13個から検証できます。その次の8ページは、青枠・赤枠の壁を1〜4ジャンプ分の高さで練習できます。壁の高さ・幅はボタンで調整できます。青枠の壁は上に着地できてジャンプ回数が回復しますが、赤枠の壁は上も側面も危険です。トゲ・壁などへの衝突、穴への落下は失敗。青く光る<b>GOAL</b>を通ればクリア。失敗したら「リトライ」で何度でも練習できます。</p><p>操作：タップ / Space / ↑ / W = ジャンプ、R = リトライ、P = 一時停止、← / → = ページ移動。数字の色は <span style="color:#4fc3f7">1 青</span>・<span style="color:#94df84">2 緑</span>・<span style="color:#ffbc68">3 オレンジ</span>・<span style="color:#be9bff">4 紫</span>。</p></div></div>
 </main>
 <script>
 (()=>{
@@ -76,6 +93,17 @@ const calibrationEntries=[
  {n:'T-02',jp:'トゲ / 2ジャンプ用',en:'SPIKE TEST · 2 JUMPS',face:2,type:'calibration',target:2,initialCount:5,tip:'着地前の空中ジャンプで距離を伸ばす',desc:'5個の連続トゲを2回のジャンプで越えられるか検証する。ジャンプの間隔によって飛距離が変わる。',spec:[['目標','2段ジャンプ'],['初期トゲ','5個'],['調整','±1個'],['基準','1マス=64']]},
  {n:'T-03',jp:'トゲ / 3ジャンプ用',en:'SPIKE TEST · 3 JUMPS',face:3,type:'calibration',target:3,initialCount:9,tip:'飛び始めと追加ジャンプのタイミングを合わせよう',desc:'9個の連続トゲを3回のジャンプで越える検証。失敗する場合は個数を減らして安全な長さを探そう。',spec:[['目標','3段ジャンプ'],['初期トゲ','9個'],['調整','±1個'],['基準','1マス=64']]},
  {n:'T-04',jp:'トゲ / 4ジャンプ用',en:'SPIKE TEST · 4 JUMPS',face:4,type:'calibration',target:4,initialCount:13,tip:'4回を一度に使わず、空中での間隔を考える',desc:'13個の連続トゲを4回のジャンプで越える検証。現段階は仮の長さなので操作して上限を見つけよう。',spec:[['目標','4段ジャンプ'],['初期トゲ','13個'],['調整','±1個'],['基準','1マス=64']]}
+];
+const WALL_PRESETS=[100,206,314,422]; // 1~4段ジャンプで越える仮の高さ (単位)
+const wallEntries=[
+ {n:'B-01',jp:'青枠の壁 / 1ジャンプ用',en:'BLUE LANDING WALL · 1 JUMP',face:1,type:'wallCalibration',lethal:false,target:1,initialHeight:WALL_PRESETS[0],initialWidth:192,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','1段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','1.56マス'],['初期の幅','3マス']]},
+ {n:'B-02',jp:'青枠の壁 / 2ジャンプ用',en:'BLUE LANDING WALL · 2 JUMPS',face:2,type:'wallCalibration',lethal:false,target:2,initialHeight:WALL_PRESETS[1],initialWidth:192,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','2段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','3.22マス'],['初期の幅','3マス']]},
+ {n:'B-03',jp:'青枠の壁 / 3ジャンプ用',en:'BLUE LANDING WALL · 3 JUMPS',face:3,type:'wallCalibration',lethal:false,target:3,initialHeight:WALL_PRESETS[2],initialWidth:192,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','3段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','4.91マス'],['初期の幅','3マス']]},
+ {n:'B-04',jp:'青枠の壁 / 4ジャンプ用',en:'BLUE LANDING WALL · 4 JUMPS',face:4,type:'wallCalibration',lethal:false,target:4,initialHeight:WALL_PRESETS[3],initialWidth:192,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','4段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','6.59マス'],['初期の幅','3マス']]},
+ {n:'R-01',jp:'赤枠の壁 / 1ジャンプ用',en:'RED DANGER WALL · 1 JUMP',face:1,type:'wallCalibration',lethal:true,target:1,initialHeight:80,initialWidth:64,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','1段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','1.25マス'],['初期の幅','2マス']]},
+ {n:'R-02',jp:'赤枠の壁 / 2ジャンプ用',en:'RED DANGER WALL · 2 JUMPS',face:2,type:'wallCalibration',lethal:true,target:2,initialHeight:WALL_PRESETS[1],initialWidth:64,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','2段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','3.22マス'],['初期の幅','2マス']]},
+ {n:'R-03',jp:'赤枠の壁 / 3ジャンプ用',en:'RED DANGER WALL · 3 JUMPS',face:3,type:'wallCalibration',lethal:true,target:3,initialHeight:298,initialWidth:128,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','3段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','4.66マス'],['初期の幅','2マス']]},
+ {n:'R-04',jp:'赤枠の壁 / 4ジャンプ用',en:'RED DANGER WALL · 4 JUMPS',face:4,type:'wallCalibration',lethal:true,target:4,initialHeight:WALL_PRESETS[3],initialWidth:128,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','4段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','6.59マス'],['初期の幅','2マス']]}
 ];
 const baseEntries=[
  {n:'01',jp:'単体トゲ',en:'SINGLE SPIKE',face:1,type:'single',tip:'トゲの手前で1回ジャンプ',desc:'最も基本的な障害物。タイミングよくジャンプして単体トゲを飛び越えよう。',spec:[['種類','地上'],['推奨','1回ジャンプ'],['危険','接触'],['難易度','★☆☆']]},
@@ -89,28 +117,30 @@ const baseEntries=[
  {n:'09',jp:'狭い通路',en:'NARROW CORRIDOR',face:2,type:'corridor',tip:'床トゲを越えたら着地して低く進む',desc:'床のトゲと天井のトゲが続く。最初に跳んで、その後は天井に当たらないよう進もう。',spec:[['種類','複合'],['推奨','1回＋低空'],['危険','上下のトゲ'],['難易度','★★★']]},
  {n:'10',jp:'階段状の壁',en:'STAIRCASE WALL',face:4,type:'stairs',tip:'段の上に着地すると回数が回復',desc:'だんだん高くなる足場。各段に着地しながら、ジャンプ回数を補充して進もう。',spec:[['種類','地形'],['推奨','連続ジャンプ'],['判定','壁の側面'],['難易度','★★★']]}
 ];
-const entries=[...calibrationEntries,...baseEntries];
+const entries=[...calibrationEntries,...wallEntries,...baseEntries];
 const $=id=>document.getElementById(id), stage=$('stage'),canvas=$('game'),ctx=canvas.getContext('2d',{alpha:false});
 const COLORS={1:['#4fc3f7','#123d55'],2:['#94df84','#204e2b'],3:['#ffbc68','#5c3e14'],4:['#be9bff','#36244f']};
 const GRID_UNIT=64; // 1マス = プレイヤーの横幅（64ゲーム単位）
 const GRAVITY=1850, JUMP=700, SPEED=285, ZOOM=.49, SIZE=64, VH=540, FLOOR=426;
 let idx=0, W=960, scale=1, dpr=1,last=0, state,objs=[],goal=0,cleared=[],silent=false;
 try{
- const saved=localStorage.getItem('numberRollRulebookClear04');
+ const saved=localStorage.getItem('numberRollRulebookClear05');
  if(saved){cleared=JSON.parse(saved)}
- else {const old=JSON.parse(localStorage.getItem('numberRollRulebookClear01')||'[]');cleared=Array.isArray(old)?old.filter(n=>Number.isInteger(n)&&n>=0&&n<10).map(n=>n+4):[];}
+ else {const old=JSON.parse(localStorage.getItem('numberRollRulebookClear04')||'[]');cleared=Array.isArray(old)?old.filter(n=>Number.isInteger(n)&&n>=0&&n<14).map(n=>n>=4?n+8:n):[];}
  if(!Array.isArray(cleared))cleared=[];
 } catch{cleared=[];}
 const max=(a,b)=>Math.max(a,b),min=(a,b)=>Math.min(a,b);
-function save(){try{localStorage.setItem('numberRollRulebookClear04',JSON.stringify(cleared));}catch{}}
+function save(){try{localStorage.setItem('numberRollRulebookClear05',JSON.stringify(cleared));}catch{}}
 function progress(){$('bookProgress').textContent=cleared.length+' / '+entries.length;}
 const SPIKE_PITCH=56; // 検証用トゲ1個の幅。0.875マス。まず固定して数で比較
 const spikeCounts=calibrationEntries.map(p=>p.initialCount);
+const wallSettings=wallEntries.map(p=>({height:p.initialHeight,width:p.initialWidth}));
 function rectObj(x,width,height){return {type:'wall',x,width,height}}
 function spikeObj(x,width,count,height,base=0,down=false){return {type:'spike',x,width,count,height,base,down}}
 function createLevel(){
  const X=240+540;const type=entries[idx].type;
  if(type==='calibration'){const count=spikeCounts[idx]||entries[idx].initialCount;objs=[spikeObj(X,count*SPIKE_PITCH,count,80)];goal=X+count*SPIKE_PITCH+300;return;}
+ if(type==='wallCalibration'){const p=entries[idx],v=wallSettings[idx-calibrationEntries.length];objs=[{...rectObj(X,v.width,v.height),lethal:p.lethal}];goal=X+v.width+300;return;}
  const levels={
   single:[spikeObj(X,75,1,80)],
   row:[spikeObj(X,310,5,80)],
@@ -140,10 +170,32 @@ function changeSpikeCount(delta){
  spikeCounts[idx]=Math.max(1,Math.min(24,spikeCounts[idx]+delta));
  refreshCalibrationBar();createLevel();newState();showResult('ready');draw();
 }
-function setPage(n){idx=Math.max(0,Math.min(entries.length-1,n));const p=entries[idx];$('number').textContent=p.n;$('jp').textContent=p.jp;$('en').textContent=p.en;$('tip').textContent=p.tip;$('description').textContent=p.desc;$('specs').innerHTML=p.spec.map(([k,v])=>`<div class="spec"><span>${k}</span><b>${v}</b></div>`).join('');$('prev').disabled=idx===0;$('next').disabled=idx===entries.length-1;refreshCalibrationBar();createLevel();newState();showResult('ready');draw();}
+function refreshWallBar(){
+ const p=entries[idx],on=p.type==='wallCalibration';$('wallTools').hidden=!on;
+ if(!on)return;
+ const v=wallSettings[idx-calibrationEntries.length],k=$('wallKind');
+ k.textContent=p.lethal?'赤枠：上も接触禁止':'青枠：上に着地可能';k.className='wall-kind '+(p.lethal?'deadly':'safe');
+ $('wallHeight').textContent=(v.height/GRID_UNIT).toFixed(2)+'マス';$('wallWidth').textContent=(v.width/GRID_UNIT).toFixed(1)+'マス';
+ $('wallHeightMinus').disabled=v.height<=40;$('wallHeightPlus').disabled=v.height>=560;
+ $('wallWidthMinus').disabled=v.width<=GRID_UNIT;$('wallWidthPlus').disabled=v.width>=GRID_UNIT*12;
+ $('description').textContent=p.desc+' 【現在の高さ '+(v.height/GRID_UNIT).toFixed(2)+'マス・横幅 '+(v.width/GRID_UNIT).toFixed(1)+'マス】';
+}
+function changeWall(setting,delta){
+ const p=entries[idx];if(p.type!=='wallCalibration')return;
+ const v=wallSettings[idx-calibrationEntries.length];
+ if(setting==='height')v.height=Math.max(40,Math.min(560,v.height+delta*16));
+ if(setting==='width')v.width=Math.max(GRID_UNIT,Math.min(GRID_UNIT*12,v.width+delta*GRID_UNIT));
+ refreshWallBar();createLevel();newState();showResult('ready');draw();
+}
+function restoreWall(){
+ const p=entries[idx];if(p.type!=='wallCalibration')return;
+ wallSettings[idx-calibrationEntries.length]={height:p.initialHeight,width:p.initialWidth};
+ refreshWallBar();createLevel();newState();showResult('ready');draw();
+}
+function setPage(n){idx=Math.max(0,Math.min(entries.length-1,n));const p=entries[idx];$('number').textContent=p.n;$('jp').textContent=p.jp;$('en').textContent=p.en;$('tip').textContent=p.tip;$('description').textContent=p.desc;$('specs').innerHTML=p.spec.map(([k,v])=>`<div class="spec"><span>${k}</span><b>${v}</b></div>`).join('');$('prev').disabled=idx===0;$('next').disabled=idx===entries.length-1;refreshCalibrationBar();refreshWallBar();createLevel();newState();showResult('ready');draw();}
 function start(){newState();state.status='running';hideResult();ui();}
 function retry(){start()}
-function showResult(kind){const box=$('result');box.classList.add('show');$('resultNext').hidden=(kind!=='win'||idx===entries.length-1);$('retry').textContent=kind==='ready'?'▶ スタート':'↻ リトライ';$('resultTitle').className='result-title '+(kind==='win'?'win':kind==='lose'?'lose':'');if(kind==='ready'){$('resultTitle').textContent='練習 '+entries[idx].n;$('resultCaption').textContent='障害物を避けてGOALへ！ '+entries[idx].tip+'。';}else if(kind==='win'){$('resultTitle').textContent='✓ CLEAR!';$('resultCaption').textContent=entries[idx].type==='calibration'?`トゲ${spikeCounts[idx]}個（${(spikeCounts[idx]*SPIKE_PITCH/GRID_UNIT).toFixed(2)}マス）を突破！ 今回のジャンプ操作：${state.totalJumps}回。長さを変更して再挑戦できます。`:'障害物「'+entries[idx].jp+'」を突破！ 同じコースを再挑戦することもできます。';}else if(kind==='paused'){$('resultTitle').textContent='Ⅱ 一時停止';$('resultCaption').textContent='再開すると同じ位置からプレイできます。';$('retry').textContent='▶ 再開';}else{$('resultTitle').textContent='GAME OVER';$('resultCaption').textContent=state.cause||'もう一度ジャンプのタイミングを試してみよう。';}}
+function showResult(kind){const box=$('result');box.classList.add('show');$('resultNext').hidden=(kind!=='win'||idx===entries.length-1);$('retry').textContent=kind==='ready'?'▶ スタート':'↻ リトライ';$('resultTitle').className='result-title '+(kind==='win'?'win':kind==='lose'?'lose':'');if(kind==='ready'){$('resultTitle').textContent='練習 '+entries[idx].n;$('resultCaption').textContent='障害物を避けてGOALへ！ '+entries[idx].tip+'。';}else if(kind==='win'){$('resultTitle').textContent='✓ CLEAR!';$('resultCaption').textContent=entries[idx].type==='calibration'?`トゲ${spikeCounts[idx]}個（${(spikeCounts[idx]*SPIKE_PITCH/GRID_UNIT).toFixed(2)}マス）を突破！ 今回のジャンプ操作：${state.totalJumps}回。長さを変更して再挑戦できます。`:entries[idx].type==='wallCalibration'?`高さ ${(wallSettings[idx-calibrationEntries.length].height/GRID_UNIT).toFixed(2)}マス / 幅 ${(wallSettings[idx-calibrationEntries.length].width/GRID_UNIT).toFixed(1)}マスを${state.totalJumps}回のジャンプで突破！ 調整して再挑戦できます。`:'障害物「'+entries[idx].jp+'」を突破！ 同じコースを再挑戦することもできます。';}else if(kind==='paused'){$('resultTitle').textContent='Ⅱ 一時停止';$('resultCaption').textContent='再開すると同じ位置からプレイできます。';$('retry').textContent='▶ 再開';}else{$('resultTitle').textContent='GAME OVER';$('resultCaption').textContent=state.cause||'もう一度ジャンプのタイミングを試してみよう。';}}
 function hideResult(){$('result').classList.remove('show')}
 function fail(reason){if(state.status!=='running')return;state.status='lost';state.cause=reason;showResult('lose');ui()}
 function win(){if(state.status!=='running')return;state.status='won';if(!cleared.includes(idx)){cleared.push(idx);save();progress();}showResult('win');ui();}
@@ -151,7 +203,7 @@ function jump(){if(state.status==='ready'){start();return;}if(state.status!=='ru
 function togglePause(){if(state.status==='running'){state.status='paused';showResult('paused')}else if(state.status==='paused'){state.status='running';hideResult()}last=0;ui()}
 function ui(){const s=state;if(!s)return;let left=s.air?Math.max(0,s.limit-s.used):s.face,total=s.air?s.limit:s.face;$('face').textContent=s.face;$('face').style.color=COLORS[s.face][0];$('jumps').textContent=`${left} / ${total}`;$('distance').textContent=Math.round(Math.min(1,s.distance/(goal-240))*100)+'%';$('actionHint').textContent=s.status==='running'?'画面タップでジャンプ':s.status==='paused'?'一時停止中':s.status==='won'?'クリア！':s.status==='lost'?'もう一度挑戦': 'まずはスタート';$('jump').textContent=s.status==='ready'?'▶ スタート':s.status==='running'?'↑ ジャンプ':s.status==='paused'?'▶ 再開':s.status==='lost'?'↻ リトライ':'次の障害物 ▶';$('jump').disabled=s.status==='running'&&left===0;$('pause').textContent=s.status==='paused'?'▶':'Ⅱ';}
 function action(){if(state.status==='running'||state.status==='ready')jump();else if(state.status==='paused')togglePause();else if(state.status==='won')setPage(Math.min(idx+1,entries.length-1));else retry();}
-function groundAt(centerX, feet, vy){let h=0;for(const o of objs){if(o.type!=='wall')continue;if(centerX+SIZE*.34>=o.x&&centerX-SIZE*.34<=o.x+o.width&&feet>=o.height-3&&vy<=0)h=Math.max(h,o.height);}return h;}
+function groundAt(centerX, feet, vy){let h=0;for(const o of objs){if(o.type!=='wall'||o.lethal)continue;if(centerX+SIZE*.34>=o.x&&centerX-SIZE*.34<=o.x+o.width&&feet>=o.height-3&&vy<=0)h=Math.max(h,o.height);}return h;}
 function isOverGap(centerX){return objs.some(o=>o.type==='gap'&&centerX+SIZE*.24>o.x&&centerX-SIZE*.24<o.x+o.width)}
 function triangleHit(points, rect){ // SAT for a triangle against a rectangular player box
  const poly=[...points], box=[[rect.l,rect.b],[rect.r,rect.b],[rect.r,rect.t],[rect.l,rect.t]];
@@ -192,8 +244,12 @@ function update(dt){if(state.status!=='running')return;const s=state;
   }
  }
  if(o.type==='wall'&&rc.r>o.x&&rc.l<o.x+o.width){
-  if(s.y<o.height-8&&s.y+SIZE/ZOOM>0){fail(o.lethal?'危険壁に接触！ 赤枠の壁は上も横も危険。':'壁の側面に衝突！ もう少し早く、高くジャンプ。');return;}
-  if(o.lethal&&s.y<=o.height+6&&rc.b<o.height+3){fail('危険壁に接触！ 赤枠の壁は上も横も危険。');return;}
+  if(o.lethal){
+   // 赤枠は上面/左右側面どこに触れてもアウト。位置によらず厳密な矩形重なり。
+   if(s.y<=o.height && rc.t>0){fail('赤枠の危険壁に接触！ 上も側面も危険。');return;}
+  } else if(s.y<o.height-8&&s.y+SIZE/ZOOM>0){
+   fail('青枠の壁の側面に衝突！ 上に着地するなら先に高度を上げよう。');return;
+  }
  }
  }
  if(centerX>=goal){win();return}
@@ -274,12 +330,17 @@ function loop(t){if(!last)last=t;const dt=Math.min(.03,Math.max(0,(t-last)/1000)
 function catalog(mode){const o=$('overlay');$('catalog').style.display=mode==='rules'?'none':'grid';$('rules').style.display=mode==='rules'?'block':'none';$('overlayTitle').textContent=mode==='rules'?'遊び方・ルール':'障害物一覧';if(mode==='catalog'){$('catalog').innerHTML='';entries.forEach((p,i)=>{const b=document.createElement('button');b.className=i===idx?'active':'';b.innerHTML=`<span class="n">${p.n} / ${p.en}</span><span class="nm">${p.jp}</span>${cleared.includes(i)?'<span class="done">✓ CLEAR</span>':''}`;b.onclick=()=>{closeCatalog();setPage(i)};$('catalog').appendChild(b)})}o.classList.add('open');if(state.status==='running'){state.status='paused';showResult('paused');ui();}last=0}
 function closeCatalog(){$('overlay').classList.remove('open')}
 $('spikeMinus').onclick=()=>changeSpikeCount(-1);$('spikePlus').onclick=()=>changeSpikeCount(1);$('spikeDefault').onclick=()=>changeSpikeCount(entries[idx].initialCount-spikeCounts[idx]);
+$('wallHeightMinus').onclick=()=>changeWall('height',-1);
+$('wallHeightPlus').onclick=()=>changeWall('height',1);
+$('wallWidthMinus').onclick=()=>changeWall('width',-1);
+$('wallWidthPlus').onclick=()=>changeWall('width',1);
+$('wallDefault').onclick=restoreWall;
 $('prev').onclick=()=>setPage(idx-1);$('next').onclick=()=>setPage(idx+1);$('catalogButton').onclick=()=>catalog('catalog');$('ruleButton').onclick=()=>catalog('rules');$('close').onclick=closeCatalog;$('retry').onclick=()=>state.status==='paused'?togglePause():retry();$('resultNext').onclick=()=>setPage(idx+1);$('reset').onclick=retry();$('pause').onclick=togglePause;
 $('jump').addEventListener('pointerdown',e=>{e.preventDefault();action()});$('jump').addEventListener('click',e=>{if(e.detail===0)action()});stage.addEventListener('pointerdown',e=>{if(e.target.closest('button')||e.target.closest('.result'))return;e.preventDefault();action()});
 window.addEventListener('keydown',e=>{if($('overlay').classList.contains('open')){if(e.key==='Escape')closeCatalog();return;}if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();if(!e.repeat)action();}else if(e.code==='KeyR'){e.preventDefault();retry()}else if(e.code==='KeyP'){e.preventDefault();togglePause()}else if(e.code==='ArrowLeft'){e.preventDefault();setPage(idx-1)}else if(e.code==='ArrowRight'){e.preventDefault();setPage(idx+1)}});
 ['contextmenu','dragstart','selectstart','gesturestart'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
 // Exposed for automated smoke tests; the user-facing game never needs these hooks.
-window.__NRBook={page:n=>setPage(n),start,jump,step:update,get:()=>({...state,index:idx,goal,obstacles:objs,completed:[...cleared]}),setSilent:v=>silent=!!v,spikeCount:()=>idx<4?spikeCounts[idx]:null,changeSpikeCount};
+window.__NRBook={page:n=>setPage(n),start,jump,step:update,get:()=>({...state,index:idx,goal,obstacles:objs,completed:[...cleared]}),setSilent:v=>silent=!!v,wallSettings:()=>wallSettings.map(v=>({...v})),spikeCount:()=>idx<4?spikeCounts[idx]:null,changeSpikeCount};
 new ResizeObserver(resize).observe(stage);progress();setPage(0);requestAnimationFrame(loop);
 })();
 </script>
