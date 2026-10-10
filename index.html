@@ -101,8 +101,8 @@ body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 2
     <div class="details"><div class="description" id="description"></div><div class="specs" id="specs"></div></div>
   </section>
   <nav class="footer"><button id="prev" class="nav" type="button">◀ 前の障害物</button><div class="center"><button id="catalogButton" class="nav" type="button">☷ 一覧</button><button id="ruleButton" class="nav" type="button">？ 操作</button></div><button id="next" class="nav" type="button">次の障害物 ▶</button></nav>
-  <div class="note">Ver.1.0 空中トゲA/Bを追加｜基本障害物の設定は維持。</div>
-  <div class="overlay" id="overlay"><div class="overlay-head"><h2 id="overlayTitle">障害物一覧</h2><button class="close" id="close" type="button">✕ 戻る</button></div><div class="catalog" id="catalog"></div><div id="rules" style="display:none;overflow:auto;touch-action:pan-y;color:#d1e5f3;line-height:1.75;font-size:14px;padding:6px 4px"><p><b>自動で右に進む四角形</b>をジャンプで操作します。画面のどこかをタップするか、Space・↑・Wキーでジャンプします。</p><p>ジャンプするたびに四角形は<b>時計回りに90°回転</b>し、上の数字が1→2→3→4→1の順に変わります。数字ごとに色も変わります。</p><p><b>着地した時の数字</b>が、次の着地までに使えるジャンプ回数です。空中で数字が変わっても、途中で回数の上限は変わりません。</p><p>最初の4ページはトゲ1 / 5 / 9 / 13個から検証できます。その次の8ページは、青枠・赤枠の壁を1〜4ジャンプ分の高さで練習できます。穴の幅の調整ページに続いて、空中トゲA/Bの単体・複合練習ページがあります。壁の高さは0.25マス刻み、幅は0.5マス刻みで調整できます。Ver.0.8は壁の高さを「ひとつ少ないジャンプ回数では届かず、目標回数なら余裕がある」中間高度に再設計しました。青枠壁は幅2マス、赤枠は0.75マスを基準にしています。プレイ中の▲1〜4はジャンプする位置の目安です。青枠の壁は上に着地できてジャンプ回数が回復しますが、赤枠の壁は上も側面も危険です。穴の幅は0.25マス単位で調整できます。空中トゲAは全面接触禁止。空中トゲBは緑色の上面に着地可能で、着地するとジャンプ回数が回復します。Bの下面・側面は危険です。トゲ・壁などへの衝突、穴への落下は失敗。青く光る<b>GOAL</b>を通ればクリア。失敗したら「リトライ」で何度でも練習できます。</p><p>操作：タップ / Space / ↑ / W = ジャンプ、R = リトライ、P = 一時停止、← / → = ページ移動。数字の色は <span style="color:#4fc3f7">1 青</span>・<span style="color:#94df84">2 緑</span>・<span style="color:#ffbc68">3 オレンジ</span>・<span style="color:#be9bff">4 紫</span>。</p></div></div>
+  <div class="note">Ver.1.1 穴からの復帰を追加｜壁に接触・画面下へ落下でアウト。</div>
+  <div class="overlay" id="overlay"><div class="overlay-head"><h2 id="overlayTitle">障害物一覧</h2><button class="close" id="close" type="button">✕ 戻る</button></div><div class="catalog" id="catalog"></div><div id="rules" style="display:none;overflow:auto;touch-action:pan-y;color:#d1e5f3;line-height:1.75;font-size:14px;padding:6px 4px"><p><b>自動で右に進む四角形</b>をジャンプで操作します。画面のどこかをタップするか、Space・↑・Wキーでジャンプします。</p><p>ジャンプするたびに四角形は<b>時計回りに90°回転</b>し、上の数字が1→2→3→4→1の順に変わります。数字ごとに色も変わります。</p><p><b>着地した時の数字</b>が、次の着地までに使えるジャンプ回数です。空中で数字が変わっても、途中で回数の上限は変わりません。</p><p>最初の4ページはトゲ1 / 5 / 9 / 13個から検証できます。その次の8ページは、青枠・赤枠の壁を1〜4ジャンプ分の高さで練習できます。穴の幅の調整ページに続いて、空中トゲA/Bの単体・複合練習ページがあります。壁の高さは0.25マス刻み、幅は0.5マス刻みで調整できます。Ver.0.8は壁の高さを「ひとつ少ないジャンプ回数では届かず、目標回数なら余裕がある」中間高度に再設計しました。青枠壁は幅2マス、赤枠は0.75マスを基準にしています。プレイ中の▲1〜4はジャンプする位置の目安です。青枠の壁は上に着地できてジャンプ回数が回復しますが、赤枠の壁は上も側面も危険です。穴の幅は0.25マス単位で調整できます。空中トゲAは全面接触禁止。空中トゲBは緑色の上面に着地可能で、着地するとジャンプ回数が回復します。Bの下面・側面は危険です。トゲ・壁などへの衝突は失敗。穴は落下中でもジャンプ回数が残っていれば復帰可能。穴の左右の側壁への衝突、または四角形が画面下へ完全に消えると失敗。青く光る<b>GOAL</b>を通ればクリア。失敗したら「リトライ」で何度でも練習できます。</p><p>操作：タップ / Space / ↑ / W = ジャンプ、R = リトライ、P = 一時停止、← / → = ページ移動。数字の色は <span style="color:#4fc3f7">1 青</span>・<span style="color:#94df84">2 緑</span>・<span style="color:#ffbc68">3 オレンジ</span>・<span style="color:#be9bff">4 紫</span>。</p></div></div>
 </main>
 <script>
 (()=>{
@@ -131,8 +131,8 @@ const baseEntries=[
  {n:'02',jp:'連続トゲ',en:'SPIKE ROW',face:2,type:'row',tip:'空中ジャンプで距離を伸ばす',desc:'トゲが横に連なる。連続ジャンプを使って、安全な地面まで届かせよう。',spec:[['種類','地上'],['推奨','1〜2回'],['危険','接触'],['難易度','★★☆']]},
  {n:'03',jp:'低い壁',en:'LOW WALL',face:1,type:'low',tip:'壁に当たる前に飛び越える',desc:'一段ジャンプで越えられる高さ。側面にぶつかると失敗。上には着地できる。',spec:[['種類','壁'],['推奨','1回ジャンプ'],['判定','側面衝突'],['難易度','★☆☆']]},
  {n:'04',jp:'高い壁',en:'HIGH WALL',face:4,type:'high',tip:'空中で複数回タップ',desc:'高い壁を越すには空中ジャンプが必要。ジャンプの高度を積み上げよう。',spec:[['種類','壁'],['推奨','3回程度'],['判定','側面衝突'],['難易度','★★★']]},
- {n:'05',jp:'小さな穴',en:'SMALL PIT',face:2,type:'smallPit',tip:'穴へ落ちる前に跳ぼう',desc:'短い地面の切れ目。ジャンプして向こう側の地面へ着地しよう。',spec:[['種類','地形'],['推奨','1回ジャンプ'],['危険','落下'],['難易度','★☆☆']]},
- {n:'06',jp:'大きな穴',en:'LARGE PIT',face:4,type:'largePit',tip:'空中ジャンプで滞空を維持',desc:'長い穴は1回のジャンプでは届きにくい。空中ジャンプを残しておこう。',spec:[['種類','地形'],['推奨','2〜4回'],['危険','落下'],['難易度','★★★']]},
+ {n:'05',jp:'小さな穴',en:'SMALL PIT',face:2,type:'smallPit',tip:'少し落ちてもジャンプで復帰可能',desc:'短い地面の切れ目。落ちても画面外へ消える前ならジャンプで復帰できる。ただし対岸の垂直な壁に当たると失敗。',spec:[['種類','地形'],['推奨','1回ジャンプ'],['危険','壁接触・画面外'],['難易度','★☆☆']]},
+ {n:'06',jp:'大きな穴',en:'LARGE PIT',face:4,type:'largePit',tip:'落ちても残り回数で復帰を狙える',desc:'大きな穴でも、落下中に残りのジャンプを使える。対岸の側壁へぶつかる前に地面より上まで戻ろう。',spec:[['種類','地形'],['推奨','2〜4回'],['危険','壁接触・画面外'],['難易度','★★★']]},
  {n:'07',jp:'天井トゲ',en:'CEILING SPIKES',face:3,type:'ceiling',tip:'ジャンプしなければ安全',desc:'上から下向きに伸びるトゲ。余計なジャンプはしないで低い位置を通ろう。',spec:[['種類','天井'],['推奨','ジャンプ不要'],['危険','高い位置'],['難易度','★☆☆']]},
  {n:'08',jp:'空中トゲ',en:'FLOATING SPIKES',face:2,type:'floating',tip:'飛んでいる途中の高度に注意',desc:'空中に浮いたトゲ。地上なら避けられる配置でも、空中では接触の危険がある。',spec:[['種類','空中'],['推奨','高さを調整'],['危険','空中衝突'],['難易度','★★☆']]},
  {n:'09',jp:'狭い通路',en:'NARROW CORRIDOR',face:2,type:'corridor',tip:'床トゲを越えたら着地して低く進む',desc:'床のトゲと天井のトゲが続く。最初に跳んで、その後は天井に当たらないよう進もう。',spec:[['種類','複合'],['推奨','1回＋低空'],['危険','上下のトゲ'],['難易度','★★★']]},
@@ -141,10 +141,10 @@ const baseEntries=[
 // 穴調整の基準幅：前のジャンプ段数の理論飛距離以上・必要回数なら余裕。
 // 1マス=64、速度285、初速700、重力1850。幅はプレイしながら調整できる。
 const gapEntries=[
- {n:'G-01',jp:'穴 / 1ジャンプ用',en:'PIT TEST · 1 JUMP',face:1,type:'gapCalibration',target:1,initialWidth:144,tip:'穴の直前からジャンプして対岸に着地',desc:'最初の穴。踏み切り位置を変えながら、1回のジャンプで安定して渡れる幅を探そう。',spec:[['目標','1段ジャンプ'],['基準幅','2.25マス'],['調整','±0.25マス'],['地形','落下すると失敗']]},
- {n:'G-02',jp:'穴 / 2ジャンプ用',en:'PIT TEST · 2 JUMPS',face:2,type:'gapCalibration',target:2,initialWidth:304,tip:'途中で2回目のジャンプを入れて距離を伸ばす',desc:'1回では届かない長さ。着地前に空中ジャンプを追加し、余裕を持って渡れる幅を確かめよう。',spec:[['目標','2段ジャンプ'],['基準幅','4.75マス'],['調整','±0.25マス'],['地形','落下すると失敗']]},
- {n:'G-03',jp:'穴 / 3ジャンプ用',en:'PIT TEST · 3 JUMPS',face:3,type:'gapCalibration',target:3,initialWidth:496,tip:'飛行中にジャンプを2回追加して対岸へ',desc:'2回分の最大飛距離では足りない穴。ジャンプの間隔を調整して余裕を持って渡ろう。',spec:[['目標','3段ジャンプ'],['基準幅','7.75マス'],['調整','±0.25マス'],['地形','落下すると失敗']]},
- {n:'G-04',jp:'穴 / 4ジャンプ用',en:'PIT TEST · 4 JUMPS',face:4,type:'gapCalibration',target:4,initialWidth:688,tip:'4回のジャンプを適度な間隔で使って渡る',desc:'3回分では届かない長さ。最後のジャンプに余裕を残し、落ち着いて向こう岸まで渡ろう。',spec:[['目標','4段ジャンプ'],['基準幅','10.75マス'],['調整','±0.25マス'],['地形','落下すると失敗']]}
+ {n:'G-01',jp:'穴 / 1ジャンプ用',en:'PIT TEST · 1 JUMP',face:1,type:'gapCalibration',target:1,initialWidth:144,tip:'穴の直前からジャンプして対岸に着地',desc:'最初の穴。踏み切り位置を変えながら、1回のジャンプで安定して渡れる幅を探そう。',spec:[['目標','1段ジャンプ'],['基準幅','2.25マス'],['調整','±0.25マス'],['判定','穴の側壁 / 画面外']]},
+ {n:'G-02',jp:'穴 / 2ジャンプ用',en:'PIT TEST · 2 JUMPS',face:2,type:'gapCalibration',target:2,initialWidth:304,tip:'途中で2回目のジャンプを入れて距離を伸ばす',desc:'1回では届かない長さ。着地前に空中ジャンプを追加し、余裕を持って渡れる幅を確かめよう。',spec:[['目標','2段ジャンプ'],['基準幅','4.75マス'],['調整','±0.25マス'],['判定','穴の側壁 / 画面外']]},
+ {n:'G-03',jp:'穴 / 3ジャンプ用',en:'PIT TEST · 3 JUMPS',face:3,type:'gapCalibration',target:3,initialWidth:496,tip:'飛行中にジャンプを2回追加して対岸へ',desc:'2回分の最大飛距離では足りない穴。ジャンプの間隔を調整して余裕を持って渡ろう。',spec:[['目標','3段ジャンプ'],['基準幅','7.75マス'],['調整','±0.25マス'],['判定','穴の側壁 / 画面外']]},
+ {n:'G-04',jp:'穴 / 4ジャンプ用',en:'PIT TEST · 4 JUMPS',face:4,type:'gapCalibration',target:4,initialWidth:688,tip:'4回のジャンプを適度な間隔で使って渡る',desc:'3回分では届かない長さ。最後のジャンプに余裕を残し、落ち着いて向こう岸まで渡ろう。',spec:[['目標','4段ジャンプ'],['基準幅','10.75マス'],['調整','±0.25マス'],['判定','穴の側壁 / 画面外']]}
 ];
 const airEntries=[
  {n:'A-01',jp:'空中トゲA / 回避練習',en:'AIR SPIKE A · DODGE',face:2,type:'airADodge',tip:'空中トゲの下を通過した後、地上のトゲをジャンプ',desc:'赤い空中トゲは全面危険。飛ぶタイミングを早くしすぎると空中で接触する。トゲの下を通過してから地上トゲを避けよう。',spec:[['上面','接触禁止'],['側面・下面','接触禁止'],['安全なルート','下を通過'],['ジャンプ','地上トゲで使う']]},
@@ -258,7 +258,7 @@ function refreshGapBar(){
  $('gapWidth').textContent=(v/GRID_UNIT).toFixed(2)+' マス';
  $('gapWidthMinus').disabled=v<=GRID_UNIT*.5;
  $('gapWidthPlus').disabled=v>=GRID_UNIT*20;
- $('description').textContent=p.desc+' 【現在の穴の幅 '+(v/GRID_UNIT).toFixed(2)+'マス】 '+'下の目盛りで長さを確認しよう。';
+ $('description').textContent=p.desc+' 【現在の穴の幅 '+(v/GRID_UNIT).toFixed(2)+'マス】 '+'落下中も残りのジャンプで復帰できる。赤い側壁に触れるか、画面下に消えるとアウト。';
 }
 function changeGap(delta){
  if(entries[idx].type!=='gapCalibration')return;
@@ -281,7 +281,7 @@ function fail(reason){if(state.status!=='running')return;state.status='lost';sta
 function win(){if(state.status!=='running')return;state.status='won';if(!cleared.includes(idx)){cleared.push(idx);save();progress();}showResult('win');ui();}
 function jump(){if(state.status==='ready'){start();return;}if(state.status!=='running')return;const s=state;if(s.air&&s.used>=s.limit)return;if(!s.air){s.limit=s.face;s.used=0;}s.air=true;s.used++;s.totalJumps++;s.vy=JUMP;s.groundH=0;s.turnFrom=s.angle;s.turnTo+=Math.PI/2;s.turn=0;s.face=s.face%4+1;ui();}
 function togglePause(){if(state.status==='running'){state.status='paused';showResult('paused')}else if(state.status==='paused'){state.status='running';hideResult()}last=0;ui()}
-function ui(){const s=state;if(!s)return;let left=s.air?Math.max(0,s.limit-s.used):s.face,total=s.air?s.limit:s.face;$('face').textContent=s.face;$('face').style.color=COLORS[s.face][0];$('jumps').textContent=`${left} / ${total}`;$('distance').textContent=Math.round(Math.min(1,s.distance/(goal-240))*100)+'%';$('actionHint').textContent=s.status==='running'?(entries[idx].type.startsWith('airB')?`B着地 ${s.airBLandings}回 / タップでジャンプ`:'画面タップでジャンプ'):s.status==='paused'?'一時停止中':s.status==='won'?'クリア！':s.status==='lost'?'もう一度挑戦': 'まずはスタート';$('jump').textContent=s.status==='ready'?'▶ スタート':s.status==='running'?'↑ ジャンプ':s.status==='paused'?'▶ 再開':s.status==='lost'?'↻ リトライ':'次の障害物 ▶';$('jump').disabled=s.status==='running'&&left===0;$('pause').textContent=s.status==='paused'?'▶':'Ⅱ';}
+function ui(){const s=state;if(!s)return;let left=s.air?Math.max(0,s.limit-s.used):s.face,total=s.air?s.limit:s.face;$('face').textContent=s.face;$('face').style.color=COLORS[s.face][0];$('jumps').textContent=`${left} / ${total}`;$('distance').textContent=Math.round(Math.min(1,s.distance/(goal-240))*100)+'%';$('actionHint').textContent=s.status==='running'?(s.y<0&&objs.some(o=>o.type==='gap')?'落下中！ ↑ ジャンプで復帰':entries[idx].type.startsWith('airB')?`B着地 ${s.airBLandings}回 / タップでジャンプ`:'画面タップでジャンプ'):s.status==='paused'?'一時停止中':s.status==='won'?'クリア！':s.status==='lost'?'もう一度挑戦': 'まずはスタート';$('jump').textContent=s.status==='ready'?'▶ スタート':s.status==='running'?'↑ ジャンプ':s.status==='paused'?'▶ 再開':s.status==='lost'?'↻ リトライ':'次の障害物 ▶';$('jump').disabled=s.status==='running'&&left===0;$('pause').textContent=s.status==='paused'?'▶':'Ⅱ';}
 function action(){if(state.status==='running'||state.status==='ready')jump();else if(state.status==='paused')togglePause();else if(state.status==='won')setPage(Math.min(idx+1,entries.length-1));else retry();}
 // 接触中の足場の高さ。着地の横断判定とは分けて、前フレームと現在の足元を比較する。
 function groundAt(centerX, feet){
@@ -293,6 +293,17 @@ function groundAt(centerX, feet){
  return h;
 }
 function isOverGap(centerX){return objs.some(o=>o.type==='gap'&&centerX+SIZE*.24>o.x&&centerX-SIZE*.24<o.x+o.width)}
+// Ver.1.1: 歩いて穴へ落ちてもジャンプできる。穴の幅と従来の踏み切り判定は維持する。
+// 自動走行は右向きだけなので、左縁からの踏み外しは側壁衝突として扱わない。
+// 向こう岸の垂直な壁は、地面の下でプレイヤーの当たり判定が触れた瞬間アウト。
+function hitGapSideWall(o,centerX,feet){
+ if(feet>=0)return false;
+ const half=SIZE/2,farEdge=o.x+o.width;
+ return centerX>o.x && centerX-half<farEdge && centerX+half>=farEdge;
+}
+// 描画しているプレイヤーは64px四方。上端が画面の下端より下に出たら完全に見えない。
+function completelyOffscreenBelow(feet){return scrY(feet)-SIZE>=VH;}
+
 function triangleHit(points, rect){ // SAT for a triangle against a rectangular player box
  const poly=[...points], box=[[rect.l,rect.b],[rect.r,rect.b],[rect.r,rect.t],[rect.l,rect.t]];
  for(const P of [poly,box])for(let i=0;i<P.length;i++){
@@ -341,7 +352,7 @@ function update(dt){if(state.status!=='running')return;const s=state;
  // 旧実装の「今の足元が壁面より高い」チェックは速い下降で飛び越してしまうことがあった。
  if(s.air&&s.vy<=0){
   let land=-Infinity;
-  if(!isOverGap(centerX)&&oldY>=-1&&s.y<=0)land=0;
+  if(!isOverGap(centerX)&&oldY>=0&&s.y<=0)land=0;
   for(const o of objs){
    if(!((o.type==='wall'&&!o.lethal)||o.type==='airB'))continue;
    const overlaps=centerX+SIZE*.34>o.x&&centerX-SIZE*.34<o.x+o.width;
@@ -358,9 +369,10 @@ function update(dt){if(state.status!=='running')return;const s=state;
   if(s.groundH>0&&topH<s.groundH-2){s.air=true;s.vy=0;s.groundH=0;}
   else if(s.groundH===0&&isOverGap(centerX)){s.air=true;s.vy=0;}
  }
- if(s.air&&s.y<-145){fail('穴に落ちた！ 落ちる前にジャンプしよう。');return;}
+ if(s.air&&completelyOffscreenBelow(s.y)){fail('画面の下まで落下！ 見えなくなる前にジャンプで復帰しよう。');return;}
  const rc={l:centerX-SIZE*.36,r:centerX+SIZE*.36,b:s.y+5,t:s.y+SIZE/ZOOM-13};
  for(const o of objs){
+  if(o.type==='gap'&&hitGapSideWall(o,centerX,s.y)){fail('穴の側壁に衝突！ 対岸の壁に届く前に地面より上へ復帰しよう。');return;}
   if(o.type==='spike'&&hitSpike(o,rc)){fail('トゲに接触！ 高さとタイミングを調整しよう。');return;}
   if(o.type==='ceiling'){
    if(rc.r>o.x&&rc.l<o.x+o.width){
@@ -513,6 +525,20 @@ function drawAirB(o){
  ctx.shadowColor='#81ffd3';ctx.shadowBlur=8;stroke(x+3,top,x+w-3,top,'#81ffd3',4);
  ctx.shadowBlur=0;ctx.font='900 11px system-ui';ctx.fillStyle='#a2ffd9';ctx.textAlign='center';ctx.fillText('B  ✓ LAND',x+w/2,top-12);ctx.restore();
 }
+function drawGapWalls(){
+ // 赤い縦ライン＝穴の側壁は危険。地面を歩く方向にある対岸の壁に触れるとアウト。
+ ctx.save();ctx.lineWidth=3;ctx.shadowColor='#ff627d';ctx.shadowBlur=8;
+ for(const o of objs){
+  if(o.type!=='gap')continue;
+  for(const edge of [o.x,o.x+o.width]){
+   const x=screenX(edge);if(x<-8||x>W+8)continue;
+   stroke(x,FLOOR+2,x,VH,'#ff7990',3);
+   ctx.strokeStyle='#ffc2cf';ctx.lineWidth=1.5;
+   for(let y=FLOOR+10;y<VH-8;y+=21){ctx.beginPath();ctx.moveTo(x-3,y+9);ctx.lineTo(x+3,y);ctx.stroke()}
+  }
+ }
+ ctx.restore();
+}
 function drawGoal(){let x=screenX(goal);if(x< -100||x>W+120)return;ctx.save();ctx.shadowColor='#61e4b8';ctx.shadowBlur=15;ctx.strokeStyle='#78f0ce';ctx.lineWidth=4;ctx.strokeRect(x-5,170,8,FLOOR-170);ctx.shadowBlur=0;ctx.fillStyle='#a2fce8';ctx.font='900 21px system-ui';ctx.textAlign='center';ctx.fillText('GOAL',x+9,160);ctx.restore()}
 function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);background();drawWallHeightReferences();
  const gaps=objs.filter(o=>o.type==='gap');function floor(a,b){if(b<=a)return;ctx.fillStyle='#13283d';ctx.fillRect(a,FLOOR,b-a,VH-FLOOR);stroke(a,FLOOR,b,FLOOR,'#c1e7fa',3);}
@@ -524,6 +550,7 @@ function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);b
  drawGapGuide();
  drawObjectMeasures();
  drawMeasureBand();
+ drawGapWalls();
  // light motion streaks and shadow
  let sq=SIZE,px=cameraPlayerX(),py=scrY(state.y)-sq/2;
  ctx.fillStyle='#071827a6';ctx.beginPath();ctx.ellipse(px,FLOOR+3,30*(1-Math.min(.6,state.y/650)),4,0,0,Math.PI*2);ctx.fill();
@@ -548,7 +575,7 @@ $('jump').addEventListener('pointerdown',e=>{e.preventDefault();action()});$('ju
 window.addEventListener('keydown',e=>{if($('overlay').classList.contains('open')){if(e.key==='Escape')closeCatalog();return;}if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();if(!e.repeat)action();}else if(e.code==='KeyR'){e.preventDefault();retry()}else if(e.code==='KeyP'){e.preventDefault();togglePause()}else if(e.code==='ArrowLeft'){e.preventDefault();setPage(idx-1)}else if(e.code==='ArrowRight'){e.preventDefault();setPage(idx+1)}});
 ['contextmenu','dragstart','selectstart','gesturestart'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
 // Exposed for automated smoke tests; the user-facing game never needs these hooks.
-window.__NRBook={page:n=>setPage(n),start,jump,step:update,get:()=>({...state,index:idx,goal,obstacles:objs,completed:[...cleared]}),setSilent:v=>silent=!!v,wallSettings:()=>wallSettings.map(v=>({...v})),spikeCount:()=>idx<4?spikeCounts[idx]:null,changeSpikeCount,changeWall,restoreWall,gapSettings:()=>gapSettings.slice(),changeGap,restoreGap,airCount:()=>airEntries.length};
+window.__NRBook={version:'1.1',page:n=>setPage(n),start,jump,step:update,get:()=>({...state,index:idx,goal,obstacles:objs,completed:[...cleared]}),setSilent:v=>silent=!!v,wallSettings:()=>wallSettings.map(v=>({...v})),spikeCount:()=>idx<4?spikeCounts[idx]:null,changeSpikeCount,changeWall,restoreWall,gapSettings:()=>gapSettings.slice(),changeGap,restoreGap,airCount:()=>airEntries.length};
 new ResizeObserver(resize).observe(stage);progress();setPage(window.location.hash==='#gap'?22:window.location.hash==='#air'?26:0);requestAnimationFrame(loop);
 })();
 </script>
