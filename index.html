@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — WALL & SPIKE LAB Ver.0.6</title>
+<title>NUMBER ROLL — WALL & SPIKE LAB Ver.0.7</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -82,8 +82,8 @@ body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 2
     <div class="details"><div class="description" id="description"></div><div class="specs" id="specs"></div></div>
   </section>
   <nav class="footer"><button id="prev" class="nav" type="button">◀ 前の障害物</button><div class="center"><button id="catalogButton" class="nav" type="button">☷ 一覧</button><button id="ruleButton" class="nav" type="button">？ 操作</button></div><button id="next" class="nav" type="button">次の障害物 ▶</button></nav>
-  <div class="note">Ver.0.6 壁の着地判定を修正｜1マス＝64単位｜幅は0.5マス刻み｜青枠は上面のみ着地可。</div>
-  <div class="overlay" id="overlay"><div class="overlay-head"><h2 id="overlayTitle">障害物一覧</h2><button class="close" id="close" type="button">✕ 戻る</button></div><div class="catalog" id="catalog"></div><div id="rules" style="display:none;overflow:auto;touch-action:pan-y;color:#d1e5f3;line-height:1.75;font-size:14px;padding:6px 4px"><p><b>自動で右に進む四角形</b>をジャンプで操作します。画面のどこかをタップするか、Space・↑・Wキーでジャンプします。</p><p>ジャンプするたびに四角形は<b>時計回りに90°回転</b>し、上の数字が1→2→3→4→1の順に変わります。数字ごとに色も変わります。</p><p><b>着地した時の数字</b>が、次の着地までに使えるジャンプ回数です。空中で数字が変わっても、途中で回数の上限は変わりません。</p><p>最初の4ページはトゲ1 / 5 / 9 / 13個から検証できます。その次の8ページは、青枠・赤枠の壁を1〜4ジャンプ分の高さで練習できます。壁の高さは0.25マス刻み、幅は0.5マス刻みで調整できます。青枠の壁は上に着地できてジャンプ回数が回復しますが、赤枠の壁は上も側面も危険です。トゲ・壁などへの衝突、穴への落下は失敗。青く光る<b>GOAL</b>を通ればクリア。失敗したら「リトライ」で何度でも練習できます。</p><p>操作：タップ / Space / ↑ / W = ジャンプ、R = リトライ、P = 一時停止、← / → = ページ移動。数字の色は <span style="color:#4fc3f7">1 青</span>・<span style="color:#94df84">2 緑</span>・<span style="color:#ffbc68">3 オレンジ</span>・<span style="color:#be9bff">4 紫</span>。</p></div></div>
+  <div class="note">Ver.0.7 壁に余裕を追加｜マス目・高さ調整は継続｜ガイド位置は目安。</div>
+  <div class="overlay" id="overlay"><div class="overlay-head"><h2 id="overlayTitle">障害物一覧</h2><button class="close" id="close" type="button">✕ 戻る</button></div><div class="catalog" id="catalog"></div><div id="rules" style="display:none;overflow:auto;touch-action:pan-y;color:#d1e5f3;line-height:1.75;font-size:14px;padding:6px 4px"><p><b>自動で右に進む四角形</b>をジャンプで操作します。画面のどこかをタップするか、Space・↑・Wキーでジャンプします。</p><p>ジャンプするたびに四角形は<b>時計回りに90°回転</b>し、上の数字が1→2→3→4→1の順に変わります。数字ごとに色も変わります。</p><p><b>着地した時の数字</b>が、次の着地までに使えるジャンプ回数です。空中で数字が変わっても、途中で回数の上限は変わりません。</p><p>最初の4ページはトゲ1 / 5 / 9 / 13個から検証できます。その次の8ページは、青枠・赤枠の壁を1〜4ジャンプ分の高さで練習できます。壁の高さは0.25マス刻み、幅は0.5マス刻みで調整できます。Ver.0.7では初期の壁を少し低くし、4回用の赤枠壁は幅1.5マスに変更しました。プレイ中の▲1〜4はジャンプする位置の目安です。青枠の壁は上に着地できてジャンプ回数が回復しますが、赤枠の壁は上も側面も危険です。トゲ・壁などへの衝突、穴への落下は失敗。青く光る<b>GOAL</b>を通ればクリア。失敗したら「リトライ」で何度でも練習できます。</p><p>操作：タップ / Space / ↑ / W = ジャンプ、R = リトライ、P = 一時停止、← / → = ページ移動。数字の色は <span style="color:#4fc3f7">1 青</span>・<span style="color:#94df84">2 緑</span>・<span style="color:#ffbc68">3 オレンジ</span>・<span style="color:#be9bff">4 紫</span>。</p></div></div>
 </main>
 <script>
 (()=>{
@@ -94,16 +94,16 @@ const calibrationEntries=[
  {n:'T-03',jp:'トゲ / 3ジャンプ用',en:'SPIKE TEST · 3 JUMPS',face:3,type:'calibration',target:3,initialCount:9,tip:'飛び始めと追加ジャンプのタイミングを合わせよう',desc:'9個の連続トゲを3回のジャンプで越える検証。失敗する場合は個数を減らして安全な長さを探そう。',spec:[['目標','3段ジャンプ'],['初期トゲ','9個'],['調整','±1個'],['基準','1マス=64']]},
  {n:'T-04',jp:'トゲ / 4ジャンプ用',en:'SPIKE TEST · 4 JUMPS',face:4,type:'calibration',target:4,initialCount:13,tip:'4回を一度に使わず、空中での間隔を考える',desc:'13個の連続トゲを4回のジャンプで越える検証。現段階は仮の長さなので操作して上限を見つけよう。',spec:[['目標','4段ジャンプ'],['初期トゲ','13個'],['調整','±1個'],['基準','1マス=64']]}
 ];
-const WALL_PRESETS=[100,206,314,422]; // 1~4段ジャンプで越える仮の高さ (単位)
+const WALL_PRESETS=[88,176,280,400]; // 各段の最高到達点(約132.4×段数)を考慮した余裕のある初期高さ
 const wallEntries=[
- {n:'B-01',jp:'青枠の壁 / 1ジャンプ用',en:'BLUE LANDING WALL · 1 JUMP',face:1,type:'wallCalibration',lethal:false,target:1,initialHeight:WALL_PRESETS[0],initialWidth:192,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','1段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','1.56マス'],['初期の幅','3マス']]},
- {n:'B-02',jp:'青枠の壁 / 2ジャンプ用',en:'BLUE LANDING WALL · 2 JUMPS',face:2,type:'wallCalibration',lethal:false,target:2,initialHeight:WALL_PRESETS[1],initialWidth:192,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','2段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','3.22マス'],['初期の幅','3マス']]},
- {n:'B-03',jp:'青枠の壁 / 3ジャンプ用',en:'BLUE LANDING WALL · 3 JUMPS',face:3,type:'wallCalibration',lethal:false,target:3,initialHeight:WALL_PRESETS[2],initialWidth:192,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','3段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','4.91マス'],['初期の幅','3マス']]},
- {n:'B-04',jp:'青枠の壁 / 4ジャンプ用',en:'BLUE LANDING WALL · 4 JUMPS',face:4,type:'wallCalibration',lethal:false,target:4,initialHeight:WALL_PRESETS[3],initialWidth:192,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','4段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','6.59マス'],['初期の幅','3マス']]},
- {n:'R-01',jp:'赤枠の壁 / 1ジャンプ用',en:'RED DANGER WALL · 1 JUMP',face:1,type:'wallCalibration',lethal:true,target:1,initialHeight:80,initialWidth:64,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','1段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','1.25マス'],['初期の幅','2マス']]},
- {n:'R-02',jp:'赤枠の壁 / 2ジャンプ用',en:'RED DANGER WALL · 2 JUMPS',face:2,type:'wallCalibration',lethal:true,target:2,initialHeight:WALL_PRESETS[1],initialWidth:64,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','2段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','3.22マス'],['初期の幅','2マス']]},
- {n:'R-03',jp:'赤枠の壁 / 3ジャンプ用',en:'RED DANGER WALL · 3 JUMPS',face:3,type:'wallCalibration',lethal:true,target:3,initialHeight:298,initialWidth:96,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','3段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','4.66マス'],['初期の幅','1.5マス']]},
- {n:'R-04',jp:'赤枠の壁 / 4ジャンプ用',en:'RED DANGER WALL · 4 JUMPS',face:4,type:'wallCalibration',lethal:true,target:4,initialHeight:WALL_PRESETS[3],initialWidth:128,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','4段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','6.59マス'],['初期の幅','2マス']]}
+ {n:'B-01',jp:'青枠の壁 / 1ジャンプ用',en:'BLUE LANDING WALL · 1 JUMP',face:1,type:'wallCalibration',lethal:false,target:1,initialHeight:WALL_PRESETS[0],initialWidth:192,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','1段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','1.38マス'],['初期の幅','3マス']]},
+ {n:'B-02',jp:'青枠の壁 / 2ジャンプ用',en:'BLUE LANDING WALL · 2 JUMPS',face:2,type:'wallCalibration',lethal:false,target:2,initialHeight:WALL_PRESETS[1],initialWidth:192,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','2段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','2.75マス'],['初期の幅','3マス']]},
+ {n:'B-03',jp:'青枠の壁 / 3ジャンプ用',en:'BLUE LANDING WALL · 3 JUMPS',face:3,type:'wallCalibration',lethal:false,target:3,initialHeight:WALL_PRESETS[2],initialWidth:192,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','3段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','4.38マス'],['初期の幅','3マス']]},
+ {n:'B-04',jp:'青枠の壁 / 4ジャンプ用',en:'BLUE LANDING WALL · 4 JUMPS',face:4,type:'wallCalibration',lethal:false,target:4,initialHeight:WALL_PRESETS[3],initialWidth:192,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','4段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','6.25マス'],['初期の幅','3マス']]},
+ {n:'R-01',jp:'赤枠の壁 / 1ジャンプ用',en:'RED DANGER WALL · 1 JUMP',face:1,type:'wallCalibration',lethal:true,target:1,initialHeight:65,initialWidth:64,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','1段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','1.02マス'],['初期の幅','1マス']]},
+ {n:'R-02',jp:'赤枠の壁 / 2ジャンプ用',en:'RED DANGER WALL · 2 JUMPS',face:2,type:'wallCalibration',lethal:true,target:2,initialHeight:WALL_PRESETS[1],initialWidth:64,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','2段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','2.75マス'],['初期の幅','1マス']]},
+ {n:'R-03',jp:'赤枠の壁 / 3ジャンプ用',en:'RED DANGER WALL · 3 JUMPS',face:3,type:'wallCalibration',lethal:true,target:3,initialHeight:278,initialWidth:96,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','3段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','4.34マス'],['初期の幅','1.5マス']]},
+ {n:'R-04',jp:'赤枠の壁 / 4ジャンプ用',en:'RED DANGER WALL · 4 JUMPS',face:4,type:'wallCalibration',lethal:true,target:4,initialHeight:WALL_PRESETS[3],initialWidth:96,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を実際に変えて調整しよう。',spec:[['目標','4段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','6.25マス'],['初期の幅','1.5マス']]}
 ];
 const baseEntries=[
  {n:'01',jp:'単体トゲ',en:'SINGLE SPIKE',face:1,type:'single',tip:'トゲの手前で1回ジャンプ',desc:'最も基本的な障害物。タイミングよくジャンプして単体トゲを飛び越えよう。',spec:[['種類','地上'],['推奨','1回ジャンプ'],['危険','接触'],['難易度','★☆☆']]},
@@ -140,7 +140,7 @@ function spikeObj(x,width,count,height,base=0,down=false){return {type:'spike',x
 function createLevel(){
  const X=240+540;const type=entries[idx].type;
  if(type==='calibration'){const count=spikeCounts[idx]||entries[idx].initialCount;objs=[spikeObj(X,count*SPIKE_PITCH,count,80)];goal=X+count*SPIKE_PITCH+300;return;}
- if(type==='wallCalibration'){const p=entries[idx],v=wallSettings[idx-calibrationEntries.length];objs=[{...rectObj(X,v.width,v.height),lethal:p.lethal}];goal=X+v.width+300;return;}
+ if(type==='wallCalibration'){const p=entries[idx],v=wallSettings[idx-calibrationEntries.length];const wallX=X+140;objs=[{...rectObj(wallX,v.width,v.height),lethal:p.lethal}];goal=wallX+v.width+300;return;}
  const levels={
   single:[spikeObj(X,75,1,80)],
   row:[spikeObj(X,310,5,80)],
@@ -178,7 +178,7 @@ function refreshWallBar(){
  $('wallHeight').textContent=(v.height/GRID_UNIT).toFixed(2)+'マス';$('wallWidth').textContent=(v.width/GRID_UNIT).toFixed(1)+'マス';
  $('wallHeightMinus').disabled=v.height<=40;$('wallHeightPlus').disabled=v.height>=560;
  $('wallWidthMinus').disabled=v.width<=GRID_UNIT*.5;$('wallWidthPlus').disabled=v.width>=GRID_UNIT*12;
- $('description').textContent=p.desc+' 【現在の高さ '+(v.height/GRID_UNIT).toFixed(2)+'マス・横幅 '+(v.width/GRID_UNIT).toFixed(1)+'マス】';
+ $('description').textContent=p.desc+' 【現在の高さ '+(v.height/GRID_UNIT).toFixed(2)+'マス・横幅 '+(v.width/GRID_UNIT).toFixed(1)+'マス】 地面の▲1〜4はジャンプする位置の目安。';
 }
 function changeWall(setting,delta){
  const p=entries[idx];if(p.type!=='wallCalibration')return;
@@ -333,6 +333,29 @@ function background(){const g=ctx.createLinearGradient(0,0,0,VH);g.addColorStop(
 }
 function drawBlock(o){const x=screenX(o.x),y=scrY(o.height),w=o.width,h=o.height*ZOOM;const lethal=!!o.lethal;ctx.save();ctx.shadowColor=lethal?'#ff7891':'#73c4ff';ctx.shadowBlur=13;round(x,y,w,h,4);ctx.fillStyle=lethal?'#3b1d2b':'#19334e';ctx.fill();ctx.strokeStyle=lethal?'#ff8fa4':'#a2e2ff';ctx.lineWidth=3;ctx.stroke();ctx.shadowBlur=0;ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();for(let k=-h;k<w+h;k+=25)stroke(x+k,y+h,x+k+h,y,lethal?'#ff7e9730':'#76a8d02f',5);ctx.restore();if(!lethal){ctx.shadowColor='#79ffd6';ctx.shadowBlur=6;stroke(x+3,y+1,x+w-3,y+1,'#74ffd0',4);ctx.shadowBlur=0;}if(lethal){ctx.strokeStyle='#ffd8df';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x+6,y+h-6);ctx.lineTo(x+w-6,y+6);ctx.moveTo(x+6,y+h*.62);ctx.lineTo(x+w*.62,y+6);ctx.moveTo(x+w*.38,y+h-6);ctx.lineTo(x+w-6,y+h*.38);ctx.stroke();}ctx.restore()}
 function drawSpike(o){const dw=o.width/o.count;ctx.save();ctx.shadowColor='#ff7794';ctx.shadowBlur=13;for(let k=0;k<o.count;k++){let x=screenX(o.x+k*dw),x2=x+dw,cy=scrY(o.base),tip=scrY(o.base+(o.down?-o.height:o.height));ctx.beginPath();ctx.moveTo(x,cy);ctx.lineTo(x+dw/2,tip);ctx.lineTo(x2,cy);ctx.closePath();ctx.fillStyle='#6b1d38';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#ff8da2';ctx.stroke();}ctx.restore()}
+const JUMP_GUIDES={
+ 'B-01':[1.90,0], 'B-02':[1.45,.48], 'B-03':[1.05,.455], 'B-04':[.70,.455],
+ 'R-01':[2.10,0], 'R-02':[1.70,.43], 'R-03':[1.30,.43], 'R-04':[.90,.43]
+};
+function drawJumpGuide(){
+  if(entries[idx].type!=='wallCalibration')return;
+  const data=JUMP_GUIDES[entries[idx].n];if(!data)return;
+  const n=entries[idx].target;
+  ctx.save();ctx.textAlign='center';
+  for(let i=0;i<n;i++){
+    const worldX=240+SPEED*(data[0]+i*data[1]);
+    const x=screenX(worldX);
+    if(x<-30||x>W+30)continue;
+    const last=i===n-1;
+    ctx.fillStyle=last?'#a8f8c9':'#78ddf7';ctx.strokeStyle=last?'#a8f8c9':'#78ddf7';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(x,FLOOR-5);ctx.lineTo(x-8,FLOOR-20);ctx.lineTo(x+8,FLOOR-20);ctx.closePath();ctx.fill();
+    ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(x,FLOOR-23);ctx.lineTo(x,FLOOR-42);ctx.stroke();ctx.setLineDash([]);
+    ctx.font='800 12px system-ui';ctx.fillText(String(i+1),x,FLOOR-50);
+  }
+  ctx.textAlign='left';ctx.font='800 10px system-ui';ctx.fillStyle='#abdef3';
+  ctx.fillText('▲ 数字の位置でジャンプ（目安）',12,FLOOR-10);
+  ctx.restore();
+}
 function drawGoal(){let x=screenX(goal);if(x< -100||x>W+120)return;ctx.save();ctx.shadowColor='#61e4b8';ctx.shadowBlur=15;ctx.strokeStyle='#78f0ce';ctx.lineWidth=4;ctx.strokeRect(x-5,170,8,FLOOR-170);ctx.shadowBlur=0;ctx.fillStyle='#a2fce8';ctx.font='900 21px system-ui';ctx.textAlign='center';ctx.fillText('GOAL',x+9,160);ctx.restore()}
 function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);background();
  const gaps=objs.filter(o=>o.type==='gap');function floor(a,b){if(b<=a)return;ctx.fillStyle='#13283d';ctx.fillRect(a,FLOOR,b-a,VH-FLOOR);stroke(a,FLOOR,b,FLOOR,'#c1e7fa',3);}
@@ -340,6 +363,7 @@ function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);b
  let off=-(state.distance%51);for(let x=off;x<W;x+=51){if(gaps.some(o=>x>screenX(o.x)&&x<screenX(o.x)+o.width))continue;stroke(x,FLOOR+22,x+19,FLOOR+22,'#4b708b',3)}
  for(const o of objs){if(o.type==='wall')drawBlock(o);if(o.type==='spike')drawSpike(o);if(o.type==='ceiling'){let roof={type:'wall',x:o.x,width:o.width,height:0};let x=screenX(o.x),y=scrY(o.base),top=y-32;ctx.fillStyle='#14273f';ctx.fillRect(x,top,o.width,32);stroke(x,top,x+o.width,top,'#7caac9',3);drawSpike({type:'spike',x:o.x,width:o.width,count:Math.round(o.width/75),height:o.spikeH,base:o.base,down:true})}}
  drawGoal();
+ drawJumpGuide();
  drawObjectMeasures();
  drawMeasureBand();
  // light motion streaks and shadow
