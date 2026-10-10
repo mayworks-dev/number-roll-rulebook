@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="theme-color" content="#091524">
+<meta name="application-name" content="NUMBER ROLL">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NUMBER ROLL">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
 <title>NUMBER ROLL — PLAYABLE RULEBOOK</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
@@ -38,7 +44,7 @@ body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 2
     <div class="details"><div class="description" id="description"></div><div class="specs" id="specs"></div></div>
   </section>
   <nav class="footer"><button id="prev" class="nav" type="button">◀ 前の障害物</button><div class="center"><button id="catalogButton" class="nav" type="button">☷ 一覧</button><button id="ruleButton" class="nav" type="button">？ 操作</button></div><button id="next" class="nav" type="button">次の障害物 ▶</button></nav>
-  <div class="note">各ページは独立した練習コースです。横画面がおすすめ。クリア記録はこのブラウザに保存されます。</div>
+  <div class="note">Ver.0.3 修正版｜1マス＝四角1個分。横画面がおすすめ。クリア記録はこのブラウザに保存されます。</div>
   <div class="overlay" id="overlay"><div class="overlay-head"><h2 id="overlayTitle">障害物一覧</h2><button class="close" id="close" type="button">✕ 戻る</button></div><div class="catalog" id="catalog"></div><div id="rules" style="display:none;overflow:auto;touch-action:pan-y;color:#d1e5f3;line-height:1.75;font-size:14px;padding:6px 4px"><p><b>自動で右に進む四角形</b>をジャンプで操作します。画面のどこかをタップするか、Space・↑・Wキーでジャンプします。</p><p>ジャンプするたびに四角形は<b>時計回りに90°回転</b>し、上の数字が1→2→3→4→1の順に変わります。数字ごとに色も変わります。</p><p><b>着地した時の数字</b>が、次の着地までに使えるジャンプ回数です。空中で数字が変わっても、途中で回数の上限は変わりません。</p><p>トゲ・壁などへの衝突、穴への落下は失敗。青く光る<b>GOAL</b>を通ればクリア。失敗したら「リトライ」で何度でも練習できます。</p><p>操作：タップ / Space / ↑ / W = ジャンプ、R = リトライ、P = 一時停止、← / → = ページ移動。数字の色は <span style="color:#4fc3f7">1 青</span>・<span style="color:#94df84">2 緑</span>・<span style="color:#ffbc68">3 オレンジ</span>・<span style="color:#be9bff">4 紫</span>。</p></div></div>
 </main>
 <script>
@@ -58,6 +64,7 @@ const entries=[
 ];
 const $=id=>document.getElementById(id), stage=$('stage'),canvas=$('game'),ctx=canvas.getContext('2d',{alpha:false});
 const COLORS={1:['#4fc3f7','#123d55'],2:['#94df84','#204e2b'],3:['#ffbc68','#5c3e14'],4:['#be9bff','#36244f']};
+const GRID_UNIT=64; // 1マス = プレイヤーの横幅（64ゲーム単位）
 const GRAVITY=1850, JUMP=700, SPEED=285, ZOOM=.49, SIZE=64, VH=540, FLOOR=426;
 let idx=0, W=960, scale=1, dpr=1,last=0, state,objs=[],goal=0,cleared=[],silent=false;
 try{cleared=JSON.parse(localStorage.getItem('numberRollRulebookClear01')||'[]');if(!Array.isArray(cleared))cleared=[];}catch{cleared=[];}
@@ -157,19 +164,19 @@ function drawMeasureBand(){
    const major=i%5===0;
    ctx.strokeStyle=major?'#9fdcff7a':'#7fb4d63b';
    ctx.lineWidth=major?1.6:1;
-   ctx.beginPath();ctx.moveTo(x,bandTop);ctx.lineTo(x,bandBottom-(major?18:26));ctx.stroke();
+   ctx.beginPath();ctx.moveTo(x,bandTop);ctx.lineTo(x,bandBottom-22);ctx.stroke();
    ctx.strokeStyle='#6ca6c83a';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(x,FLOOR);ctx.lineTo(x,bandTop);ctx.stroke();
    ctx.fillStyle=major?'#dff6ff':'#9ec3d8';
-   ctx.font=major?'800 12px system-ui':'700 10px system-ui';
+   ctx.font=major?`800 ${Math.round(14/scale)}px system-ui`:`700 ${Math.round(12/scale)}px system-ui`;
    ctx.fillText(String(i),x,bandBottom-10);
  }
- ctx.fillStyle='#b8d6e6';ctx.font='800 10px system-ui';ctx.textAlign='left';ctx.fillText('GRID  1マス ≒ プレイヤー1個分',10,bandBottom-10);
- ctx.textAlign='right';ctx.fillStyle='#8fb0c3';ctx.fillText('太線 = 5マス',W-10,bandBottom-10);
+ ctx.fillStyle='#b8d6e6';ctx.font=`800 ${Math.round(11/scale)}px system-ui`;ctx.textAlign='left';ctx.fillText('1マス = 四角1個分',10,bandBottom+13);
+ ctx.textAlign='right';ctx.fillStyle='#8fb0c3';ctx.fillText('5マスごとに太線',W-10,bandBottom+13);
  ctx.textAlign='start';ctx.textBaseline='alphabetic';
 }
 function drawObjectMeasures(){
  ctx.save();
- ctx.font='700 10px system-ui';ctx.textAlign='center';ctx.textBaseline='alphabetic';
+ ctx.font=`700 ${Math.round(12/scale)}px system-ui`;ctx.textAlign='center';ctx.textBaseline='alphabetic';
  for(const o of objs){
    if(o.type==='gap'){
      const x1=screenX(o.x),x2=screenX(o.x+o.width),mid=(x1+x2)/2;
@@ -212,7 +219,7 @@ function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);b
  if(state.lastLanding>0){ctx.strokeStyle=`rgba(155,232,255,${state.lastLanding/.3})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(px,FLOOR,30+(1-state.lastLanding/.3)*25,6,0,0,Math.PI*2);ctx.stroke()}
  const fill=COLORS[state.face][0],ink=COLORS[state.face][1];for(let k=0;k<5;k++)stroke(px-sq*.70-k*16,py+(k-2)*7,px-sq*.70-k*16+9,py+(k-2)*7,fill+'70',2);
  ctx.save();ctx.translate(px,py);ctx.rotate(state.angle);ctx.shadowColor=fill;ctx.shadowBlur=17;round(-sq/2,-sq/2,sq,sq,8);ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle='#eefaff';ctx.lineWidth=3;ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle='#ffffff77';round(-sq*.38,-sq*.37,sq*.28,5,2);ctx.fill();ctx.fillStyle='#11354e50';round(sq*.26,sq*.25,9,9,2);ctx.fill();ctx.restore();
- ctx.font='900 35px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=ink;ctx.fillText(String(state.face),px,py+2);ctx.textBaseline='alphabetic';ctx.font='800 13px system-ui';ctx.textAlign='center';ctx.fillStyle='#a7c9dd';ctx.fillText('AUTO →',px,FLOOR+69);
+ ctx.font='900 35px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=ink;ctx.fillText(String(state.face),px,py+2);ctx.textBaseline='alphabetic';ctx.font='800 13px system-ui';ctx.textAlign='center';ctx.fillStyle='#a7c9dd';ctx.fillText('AUTO →',px,FLOOR+90);
 }
 function resize(){const r=canvas.getBoundingClientRect();let width=Math.max(10,r.width),height=Math.max(10,r.height);W=VH*width/height;scale=height/VH;dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);draw()}
 function loop(t){if(!last)last=t;const dt=Math.min(.03,Math.max(0,(t-last)/1000));last=t;update(dt);draw();requestAnimationFrame(loop)}
