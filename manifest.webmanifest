@@ -1,0 +1,26 @@
+{
+  "id": "./",
+  "name": "NUMBER ROLL — プレイ型ルールブック",
+  "short_name": "NUMBER ROLL",
+  "description": "NUMBER ROLLの障害物をジャンプで攻略する練習用ウェブアプリ",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#060e18",
+  "theme_color": "#091524",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
