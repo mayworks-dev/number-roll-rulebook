@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — PLAYABLE RULEBOOK Ver.1.3.1</title>
+<title>NUMBER ROLL — PLAYABLE RULEBOOK Ver.1.5</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -107,11 +107,23 @@ body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 2
 .platform-tools .note-s{font-size:10px;color:#a4e9d6}
 @media(max-width:650px){.platform-tools{gap:3px 6px;padding:3px 5px;font-size:10px;min-height:31px}.platform-tools button{height:24px;min-width:24px}.platform-tools .note-s{display:none}}
 @media(max-height:390px) and (orientation:landscape){.platform-tools{min-height:28px;padding:2px 5px}.platform-tools button{height:22px}}
+
+/* Ver.1.5 moving walls */
+.motion-tools{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px 12px;min-height:40px;padding:5px 9px;background:#173146;border-bottom:1px solid #61a5cc;color:#e2f8ff;font-size:11px}
+.motion-tools[hidden]{display:none}
+.motion-tools .motion-tag{border:1px solid #8ad9f6;color:#d4f6ff;background:#1d4961;padding:4px 8px;border-radius:5px;font-weight:900}
+.motion-tools .motion-set{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.motion-tools strong{min-width:63px;text-align:center;font-variant-numeric:tabular-nums}
+.motion-tools button{border:1px solid #73b7d9;background:#1b4861;color:#fff;border-radius:6px;height:28px;min-width:29px;font-size:15px;font-weight:900}
+.motion-tools .reset{font-size:10px;padding:0 9px}
+.motion-tools .smallnote{font-size:10px;color:#a8cfe2}
+@media(max-width:650px){.motion-tools{gap:4px 7px;padding:3px 5px;font-size:10px;min-height:31px}.motion-tools button{height:24px;min-width:24px}.motion-tools .smallnote{display:none}}
+@media(max-height:390px) and (orientation:landscape){.motion-tools{padding:2px 5px;min-height:26px}.motion-tools button{height:22px}}
 </style>
 </head>
 <body>
 <main id="app">
-  <div class="top"><div><div class="brand">NUMBER ROLL / LEARNING MODE</div><h1>PLAYABLE RULEBOOK</h1><div class="sub">障害物の特徴を読み、実際に挑戦しよう / 下部の目盛りで幅と距離を確認</div></div><div class="progress">CLEAR<strong id="bookProgress">0 / 41</strong></div></div>
+  <div class="top"><div><div class="brand">NUMBER ROLL / LEARNING MODE</div><h1>PLAYABLE RULEBOOK</h1><div class="sub">障害物の特徴を読み、実際に挑戦しよう / 下部の目盛りで幅と距離を確認</div></div><div class="progress">CLEAR<strong id="bookProgress">0 / 45</strong></div></div>
   <section class="book" aria-label="プレイ型障害物図鑑">
     <div class="book-title"><div class="nameblock"><div class="chapter" id="number">01</div><div><div class="jp" id="jp">単体トゲ</div><div class="en" id="en">SINGLE SPIKE</div></div></div><div class="tip"><strong>攻略のヒント</strong><span id="tip"></span></div></div>
     <div class="calibration-tools" id="calibrationTools" hidden>
@@ -157,6 +169,14 @@ body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 2
       <strong id="switchTime">4.0秒</strong><button id="switchTimePlus" type="button" aria-label="効果時間を0.5秒長くする">＋</button>
       <button class="reset" id="switchDefault" type="button">基準に戻す</button>
       <span class="hint-s">他の仕掛けには影響しません</span>
+    </div>
+
+    <div class="motion-tools" id="motionTools" hidden>
+      <span class="motion-tag" id="motionKind">青枠 / 上下</span>
+      <span class="motion-set">移動範囲 <button type="button" id="motionRangeMinus" aria-label="移動範囲を減らす">−</button><strong id="motionRange">2.00マス</strong><button type="button" id="motionRangePlus" aria-label="移動範囲を増やす">＋</button></span>
+      <span class="motion-set">往復周期 <button type="button" id="motionPeriodMinus" aria-label="移動周期を短くする">−</button><strong id="motionPeriod">3.0秒</strong><button type="button" id="motionPeriodPlus" aria-label="移動周期を長くする">＋</button></span>
+      <button type="button" class="reset" id="motionDefault">基準に戻す</button>
+      <span class="smallnote">距離0.25マス・周期0.5秒刻み</span>
     </div>
     <div class="stage" id="stage"><canvas id="game" aria-label="プレイ画面。タップかスペースキーでジャンプ"></canvas>
       <div class="stage-hud"><div class="stats-left"><div class="stat"><label>上の数字</label><b id="face">1</b></div><div class="stat"><label>ジャンプ残り</label><b id="jumps">1 / 1</b></div></div><div class="stats-right"><div class="stat slim" id="switchTimerBox" hidden><label>効果残り</label><b id="switchTimer">未起動</b></div><div class="stat slim"><label>進行</label><b id="distance">0%</b></div><div class="game-buttons"><button type="button" id="reset" class="game-icon" aria-label="リトライ">↻</button><button type="button" id="pause" class="game-icon" aria-label="一時停止">Ⅱ</button></div></div></div>
@@ -240,7 +260,16 @@ const switchEntries=[
  {n:'S-02',jp:'数字スイッチ / 足場が現れる',en:'NUMBER SWITCH · SPAWN PLATFORM',face:2,required:3,type:'digitSwitch',effect:'platform',duration:5,tip:'足場を出して穴を渡る。足場なしで渡れればOK',desc:'数字3でスイッチに触れると、大きな穴の途中に安全な青枠足場が5秒間現れる。着地すると現在の数字でジャンプ回数が回復する。',spec:[['指定数字','3'],['変化','足場が出現'],['効果時間','初期5.0秒'],['練習','接触せず対岸へ']]},
  {n:'S-03',jp:'数字スイッチ / トゲが引っ込む',en:'NUMBER SWITCH · RETRACT SPIKES',face:3,required:4,type:'digitSwitch',effect:'spikes',duration:4,tip:'スイッチでトゲを収納、または直接飛び越える',desc:'数字4でスイッチを押すと、前方の地上トゲだけが4秒間引っ込む。時間切れで戻るが、トゲを飛び越えられるならスイッチの起動は不要。接触しなければクリア。',spec:[['指定数字','4'],['変化','トゲが引っ込む'],['効果時間','初期4.0秒'],['連動先','このトゲ列だけ']]}
 ];
-const entries=[...calibrationEntries,...wallEntries,...baseEntries,...gapEntries,...airEntries,...numberEntries,...platformEntries,...switchEntries];
+
+// Ver.1.5: moving walls. Movement range is the full end-to-end distance (2 * amplitude).
+// Red = deadly all sides; blue = safe from above, carries player while standing.
+const motionEntries=[
+ {n:'M-01',jp:'移動する壁 / 赤枠・上下',en:'MOVING WALL · RED / VERTICAL',type:'motionWall',lethal:true,axis:'y',face:2,initialX:940,initialHeight:205,initialBase:80,width:72,range:160,period:3.4,phase:-1.1,tip:'赤い壁が上がるタイミングで下を抜けるか、上を飛び越える',desc:'危険な赤い壁が上下に往復。上・横・下のどの面に触れても失敗。壁が十分高く浮けば下をくぐれる。ジャンプで飛び越えてもOK。',spec:[['種類','赤枠（全面危険）'],['方向','上下往復'],['回避方法','下抜け・飛び越え'],['接触','即アウト']]},
+ {n:'M-02',jp:'移動する壁 / 赤枠・左右',en:'MOVING WALL · RED / HORIZONTAL',type:'motionWall',lethal:true,axis:'x',face:2,initialX:970,initialHeight:168,initialBase:0,width:56,range:128,period:4.0,phase:0,tip:'前後に動く赤い壁を、タイミングよくジャンプで越える',desc:'赤い壁が左右に往復する。全面接触禁止。追いつくタイミングが変わるので、ジャンプの位置に注意。上を飛び越えればクリア。',spec:[['種類','赤枠（全面危険）'],['方向','左右往復'],['飛び越え','OK'],['接触','即アウト']]},
+ {n:'M-03',jp:'移動する壁 / 青枠・上下',en:'MOVING WALL · BLUE / VERTICAL',type:'motionWall',lethal:false,axis:'y',face:3,initialX:1000,initialHeight:175,initialBase:85,width:235,range:144,period:3.8,phase:-.7,tip:'緑ラインに着地すると、壁の上下移動に乗って運ばれる',desc:'青い壁が上下に往復。上面に着地するとジャンプ回数が回復し、足場と一緒に上下する。横・下面にぶつかると失敗。触れずに飛び越えてもOK。',spec:[['種類','青枠（上面安全）'],['方向','上下往復'],['着地','ジャンプ回復'],['移動中','上下に運ばれる']]},
+ {n:'M-04',jp:'移動する壁 / 青枠・左右',en:'MOVING WALL · BLUE / HORIZONTAL',type:'motionWall',lethal:false,axis:'x',face:3,initialX:1010,initialHeight:138,initialBase:45,width:240,range:224,period:3.6,phase:-.8,tip:'青い壁の上に乗ると、左右の移動分だけ一緒に運ばれる',desc:'青い壁が左右に往復。上面に着地している間は、オートランの前進に加えて壁の横移動分も反映。側面・下面は危険。安全に飛び越える・下を通る方法もOK。',spec:[['種類','青枠（上面安全）'],['方向','左右往復'],['着地','ジャンプ回復'],['移動中','前進＋壁の横移動']]}
+];
+const entries=[...calibrationEntries,...wallEntries,...baseEntries,...gapEntries,...airEntries,...numberEntries,...platformEntries,...switchEntries,...motionEntries];
 const $=id=>document.getElementById(id), stage=$('stage'),canvas=$('game'),ctx=canvas.getContext('2d',{alpha:false});
 const COLORS={1:['#4fc3f7','#123d55'],2:['#94df84','#204e2b'],3:['#ffbc68','#5c3e14'],4:['#be9bff','#36244f']};
 const GRID_UNIT=64; // 横1マス = 64ゲーム単位
@@ -263,6 +292,28 @@ const gapSettings=gapEntries.map(p=>p.initialWidth);
 const numberSettings=numberEntries.map(p=>({opening:p.initialOpening,lower:p.initialLower}));
 const platformSettings=platformEntries.map(p=>({height:p.initialHeight,width:p.initialWidth}));
 const switchSettings=switchEntries.map(p=>({duration:p.duration}));
+const motionSettings=motionEntries.map(p=>({range:p.range,period:p.period}));
+function motionInfo(p=entries[idx]){return p.type==='motionWall'?motionSettings[motionEntries.indexOf(p)]:null;}
+function refreshMotionBar(){
+ const p=entries[idx],on=p.type==='motionWall';$('motionTools').hidden=!on;if(!on)return;
+ const v=motionInfo(p);$('motionKind').textContent=(p.lethal?'赤枠':'青枠')+' / '+(p.axis==='y'?'上下':'左右');
+ $('motionRange').textContent=(v.range/GRID_UNIT).toFixed(2)+'マス';
+ $('motionPeriod').textContent=v.period.toFixed(1)+'秒';
+ $('motionRangeMinus').disabled=v.range<=32;$('motionRangePlus').disabled=v.range>=448;
+ $('motionPeriodMinus').disabled=v.period<=1.5;$('motionPeriodPlus').disabled=v.period>=8;
+}
+function changeMotion(setting,delta){
+ const p=entries[idx];if(p.type!=='motionWall')return;
+ const v=motionInfo(p);if(setting==='range')v.range=Math.max(32,Math.min(448,v.range+delta*16));
+ else v.period=Math.max(1.5,Math.min(8,Math.round((v.period+delta*.5)*2)/2));
+ createLevel();newState();refreshMotionBar();showResult('ready');draw();
+}
+function restoreMotion(){
+ const p=entries[idx];if(p.type!=='motionWall')return;
+ motionSettings[motionEntries.indexOf(p)]={range:p.range,period:p.period};
+ createLevel();newState();refreshMotionBar();showResult('ready');draw();
+}
+
 function switchInfo(p=entries[idx]){return p.type==='digitSwitch'?switchSettings[switchEntries.indexOf(p)]:null;}
 function switchEffectActive(id){return (state?.effectTimers?.[id]||0)>0;}
 function refreshSwitchBar(){
@@ -340,6 +391,18 @@ function restoreNumber(){
 }
 function createLevel(){
  const X=240+540;const type=entries[idx].type;
+ if(type==='motionWall'){
+   const p=entries[idx],v=motionInfo(p),a=v.range/2;
+   const o={type:'wall',id:p.n,moving:true,lethal:p.lethal,
+     x:p.initialX,width:p.width,height:p.initialHeight,base:p.initialBase,
+     originX:p.initialX,originHeight:p.initialHeight,originBase:p.initialBase,
+     motion:{axis:p.axis,amplitude:a,period:v.period,phase:p.phase}};
+   // Store the actual initial position, not just the midpoint of the motion.
+   const d=a*Math.sin(p.phase);
+   if(p.axis==='x')o.x+=d;else{o.height+=d;o.base+=d;}
+   o.oldX=o.x;o.oldHeight=o.height;o.oldBase=o.base;
+   objs=[o];goal=p.initialX+p.width+a+330;return;
+ }
  if(type==='digitSwitch'){
    const p=entries[idx],duration=switchInfo(p).duration,switchId=p.n;
    const sw={type:'digitSwitch',id:switchId,x:X+45,width:70,base:0,height:225,required:p.required,duration};
@@ -401,7 +464,7 @@ function createLevel(){
  };
  objs=levels[type];let end=Math.max(...objs.map(o=>o.x+o.width));goal=end+300;
 }
-function newState(){let face=entries[idx].face;state={status:'ready',distance:0,y:0,vy:0,air:false,face,limit:face,used:0,angle:0,turnFrom:0,turnTo:0,turn:1,groundH:0,cause:'',lastLanding:0,totalJumps:0,airBLandings:0,numberLocks:{},numberPasses:0,platformLandings:0,effectTimers:{},switchTriggered:{},switchActivations:0,switchPlatformLandings:0,switchSolved:false};last=0;ui();}
+function newState(){let face=entries[idx].face;state={status:'ready',distance:0,y:0,vy:0,air:false,face,limit:face,used:0,angle:0,turnFrom:0,turnTo:0,turn:1,groundH:0,cause:'',lastLanding:0,totalJumps:0,airBLandings:0,numberLocks:{},numberPasses:0,platformLandings:0,effectTimers:{},switchTriggered:{},switchActivations:0,switchPlatformLandings:0,switchSolved:false,elapsed:0,groundObject:null,motionLandings:0,motionCarryX:0,motionCarryY:0};last=0;ui();}
 function refreshCalibrationBar(){
  const active=idx<calibrationEntries.length;const el=$('calibrationTools');el.hidden=!active;
  if(!active)return;
@@ -461,21 +524,21 @@ function restoreGap(){
  gapSettings[j]=entries[idx].initialWidth;
  refreshGapBar();createLevel();newState();showResult('ready');draw();
 }
-function setPage(n){idx=Math.max(0,Math.min(entries.length-1,n));const p=entries[idx];$('number').textContent=p.n;$('jp').textContent=p.jp;$('en').textContent=p.en;$('tip').textContent=p.tip;$('description').textContent=p.desc;$('specs').innerHTML=p.spec.map(([k,v])=>`<div class="spec"><span>${k}</span><b>${v}</b></div>`).join('');$('prev').disabled=idx===0;$('next').disabled=idx===entries.length-1;refreshCalibrationBar();refreshWallBar();refreshGapBar();refreshNumberBar();refreshPlatformBar();refreshSwitchBar();createLevel();newState();showResult('ready');draw();}
+function setPage(n){idx=Math.max(0,Math.min(entries.length-1,n));const p=entries[idx];$('number').textContent=p.n;$('jp').textContent=p.jp;$('en').textContent=p.en;$('tip').textContent=p.tip;$('description').textContent=p.desc;$('specs').innerHTML=p.spec.map(([k,v])=>`<div class="spec"><span>${k}</span><b>${v}</b></div>`).join('');$('prev').disabled=idx===0;$('next').disabled=idx===entries.length-1;refreshCalibrationBar();refreshWallBar();refreshGapBar();refreshNumberBar();refreshPlatformBar();refreshSwitchBar();refreshMotionBar();createLevel();newState();showResult('ready');draw();}
 function start(){newState();state.status='running';hideResult();ui();}
 function retry(){start()}
-function showResult(kind){const box=$('result');box.classList.add('show');$('resultNext').hidden=(kind!=='win'||idx===entries.length-1);$('retry').textContent=kind==='ready'?'▶ スタート':'↻ リトライ';$('resultTitle').className='result-title '+(kind==='win'?'win':kind==='lose'?'lose':'');if(kind==='ready'){$('resultTitle').textContent='練習 '+entries[idx].n;$('resultCaption').textContent='障害物を避けてGOALへ！ '+entries[idx].tip+'。';}else if(kind==='win'){$('resultTitle').textContent='✓ CLEAR!';$('resultCaption').textContent=entries[idx].type==='calibration'?`トゲ${spikeCounts[idx]}個（${(spikeCounts[idx]*SPIKE_PITCH/GRID_UNIT).toFixed(2)}マス）を突破！ 今回のジャンプ操作：${state.totalJumps}回。長さを変更して再挑戦できます。`:entries[idx].type==='wallCalibration'?`高さ ${(wallSettings[idx-calibrationEntries.length].height/GRID_UNIT).toFixed(2)}マス / 幅 ${(wallSettings[idx-calibrationEntries.length].width/GRID_UNIT).toFixed(1)}マスを${state.totalJumps}回のジャンプで突破！ 調整して再挑戦できます。`:entries[idx].type==='gapCalibration'?`幅 ${(gapSettings[idx-calibrationEntries.length-wallEntries.length-baseEntries.length]/GRID_UNIT).toFixed(2)}マスの穴を${state.totalJumps}回のジャンプで突破！ 穴の幅を調整して再挑戦できます。`:entries[idx].type==='digitSwitch'?state.switchActivations>0?`数字${entries[idx].required}のスイッチを起動し、仕掛けを突破！ 効果時間も調整できます。`:`スイッチを使わず、障害物を安全に突破！ 回避ルートでもクリアです。`:entries[idx].type==='numberPlatform'?state.platformLandings>0?`数字${entries[idx].required}の足場に着地してクリア！ ジャンプ回数が回復しました。`:`数字${entries[idx].required}の足場の下を、触れずに通過してクリア！` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の壁を突破！ 数字の一致と赤い部分への接触を確認しよう。`:entries[idx].type.startsWith('airB')?state.airBLandings>0?`Bの上面に${state.airBLandings}回着地してクリア！ 着地するとジャンプ回数が回復します。`:`Bに着地せず、接触を避けてクリア！ 回避ルートもOKです。`:'障害物「'+entries[idx].jp+'」を突破！ 同じコースを再挑戦することもできます。';}else if(kind==='paused'){$('resultTitle').textContent='Ⅱ 一時停止';$('resultCaption').textContent='再開すると同じ位置からプレイできます。';$('retry').textContent='▶ 再開';}else{$('resultTitle').textContent='GAME OVER';$('resultCaption').textContent=state.cause||'もう一度ジャンプのタイミングを試してみよう。';}}
+function showResult(kind){const box=$('result');box.classList.add('show');$('resultNext').hidden=(kind!=='win'||idx===entries.length-1);$('retry').textContent=kind==='ready'?'▶ スタート':'↻ リトライ';$('resultTitle').className='result-title '+(kind==='win'?'win':kind==='lose'?'lose':'');if(kind==='ready'){$('resultTitle').textContent='練習 '+entries[idx].n;$('resultCaption').textContent='障害物を避けてGOALへ！ '+entries[idx].tip+'。';}else if(kind==='win'){$('resultTitle').textContent='✓ CLEAR!';$('resultCaption').textContent=entries[idx].type==='calibration'?`トゲ${spikeCounts[idx]}個（${(spikeCounts[idx]*SPIKE_PITCH/GRID_UNIT).toFixed(2)}マス）を突破！ 今回のジャンプ操作：${state.totalJumps}回。長さを変更して再挑戦できます。`:entries[idx].type==='wallCalibration'?`高さ ${(wallSettings[idx-calibrationEntries.length].height/GRID_UNIT).toFixed(2)}マス / 幅 ${(wallSettings[idx-calibrationEntries.length].width/GRID_UNIT).toFixed(1)}マスを${state.totalJumps}回のジャンプで突破！ 調整して再挑戦できます。`:entries[idx].type==='gapCalibration'?`幅 ${(gapSettings[idx-calibrationEntries.length-wallEntries.length-baseEntries.length]/GRID_UNIT).toFixed(2)}マスの穴を${state.totalJumps}回のジャンプで突破！ 穴の幅を調整して再挑戦できます。`:entries[idx].type==='motionWall'?state.motionLandings>0?`動く青枠に${state.motionLandings}回着地してクリア！ 足場と一緒に運ばれた移動も確認しよう。`:`動く壁を接触せずに突破！ 上を飛び越える攻略もOK。`:entries[idx].type==='digitSwitch'?state.switchActivations>0?`数字${entries[idx].required}のスイッチを起動し、仕掛けを突破！ 効果時間も調整できます。`:`スイッチを使わず、障害物を安全に突破！ 回避ルートでもクリアです。`:entries[idx].type==='numberPlatform'?state.platformLandings>0?`数字${entries[idx].required}の足場に着地してクリア！ ジャンプ回数が回復しました。`:`数字${entries[idx].required}の足場の下を、触れずに通過してクリア！` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の壁を突破！ 数字の一致と赤い部分への接触を確認しよう。`:entries[idx].type.startsWith('airB')?state.airBLandings>0?`Bの上面に${state.airBLandings}回着地してクリア！ 着地するとジャンプ回数が回復します。`:`Bに着地せず、接触を避けてクリア！ 回避ルートもOKです。`:'障害物「'+entries[idx].jp+'」を突破！ 同じコースを再挑戦することもできます。';}else if(kind==='paused'){$('resultTitle').textContent='Ⅱ 一時停止';$('resultCaption').textContent='再開すると同じ位置からプレイできます。';$('retry').textContent='▶ 再開';}else{$('resultTitle').textContent='GAME OVER';$('resultCaption').textContent=state.cause||'もう一度ジャンプのタイミングを試してみよう。';}}
 function hideResult(){$('result').classList.remove('show')}
 function fail(reason){if(state.status!=='running')return;state.status='lost';state.cause=reason;showResult('lose');ui()}
 function win(){if(state.status!=='running')return;state.status='won';if(!cleared.includes(idx)){cleared.push(idx);save();progress();}showResult('win');ui();}
-function jump(){if(state.status==='ready'){start();return;}if(state.status!=='running')return;const s=state;if(s.air&&s.used>=s.limit)return;if(!s.air){s.limit=s.face;s.used=0;}s.air=true;s.used++;s.totalJumps++;s.vy=JUMP;s.groundH=0;s.turnFrom=s.angle;s.turnTo+=Math.PI/2;s.turn=0;s.face=s.face%4+1;ui();}
+function jump(){if(state.status==='ready'){start();return;}if(state.status!=='running')return;const s=state;if(s.air&&s.used>=s.limit)return;if(!s.air){s.limit=s.face;s.used=0;}s.air=true;s.used++;s.totalJumps++;s.vy=JUMP;s.groundH=0;s.turnFrom=s.angle;s.turnTo+=Math.PI/2;s.turn=0;s.face=s.face%4+1;s.groundObject=null;ui();}
 function togglePause(){if(state.status==='running'){state.status='paused';showResult('paused')}else if(state.status==='paused'){state.status='running';hideResult()}last=0;ui()}
 function ui(){const s=state;if(!s)return;let left=s.air?Math.max(0,s.limit-s.used):s.face,total=s.air?s.limit:s.face;$('face').textContent=s.face;$('face').style.color=COLORS[s.face][0];$('jumps').textContent=`${left} / ${total}`;$('distance').textContent=Math.round(Math.min(1,s.distance/(goal-240))*100)+'%';
  if(entries[idx].type==='digitSwitch'){
   const rem=s.effectTimers[entries[idx].n]||0;
   $('switchTimer').textContent=rem>0?rem.toFixed(1)+'秒':s.switchTriggered[entries[idx].n]?'終了':'未起動';
   $('switchTimer').style.color=rem>0?'#8dffd4':'#ffc1d6';
- }$('actionHint').textContent=s.status==='running'?(s.y<0&&objs.some(o=>o.type==='gap')?'落下中！ ↑ ジャンプで復帰':entries[idx].type.startsWith('airB')?`B着地 ${s.airBLandings}回 / 避けてもOK`:entries[idx].type==='digitSwitch'?`数字${entries[idx].required}で起動／回避できれば起動不要`:entries[idx].type==='numberPlatform'?`数字${entries[idx].required}で着地／下を避けて通過もOK` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の部分を通り抜けよう`:'画面タップでジャンプ'):s.status==='paused'?'一時停止中':s.status==='won'?'クリア！':s.status==='lost'?'もう一度挑戦': 'まずはスタート';$('jump').textContent=s.status==='ready'?'▶ スタート':s.status==='running'?'↑ ジャンプ':s.status==='paused'?'▶ 再開':s.status==='lost'?'↻ リトライ':'次の障害物 ▶';$('jump').disabled=s.status==='running'&&left===0;$('pause').textContent=s.status==='paused'?'▶':'Ⅱ';}
+ }$('actionHint').textContent=s.status==='running'?(s.y<0&&objs.some(o=>o.type==='gap')?'落下中！ ↑ ジャンプで復帰':entries[idx].type.startsWith('airB')?`B着地 ${s.airBLandings}回 / 避けてもOK`:entries[idx].type==='motionWall'?`壁が${entries[idx].axis==='y'?'上下':'左右'}に移動中！ 青枠なら上に着地OK`:entries[idx].type==='digitSwitch'?`数字${entries[idx].required}で起動／回避できれば起動不要`:entries[idx].type==='numberPlatform'?`数字${entries[idx].required}で着地／下を避けて通過もOK` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の部分を通り抜けよう`:'画面タップでジャンプ'):s.status==='paused'?'一時停止中':s.status==='won'?'クリア！':s.status==='lost'?'もう一度挑戦': 'まずはスタート';$('jump').textContent=s.status==='ready'?'▶ スタート':s.status==='running'?'↑ ジャンプ':s.status==='paused'?'▶ 再開':s.status==='lost'?'↻ リトライ':'次の障害物 ▶';$('jump').disabled=s.status==='running'&&left===0;$('pause').textContent=s.status==='paused'?'▶':'Ⅱ';}
 function action(){if(state.status==='running'||state.status==='ready')jump();else if(state.status==='paused')togglePause();else if(state.status==='won')setPage(Math.min(idx+1,entries.length-1));else retry();}
 // 接触中の足場の高さ。着地の横断判定とは分けて、前フレームと現在の足元を比較する。
 function groundAt(centerX, feet){
@@ -539,6 +602,25 @@ function hitAirB(o,rc,s){
 }
 function update(dt){if(state.status!=='running')return;const s=state;
  const oldY=s.y;
+ s.elapsed+=dt;
+ // Animate all walls before collision. Capture the preceding position for landing and carrying.
+ for(const o of objs){
+  if(!o.moving)continue;
+  o.oldX=o.x;o.oldHeight=o.height;o.oldBase=o.base;
+  const m=o.motion, displacement=m.amplitude*Math.sin(s.elapsed*Math.PI*2/m.period+m.phase);
+  if(m.axis==='x'){o.x=o.originX+displacement;}
+  else{o.height=o.originHeight+displacement;o.base=o.originBase+displacement;}
+ }
+ // A grounded player is carried by the wall's actual movement as well as moving forward.
+ // The visual camera continues to follow the player at a stable screen position.
+ if(!s.air&&s.groundObject){
+  const platform=objs.find(o=>o.id===s.groundObject&&o.moving);
+  if(platform){
+   const dx=platform.x-platform.oldX,dy=platform.height-platform.oldHeight;
+   s.distance+=dx;s.y+=dy;s.groundH=s.y;
+   s.motionCarryX+=dx;s.motionCarryY+=dy;
+  }
+ }
  for(const id of Object.keys(s.effectTimers))s.effectTimers[id]=Math.max(0,s.effectTimers[id]-dt);
  s.distance+=SPEED*dt;
  const centerX=240+s.distance;
@@ -546,30 +628,34 @@ function update(dt){if(state.status!=='running')return;const s=state;
  // 上から下降して壁の上面を通過した瞬間は、壁に少し入り込む前に着地として確定する。
  // 旧実装の「今の足元が壁面より高い」チェックは速い下降で飛び越してしまうことがあった。
  if(s.air&&s.vy<=0){
-  let land=-Infinity;
+  let land=-Infinity,landingObj=null;
   if(!isOverGap(centerX)&&oldY>=0&&s.y<=0)land=0;
   for(const o of objs){
    if(!((o.type==='wall'&&!o.lethal)||o.type==='airB'||o.type==='numberPlatform'||(o.type==='switchPlatform'&&switchEffectActive(o.switchId))))continue;
    const overlaps=centerX+SIZE*.34>o.x&&centerX-SIZE*.34<o.x+o.width;
-   if(overlaps&&oldY>=o.height-1&&s.y<=o.height+1){
+   const oldTop=o.moving?o.oldHeight:o.height;
+   if(overlaps&&oldY>=oldTop-1&&s.y<=o.height+1){
     if(o.type==='switchPlatform'&&s.groundH!==o.height)s.switchPlatformLandings++;
     if(o.type==='numberPlatform'){
       if(s.face!==o.required){fail('数字が不一致！ 数字'+o.required+'の足場には、'+o.required+'で着地しよう。');return;}
       if(s.groundH!==o.height)s.platformLandings++;
     }
-    land=Math.max(land,o.height);if(o.type==='airB'&&s.groundH!==o.height){s.airBLandings++;}
+    if(o.height>land){land=o.height;landingObj=o;}
+    if(o.type==='airB'&&s.groundH!==o.height){s.airBLandings++;}
    }
   }
   if(land!==-Infinity){
    s.y=land;s.vy=0;s.air=false;s.used=0;s.limit=s.face;
-   s.groundH=land;s.lastLanding=.3;
+   s.groundH=land;s.groundObject=landingObj?.moving?landingObj.id:null;
+   if(landingObj?.moving)s.motionLandings++;
+   s.lastLanding=.3;
   }
  }
  // 壁の上を走り抜けたら落下開始。地面との高低差も自然に落ちる。
  if(!s.air){
   const topH=groundAt(centerX,s.y);
-  if(s.groundH>0&&topH<s.groundH-2){s.air=true;s.vy=0;s.groundH=0;}
-  else if(s.groundH===0&&isOverGap(centerX)){s.air=true;s.vy=0;}
+  if(s.groundH>0&&topH<s.groundH-2){s.air=true;s.vy=0;s.groundH=0;s.groundObject=null;}
+  else if(s.groundH===0&&isOverGap(centerX)){s.air=true;s.vy=0;s.groundObject=null;}
  }
  if(s.air&&completelyOffscreenBelow(s.y)){fail('画面の下まで落下！ 見えなくなる前にジャンプで復帰しよう。');return;}
  const rc={l:centerX-SIZE*.36,r:centerX+SIZE*.36,b:s.y+5,t:s.y+SIZE/ZOOM-13};
@@ -630,11 +716,11 @@ function update(dt){if(state.status!=='running')return;const s=state;
   if(o.type==='wall'&&rc.r>o.x&&rc.l<o.x+o.width){
    if(o.lethal){
     // 赤枠：上面・側面とも接触不可。水平接触時に足元が天端以下なら衝突。
-    if(s.y<=o.height&&rc.t>0){fail('赤枠の危険壁に接触！ 上も側面も危険。');return;}
+    if(s.y<=o.height&&rc.t>(o.base||0)){fail('赤枠の危険壁に接触！ 上も側面も危険。');return;}
    }else{
     // 青枠：上面に着地すればセーフ、下から側面に進入したらアウト。
     // 着地はこの判定より前に確定させているので、落下時のすり抜けが起きない。
-    if(s.y<o.height-2&&rc.t>0){fail('青枠の壁の側面に衝突！ 緑色の上面ラインに上から着地しよう。');return;}
+    if(s.y<o.height-2&&rc.t>(o.base||0)){fail('青枠の壁の側面に衝突！ 緑色の上面ラインに上から着地しよう。');return;}
    }
   }
  }
@@ -683,6 +769,7 @@ function drawObjectMeasures(){
      ctx.fillStyle='#cfefff';const visibleMid=(Math.max(0,x1)+Math.min(W,x2))/2;ctx.fillText(`${(o.width/GRID_UNIT).toFixed(2)}マス`,Math.max(65,Math.min(W-65,visibleMid)),FLOOR+33);
    }
    if(o.type==='wall'){
+     if(o.moving)continue;
      const x=screenX(o.x),mid=x+o.width/2; if(mid<-40||mid>W+40) continue;
      const top=scrY(o.height)-6;
      ctx.fillStyle=o.lethal?'#ff98aa':'#bfeaff';
@@ -715,7 +802,7 @@ function background(){const g=ctx.createLinearGradient(0,0,0,VH);g.addColorStop(
  const scroll=state.distance*.31;for(let x=-(scroll%69);x<W;x+=69)stroke(x,0,x,FLOOR,'#91bbd211');for(let y=45;y<FLOOR;y+=69)stroke(0,y,W,y,'#91bbd211');for(let x=-(state.distance*.15%210);x<W;x+=210){ctx.fillStyle='#75a8bf0d';ctx.fillRect(x+27,FLOOR-99,50,99)}
  for(let k=0;k<5;k++){let x=W-((state.distance*(.30+k*.07)+k*W*.24)%(W+50));ctx.fillStyle='#92c7e326';ctx.fillRect(x,FLOOR-115-k*57,42+k*9,2)}
 }
-function drawBlock(o){if(o.switchId&&switchEffectActive(o.switchId)){drawEffectGhost(o,'消去中');return;}const x=screenX(o.x),y=scrY(o.height),w=o.width,h=o.height*ZOOM;const lethal=!!o.lethal;ctx.save();ctx.shadowColor=lethal?'#ff7891':'#73c4ff';ctx.shadowBlur=13;round(x,y,w,h,4);ctx.fillStyle=lethal?'#3b1d2b':'#19334e';ctx.fill();ctx.strokeStyle=lethal?'#ff8fa4':'#a2e2ff';ctx.lineWidth=3;ctx.stroke();ctx.shadowBlur=0;ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();for(let k=-h;k<w+h;k+=25)stroke(x+k,y+h,x+k+h,y,lethal?'#ff7e9730':'#76a8d02f',5);ctx.restore();if(!lethal){ctx.shadowColor='#79ffd6';ctx.shadowBlur=6;stroke(x+3,y+1,x+w-3,y+1,'#74ffd0',4);ctx.shadowBlur=0;}if(lethal){ctx.strokeStyle='#ffd8df';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x+6,y+h-6);ctx.lineTo(x+w-6,y+6);ctx.moveTo(x+6,y+h*.62);ctx.lineTo(x+w*.62,y+6);ctx.moveTo(x+w*.38,y+h-6);ctx.lineTo(x+w-6,y+h*.38);ctx.stroke();}ctx.restore()}
+function drawBlock(o){if(o.switchId&&switchEffectActive(o.switchId)){drawEffectGhost(o,'消去中');return;}const x=screenX(o.x),y=scrY(o.height),w=o.width,h=(o.height-(o.base||0))*ZOOM;const lethal=!!o.lethal;ctx.save();ctx.shadowColor=lethal?'#ff7891':'#73c4ff';ctx.shadowBlur=13;round(x,y,w,h,4);ctx.fillStyle=lethal?'#3b1d2b':'#19334e';ctx.fill();ctx.strokeStyle=lethal?'#ff8fa4':'#a2e2ff';ctx.lineWidth=3;ctx.stroke();ctx.shadowBlur=0;ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();for(let k=-h;k<w+h;k+=25)stroke(x+k,y+h,x+k+h,y,lethal?'#ff7e9730':'#76a8d02f',5);ctx.restore();if(!lethal){ctx.shadowColor='#79ffd6';ctx.shadowBlur=6;stroke(x+3,y+1,x+w-3,y+1,'#74ffd0',4);ctx.shadowBlur=0;}if(lethal){ctx.strokeStyle='#ffd8df';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x+6,y+h-6);ctx.lineTo(x+w-6,y+6);ctx.moveTo(x+6,y+h*.62);ctx.lineTo(x+w*.62,y+6);ctx.moveTo(x+w*.38,y+h-6);ctx.lineTo(x+w-6,y+h*.38);ctx.stroke();}ctx.restore()}
 function drawNumberGate(o){
  const x=screenX(o.x),w=o.width,topLimit=-70,bottom=FLOOR;
  const yLow=o.mode==='full'?0:o.lower*NUMBER_GATE_VERTICAL_UNIT;
@@ -889,11 +976,39 @@ function drawGapWalls(){
  }
  ctx.restore();
 }
+
+function drawMovingWallGuide(){
+ if(entries[idx].type!=='motionWall')return;
+ const o=objs.find(v=>v.moving);if(!o)return;
+ const m=o.motion,a=m.amplitude,top=o.originHeight,base=o.originBase;
+ ctx.save();ctx.setLineDash([6,6]);ctx.lineWidth=1.8;
+ const dim='#bcd8ff76';
+ if(m.axis==='x'){
+  for(const dx of [-a,a]){
+   ctx.strokeStyle=dim;ctx.strokeRect(screenX(o.originX+dx),scrY(top),o.width,(top-base)*ZOOM);
+  }
+  const y=scrY(top)+Math.max(25,(top-base)*ZOOM/2);
+  const x1=screenX(o.originX-a),x2=screenX(o.originX+a+o.width);
+  ctx.setLineDash([]);stroke(x1,y,x2,y,'#d6b5ff85',2);
+  ctx.fillStyle='#d9c1ff';ctx.font='bold 13px system-ui';ctx.textAlign='center';
+  ctx.fillText('↔ 左右移動',screenX(o.originX+a/8+o.width/2),Math.max(40,scrY(top)-24));
+ }else{
+  for(const dy of [-a,a]){
+   ctx.strokeStyle=dim;ctx.strokeRect(screenX(o.originX),scrY(top+dy),o.width,(top-base)*ZOOM);
+  }
+  const x=screenX(o.originX+o.width+18),y1=scrY(top+a),y2=scrY(base-a);
+  ctx.setLineDash([]);stroke(x,y1,x,y2,'#d6b5ff85',2);
+  ctx.fillStyle='#d9c1ff';ctx.font='bold 13px system-ui';ctx.textAlign='left';
+  ctx.fillText('↕',x+8,(y1+y2)/2);
+ }
+ ctx.restore();
+}
 function drawGoal(){let x=screenX(goal);if(x< -100||x>W+120)return;ctx.save();ctx.shadowColor='#61e4b8';ctx.shadowBlur=15;ctx.strokeStyle='#78f0ce';ctx.lineWidth=4;ctx.strokeRect(x-5,170,8,FLOOR-170);ctx.shadowBlur=0;ctx.fillStyle='#a2fce8';ctx.font='900 21px system-ui';ctx.textAlign='center';ctx.fillText('GOAL',x+9,160);ctx.restore()}
 function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);background();drawWallHeightReferences();
  const gaps=objs.filter(o=>o.type==='gap');function floor(a,b){if(b<=a)return;ctx.fillStyle='#13283d';ctx.fillRect(a,FLOOR,b-a,VH-FLOOR);stroke(a,FLOOR,b,FLOOR,'#c1e7fa',3);}
  if(!gaps.length)floor(0,W);else{let cursor=0;for(const o of gaps){let l=screenX(o.x),r=l+o.width;floor(cursor,Math.min(W,l));cursor=Math.max(cursor,r);stroke(l,FLOOR,l,VH,'#4d9fd577',2);stroke(r,FLOOR,r,VH,'#4d9fd577',2);}floor(cursor,W)}
  let off=-(state.distance%51);for(let x=off;x<W;x+=51){if(gaps.some(o=>x>screenX(o.x)&&x<screenX(o.x)+o.width))continue;stroke(x,FLOOR+22,x+19,FLOOR+22,'#4b708b',3)}
+ drawMovingWallGuide();
  for(const o of objs){if(o.type==='digitSwitch')drawDigitSwitch(o);if(o.type==='switchPlatform')drawSwitchPlatform(o);if(o.type==='wall')drawBlock(o);if(o.type==='spike')drawSpike(o);if(o.type==='airA')drawAirA(o);if(o.type==='airB')drawAirB(o);if(o.type==='numberGate')drawNumberGate(o);if(o.type==='numberPlatform')drawNumberPlatform(o);if(o.type==='ceiling'){let roof={type:'wall',x:o.x,width:o.width,height:0};let x=screenX(o.x),y=scrY(o.base),top=y-32;ctx.fillStyle='#14273f';ctx.fillRect(x,top,o.width,32);stroke(x,top,x+o.width,top,'#7caac9',3);drawSpike({type:'spike',x:o.x,width:o.width,count:Math.round(o.width/75),height:o.spikeH,base:o.base,down:true})}}
  drawGoal();
  drawJumpGuide();
@@ -936,13 +1051,18 @@ $('platformDefault').onclick=restorePlatform;
 $('switchTimeMinus').onclick=()=>changeSwitchTime(-1);
 $('switchTimePlus').onclick=()=>changeSwitchTime(1);
 $('switchDefault').onclick=restoreSwitchTime;
+$('motionRangeMinus').onclick=()=>changeMotion('range',-1);
+$('motionRangePlus').onclick=()=>changeMotion('range',1);
+$('motionPeriodMinus').onclick=()=>changeMotion('period',-1);
+$('motionPeriodPlus').onclick=()=>changeMotion('period',1);
+$('motionDefault').onclick=restoreMotion;
 $('prev').onclick=()=>setPage(idx-1);$('next').onclick=()=>setPage(idx+1);$('catalogButton').onclick=()=>catalog('catalog');$('ruleButton').onclick=()=>catalog('rules');$('close').onclick=closeCatalog;$('retry').onclick=()=>state.status==='paused'?togglePause():retry();$('resultNext').onclick=()=>setPage(idx+1);$('reset').onclick=retry();$('pause').onclick=togglePause;
 $('jump').addEventListener('pointerdown',e=>{e.preventDefault();action()});$('jump').addEventListener('click',e=>{if(e.detail===0)action()});stage.addEventListener('pointerdown',e=>{if(e.target.closest('button')||e.target.closest('.result'))return;e.preventDefault();action()});
 window.addEventListener('keydown',e=>{if($('overlay').classList.contains('open')){if(e.key==='Escape')closeCatalog();return;}if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();if(!e.repeat)action();}else if(e.code==='KeyR'){e.preventDefault();retry()}else if(e.code==='KeyP'){e.preventDefault();togglePause()}else if(e.code==='ArrowLeft'){e.preventDefault();setPage(idx-1)}else if(e.code==='ArrowRight'){e.preventDefault();setPage(idx+1)}});
 ['contextmenu','dragstart','selectstart','gesturestart'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
 // Exposed for automated smoke tests; the user-facing game never needs these hooks.
-window.__NRBook={version:'1.4.1',page:n=>setPage(n),start,jump,step:update,get:()=>({...state,index:idx,goal,obstacles:objs,completed:[...cleared]}),setSilent:v=>silent=!!v,wallSettings:()=>wallSettings.map(v=>({...v})),spikeCount:()=>idx<4?spikeCounts[idx]:null,changeSpikeCount,changeWall,restoreWall,gapSettings:()=>gapSettings.slice(),changeGap,restoreGap,airCount:()=>airEntries.length,numberSettings:()=>numberSettings.map(v=>({...v})),changeNumber,restoreNumber,platformSettings:()=>platformSettings.map(v=>({...v})),changePlatform,restorePlatform,switchSettings:()=>switchSettings.map(v=>({...v})),changeSwitchTime,restoreSwitchTime};
-new ResizeObserver(resize).observe(stage);progress();setPage(window.location.hash==='#gap'?22:window.location.hash==='#air'?26:window.location.hash==='#number'?30:window.location.hash==='#platform'?34:window.location.hash==='#switch'?38:0);requestAnimationFrame(loop);
+window.__NRBook={version:'1.5',page:n=>setPage(n),start,jump,step:update,get:()=>({...state,index:idx,goal,obstacles:objs,completed:[...cleared]}),setSilent:v=>silent=!!v,wallSettings:()=>wallSettings.map(v=>({...v})),spikeCount:()=>idx<4?spikeCounts[idx]:null,changeSpikeCount,changeWall,restoreWall,gapSettings:()=>gapSettings.slice(),changeGap,restoreGap,airCount:()=>airEntries.length,numberSettings:()=>numberSettings.map(v=>({...v})),changeNumber,restoreNumber,platformSettings:()=>platformSettings.map(v=>({...v})),changePlatform,restorePlatform,switchSettings:()=>switchSettings.map(v=>({...v})),changeSwitchTime,restoreSwitchTime,motionSettings:()=>motionSettings.map(v=>({...v})),changeMotion,restoreMotion};
+new ResizeObserver(resize).observe(stage);progress();setPage(window.location.hash==='#gap'?22:window.location.hash==='#air'?26:window.location.hash==='#number'?30:window.location.hash==='#platform'?34:window.location.hash==='#switch'?38:window.location.hash==='#motion'?41:0);requestAnimationFrame(loop);
 })();
 </script>
 </body>
