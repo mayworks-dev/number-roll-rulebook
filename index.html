@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — PLAYABLE RULEBOOK Ver.1.5</title>
+<title>NUMBER ROLL — PLAYABLE RULEBOOK Ver.1.6</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -119,11 +119,17 @@ body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 2
 .motion-tools .smallnote{font-size:10px;color:#a8cfe2}
 @media(max-width:650px){.motion-tools{gap:4px 7px;padding:3px 5px;font-size:10px;min-height:31px}.motion-tools button{height:24px;min-width:24px}.motion-tools .smallnote{display:none}}
 @media(max-height:390px) and (orientation:landscape){.motion-tools{padding:2px 5px;min-height:26px}.motion-tools button{height:22px}}
+
+.combo-banner{background:linear-gradient(90deg,#24364f,#203f49);border-bottom:1px solid #5fb3b1;color:#dcf9ef;padding:7px 12px;display:flex;gap:13px;align-items:center;flex-wrap:wrap;font-size:12px}
+.combo-banner[hidden]{display:none}
+.combo-banner span{font-size:10px;letter-spacing:1.3px;color:#bce9d7;font-weight:900}
+.combo-banner b{font-size:12px}.combo-banner small{color:#a9c9d2}
+@media(max-width:650px){.combo-banner{padding:5px 7px;gap:4px 10px}.combo-banner small{display:none}}
 </style>
 </head>
 <body>
 <main id="app">
-  <div class="top"><div><div class="brand">NUMBER ROLL / LEARNING MODE</div><h1>PLAYABLE RULEBOOK</h1><div class="sub">障害物の特徴を読み、実際に挑戦しよう / 下部の目盛りで幅と距離を確認</div></div><div class="progress">CLEAR<strong id="bookProgress">0 / 45</strong></div></div>
+  <div class="top"><div><div class="brand">NUMBER ROLL / LEARNING MODE</div><h1>PLAYABLE RULEBOOK</h1><div class="sub">障害物の特徴を読み、実際に挑戦しよう / 下部の目盛りで幅と距離を確認</div></div><div class="progress">CLEAR<strong id="bookProgress">0 / 51</strong></div></div>
   <section class="book" aria-label="プレイ型障害物図鑑">
     <div class="book-title"><div class="nameblock"><div class="chapter" id="number">01</div><div><div class="jp" id="jp">単体トゲ</div><div class="en" id="en">SINGLE SPIKE</div></div></div><div class="tip"><strong>攻略のヒント</strong><span id="tip"></span></div></div>
     <div class="calibration-tools" id="calibrationTools" hidden>
@@ -178,6 +184,7 @@ body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 2
       <button type="button" class="reset" id="motionDefault">基準に戻す</button>
       <span class="smallnote">距離0.25マス・周期0.5秒刻み</span>
     </div>
+    <div class="combo-banner" id="comboBanner" hidden><span>COMBO CHALLENGE</span><b>安全にGOALへ進めばクリア！</b><small>別ルート・スイッチ未起動・着地なしでもOK</small></div>
     <div class="stage" id="stage"><canvas id="game" aria-label="プレイ画面。タップかスペースキーでジャンプ"></canvas>
       <div class="stage-hud"><div class="stats-left"><div class="stat"><label>上の数字</label><b id="face">1</b></div><div class="stat"><label>ジャンプ残り</label><b id="jumps">1 / 1</b></div></div><div class="stats-right"><div class="stat slim" id="switchTimerBox" hidden><label>効果残り</label><b id="switchTimer">未起動</b></div><div class="stat slim"><label>進行</label><b id="distance">0%</b></div><div class="game-buttons"><button type="button" id="reset" class="game-icon" aria-label="リトライ">↻</button><button type="button" id="pause" class="game-icon" aria-label="一時停止">Ⅱ</button></div></div></div>
       <div class="bottom-controls"><div class="hint"><b id="actionHint">画面をタップしてスタート</b><span>タップ / Space / ↑：ジャンプ</span></div><button id="jump" class="jump" type="button">▶ スタート</button></div>
@@ -186,8 +193,8 @@ body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 2
     <div class="details"><div class="description" id="description"></div><div class="specs" id="specs"></div></div>
   </section>
   <nav class="footer"><button id="prev" class="nav" type="button">◀ 前の障害物</button><div class="center"><button id="catalogButton" class="nav" type="button">☷ 一覧</button><button id="ruleButton" class="nav" type="button">？ 操作</button></div><button id="next" class="nav" type="button">次の障害物 ▶</button></nav>
-  <div class="note">Ver.1.4.1 回避ルート対応｜接触せず飛び越え・通り抜けできればクリア。スイッチの起動や足場着地は必須ではありません。</div>
-  <div class="overlay" id="overlay"><div class="overlay-head"><h2 id="overlayTitle">障害物一覧</h2><button class="close" id="close" type="button">✕ 戻る</button></div><div class="catalog" id="catalog"></div><div id="rules" style="display:none;overflow:auto;touch-action:pan-y;color:#d1e5f3;line-height:1.75;font-size:14px;padding:6px 4px"><p><b>自動で右に進む四角形</b>をジャンプで操作します。画面のどこかをタップするか、Space・↑・Wキーでジャンプします。</p><p>ジャンプするたびに四角形は<b>時計回りに90°回転</b>し、上の数字が1→2→3→4→1の順に変わります。数字ごとに色も変わります。</p><p><b>着地した時の数字</b>が、次の着地までに使えるジャンプ回数です。空中で数字が変わっても、途中で回数の上限は変わりません。</p><p>最初の4ページはトゲ1 / 5 / 9 / 13個から検証できます。その次の8ページは、青枠・赤枠の壁を1〜4ジャンプ分の高さで練習できます。穴の幅の調整ページと空中トゲA/Bの単体・複合練習に続き、数字の壁4パターンと数字足場1〜4、数字スイッチ3種類を試せます。数字の壁は0.5マス幅で、紫の数字エリアは入った瞬間の数字が一致すれば通過できます。赤い部分は常に危険。数字エリアの途中で数字が変わっても判定は維持しますが、赤に接触すると失敗します。数字足場は上面のみ数字が一致すると安全に着地でき、ジャンプ回数が回復します。不一致で着地すると失敗。側面と下面は数字に関係なく危険ですが、十分な隙間があれば接触せずに下を通り抜けてもクリアできます。足場への着地は必須ではありません。数字スイッチは上面の数字が一致する状態で触れると、対応する仕掛け1つだけが一定時間変化します。スイッチを起動しなくても、仕掛けを安全に飛び越えたり回避できればクリアです。数字が違えばスイッチは素通りでき、何も起きません。壁の消去・穴の足場出現・トゲの後退を試せます。効果時間が切れると元に戻ります。縦の高さは見た目のプレイヤーサイズを1マスとして0.25マス刻みで調整します。壁の高さは0.25マス刻み、幅は0.5マス刻みで調整できます。Ver.0.8は壁の高さを「ひとつ少ないジャンプ回数では届かず、目標回数なら余裕がある」中間高度に再設計しました。青枠壁は幅2マス、赤枠は0.75マスを基準にしています。プレイ中の▲1〜4はジャンプする位置の目安です。青枠の壁は上に着地できてジャンプ回数が回復しますが、赤枠の壁は上も側面も危険です。穴の幅は0.25マス単位で調整できます。空中トゲAは全面接触禁止。空中トゲBは緑色の上面に着地可能で、着地するとジャンプ回数が回復します。Bの下面・側面は危険です。Bに着地せず、接触を避けて通過できてもクリアです。トゲ・壁などへの衝突は失敗。ただし、安全に上を飛び越えたり触れずに通過できればクリアです。数字の壁は画面上まで続くため、数字の一致で通過する必要があります。穴は落下中でもジャンプ回数が残っていれば復帰可能。穴の左右の側壁への衝突、または四角形が画面下へ完全に消えると失敗。青く光る<b>GOAL</b>を通ればクリア。失敗したら「リトライ」で何度でも練習できます。</p><p>操作：タップ / Space / ↑ / W = ジャンプ、R = リトライ、P = 一時停止、← / → = ページ移動。数字の色は <span style="color:#4fc3f7">1 青</span>・<span style="color:#94df84">2 緑</span>・<span style="color:#ffbc68">3 オレンジ</span>・<span style="color:#be9bff">4 紫</span>。</p></div></div>
+  <div class="note">Ver.1.6 複合コース対応｜接触せず飛び越え・通り抜けできればクリア。スイッチの起動や足場着地は必須ではありません。</div>
+  <div class="overlay" id="overlay"><div class="overlay-head"><h2 id="overlayTitle">障害物一覧</h2><button class="close" id="close" type="button">✕ 戻る</button></div><div class="catalog" id="catalog"></div><div id="rules" style="display:none;overflow:auto;touch-action:pan-y;color:#d1e5f3;line-height:1.75;font-size:14px;padding:6px 4px"><p><b>自動で右に進む四角形</b>をジャンプで操作します。画面のどこかをタップするか、Space・↑・Wキーでジャンプします。</p><p>ジャンプするたびに四角形は<b>時計回りに90°回転</b>し、上の数字が1→2→3→4→1の順に変わります。数字ごとに色も変わります。</p><p><b>着地した時の数字</b>が、次の着地までに使えるジャンプ回数です。空中で数字が変わっても、途中で回数の上限は変わりません。</p><p>最初の4ページはトゲ1 / 5 / 9 / 13個から検証できます。その次の8ページは、青枠・赤枠の壁を1〜4ジャンプ分の高さで練習できます。穴の幅の調整ページと空中トゲA/Bの単体・複合練習に続き、数字の壁4パターンと数字足場1〜4、数字スイッチ3種類を試せます。数字の壁は0.5マス幅で、紫の数字エリアは入った瞬間の数字が一致すれば通過できます。赤い部分は常に危険。数字エリアの途中で数字が変わっても判定は維持しますが、赤に接触すると失敗します。数字足場は上面のみ数字が一致すると安全に着地でき、ジャンプ回数が回復します。不一致で着地すると失敗。側面と下面は数字に関係なく危険ですが、十分な隙間があれば接触せずに下を通り抜けてもクリアできます。足場への着地は必須ではありません。数字スイッチは上面の数字が一致する状態で触れると、対応する仕掛け1つだけが一定時間変化します。スイッチを起動しなくても、仕掛けを安全に飛び越えたり回避できればクリアです。数字が違えばスイッチは素通りでき、何も起きません。壁の消去・穴の足場出現・トゲの後退を試せます。効果時間が切れると元に戻ります。縦の高さは見た目のプレイヤーサイズを1マスとして0.25マス刻みで調整します。壁の高さは0.25マス刻み、幅は0.5マス刻みで調整できます。Ver.0.8は壁の高さを「ひとつ少ないジャンプ回数では届かず、目標回数なら余裕がある」中間高度に再設計しました。青枠壁は幅2マス、赤枠は0.75マスを基準にしています。プレイ中の▲1〜4はジャンプする位置の目安です。青枠の壁は上に着地できてジャンプ回数が回復しますが、赤枠の壁は上も側面も危険です。穴の幅は0.25マス単位で調整できます。空中トゲAは全面接触禁止。空中トゲBは緑色の上面に着地可能で、着地するとジャンプ回数が回復します。Bの下面・側面は危険です。Bに着地せず、接触を避けて通過できてもクリアです。トゲ・壁などへの衝突は失敗。ただし、安全に上を飛び越えたり触れずに通過できればクリアです。数字の壁は画面上まで続くため、数字の一致で通過する必要があります。穴は落下中でもジャンプ回数が残っていれば復帰可能。穴の左右の側壁への衝突、または四角形が画面下へ完全に消えると失敗。青く光る<b>GOAL</b>を通ればクリア。失敗したら「リトライ」で何度でも練習できます。</p><p>Ver.1.6では、青枠壁＋トゲ、穴＋数字足場、数字壁＋トゲ、数字スイッチ＋トゲ、移動壁＋穴、天井トゲ＋中央数字壁の6つの複合練習コースを追加しています。複合コースは障害物を安全に避けてGOALへ到達すればクリアです。<b>特定の仕掛けを必ず使う必要はありません。</b></p><p>操作：タップ / Space / ↑ / W = ジャンプ、R = リトライ、P = 一時停止、← / → = ページ移動。数字の色は <span style="color:#4fc3f7">1 青</span>・<span style="color:#94df84">2 緑</span>・<span style="color:#ffbc68">3 オレンジ</span>・<span style="color:#be9bff">4 紫</span>。</p></div></div>
 </main>
 <script>
 (()=>{
@@ -269,7 +276,18 @@ const motionEntries=[
  {n:'M-03',jp:'移動する壁 / 青枠・上下',en:'MOVING WALL · BLUE / VERTICAL',type:'motionWall',lethal:false,axis:'y',face:3,initialX:1000,initialHeight:175,initialBase:85,width:235,range:144,period:3.8,phase:-.7,tip:'緑ラインに着地すると、壁の上下移動に乗って運ばれる',desc:'青い壁が上下に往復。上面に着地するとジャンプ回数が回復し、足場と一緒に上下する。横・下面にぶつかると失敗。触れずに飛び越えてもOK。',spec:[['種類','青枠（上面安全）'],['方向','上下往復'],['着地','ジャンプ回復'],['移動中','上下に運ばれる']]},
  {n:'M-04',jp:'移動する壁 / 青枠・左右',en:'MOVING WALL · BLUE / HORIZONTAL',type:'motionWall',lethal:false,axis:'x',face:3,initialX:1010,initialHeight:138,initialBase:45,width:240,range:224,period:3.6,phase:-.8,tip:'青い壁の上に乗ると、左右の移動分だけ一緒に運ばれる',desc:'青い壁が左右に往復。上面に着地している間は、オートランの前進に加えて壁の横移動分も反映。側面・下面は危険。安全に飛び越える・下を通る方法もOK。',spec:[['種類','青枠（上面安全）'],['方向','左右往復'],['着地','ジャンプ回復'],['移動中','前進＋壁の横移動']]}
 ];
-const entries=[...calibrationEntries,...wallEntries,...baseEntries,...gapEntries,...airEntries,...numberEntries,...platformEntries,...switchEntries,...motionEntries];
+
+// Ver.1.6: multiple basic and number-based hazards in a single practical course.
+// All six courses follow the free-route rule: finish safely, no mandatory switch or platform flags.
+const comboEntries=[
+ {n:'C-01',jp:'複合① 青枠の壁＋地上トゲ',en:'COMBO · BLUE WALL + SPIKES',type:'combo',combo:'wallSpike',face:2,tip:'青枠の上に着地して回復しても、飛び越えてもOK',desc:'青い壁のあとに地上トゲがある。上面に着地するとジャンプ回数が回復。続くトゲは接触せず飛び越えればOK。',spec:[['構成','青枠壁＋地上トゲ'],['開始数字','2'],['着地','回復可能'],['自由な攻略','着地は必須ではない']]},
+ {n:'C-02',jp:'複合② 穴＋数字足場',en:'COMBO · GAP + NUMBER PLATFORM',type:'combo',combo:'gapPlatform',face:2,tip:'数字3で足場に着地すると回復。渡れれば別ルートもOK',desc:'長い穴の途中に数字3の足場が浮かぶ。足場の上に数字3で着地すればジャンプ回数を補給できる。横・下面には触れないように。',spec:[['構成','穴＋数字足場3'],['開始数字','2'],['上面','数字3でのみ安全'],['クリア','対岸まで無事に渡る']]},
+ {n:'C-03',jp:'複合③ 数字の壁＋地上トゲ',en:'COMBO · NUMBER GATE + SPIKES',type:'combo',combo:'gateSpike',face:1,tip:'まず数字2で壁を通過し、着地してからトゲを越える',desc:'通過数字2の全面数字壁の先に地上トゲ。数字壁は指定数字でしか通れないが、トゲはジャンプで避ければいい。',spec:[['構成','数字壁2＋トゲ'],['開始数字','1'],['数字壁','数字2で通過'],['トゲ','触れずに回避']]},
+ {n:'C-04',jp:'複合④ 数字スイッチ＋トゲ列',en:'COMBO · SWITCH + SPIKE ROW',type:'combo',combo:'switchSpike',face:2,tip:'数字3のスイッチでトゲを収納。飛び越えられるなら未起動でもOK',desc:'数字3で触れると対応するトゲ列だけが一時的に引っ込む。スイッチを使う方法と、ジャンプで安全に飛び越える方法のどちらも有効。',spec:[['構成','数字スイッチ3＋地上トゲ'],['効果','トゲが4.0秒収納'],['スイッチ','起動は任意'],['クリア','接触せずにGOAL']]},
+ {n:'C-05',jp:'複合⑤ 移動する青枠壁＋穴',en:'COMBO · MOVING BLUE + GAP',type:'combo',combo:'motionGap',face:3,tip:'上下に動く青枠に乗っても、そのまま跳び越えてもOK',desc:'上下に移動する青枠壁と、すぐ先の穴を連続で突破する。壁上への着地は回復と持ち上げに使えるが、必須ではない。',spec:[['構成','上下移動の青枠壁＋穴'],['開始数字','3'],['移動壁','上面のみ安全'],['ゴール','穴の対岸']]},
+ {n:'C-06',jp:'複合⑥ 天井トゲ＋中央数字壁',en:'COMBO · CEILING + MIDDLE GATE',type:'combo',combo:'ceilingGate',face:2,tip:'天井トゲの下を抜けてから2回ジャンプし、数字4の窓を通る',desc:'天井のトゲがある間は高くジャンプしすぎない。その先にある数字4の中央通路へ、高さと数字を合わせて進む。',spec:[['構成','天井トゲ＋数字壁4'],['開始数字','2'],['前半','天井トゲを回避'],['後半','高さと数字4を合わせる']]}
+];
+const entries=[...calibrationEntries,...wallEntries,...baseEntries,...gapEntries,...airEntries,...numberEntries,...platformEntries,...switchEntries,...motionEntries,...comboEntries];
 const $=id=>document.getElementById(id), stage=$('stage'),canvas=$('game'),ctx=canvas.getContext('2d',{alpha:false});
 const COLORS={1:['#4fc3f7','#123d55'],2:['#94df84','#204e2b'],3:['#ffbc68','#5c3e14'],4:['#be9bff','#36244f']};
 const GRID_UNIT=64; // 横1マス = 64ゲーム単位
@@ -317,7 +335,7 @@ function restoreMotion(){
 function switchInfo(p=entries[idx]){return p.type==='digitSwitch'?switchSettings[switchEntries.indexOf(p)]:null;}
 function switchEffectActive(id){return (state?.effectTimers?.[id]||0)>0;}
 function refreshSwitchBar(){
- const p=entries[idx],on=p.type==='digitSwitch';$('switchTools').hidden=!on;$('switchTimerBox').hidden=!on;
+ const p=entries[idx],on=p.type==='digitSwitch';$('switchTools').hidden=!on;$('switchTimerBox').hidden=!(on||p.type==='combo'&&p.combo==='switchSpike');
  if(!on)return;
  const v=switchInfo(p),k={wall:'壁消去',platform:'足場出現',spikes:'トゲ後退'};
  $('switchKind').textContent='数字'+p.required+' / '+k[p.effect];
@@ -391,6 +409,36 @@ function restoreNumber(){
 }
 function createLevel(){
  const X=240+540;const type=entries[idx].type;
+
+ if(type==='combo'){
+   const p=entries[idx];
+   if(p.combo==='wallSpike'){
+     objs=[{...rectObj(925,128,154),lethal:false},spikeObj(1300,112,2,75)];
+     goal=1675;
+   }else if(p.combo==='gapPlatform'){
+     objs=[{type:'gap',x:960,width:520},{type:'numberPlatform',id:'combo-platform-3',x:1050,width:210,height:110,required:3,thickness:34}];
+     goal=1710;
+   }else if(p.combo==='gateSpike'){
+     objs=[{type:'numberGate',id:'combo-gate-2',x:925,width:32,required:2,mode:'full',lower:0,opening:2},spikeObj(1230,112,2,75)];
+     goal=1590;
+   }else if(p.combo==='switchSpike'){
+     const sw='combo-switch-3';
+     objs=[{type:'digitSwitch',id:sw,x:920,width:72,base:0,height:225,required:3,duration:4},
+           {...spikeObj(1250,256,5,80),switchId:sw}];
+     goal=1770;
+   }else if(p.combo==='motionGap'){
+     const wall={type:'wall',id:'combo-moving-blue',moving:true,lethal:false,x:930,width:190,height:118,base:0,
+       originX:930,originHeight:118,originBase:0,motion:{axis:'y',amplitude:30,period:3.8,phase:-.5}};
+     const displacement=wall.motion.amplitude*Math.sin(wall.motion.phase);
+     wall.height+=displacement;wall.base+=displacement;wall.oldX=wall.x;wall.oldHeight=wall.height;wall.oldBase=wall.base;
+     objs=[wall,{type:'gap',x:1330,width:350}];goal=1900;
+   }else if(p.combo==='ceilingGate'){
+     objs=[{type:'ceiling',x:835,width:282,base:335,spikeH:78},
+       {type:'numberGate',id:'combo-gate-4',x:1450,width:32,required:4,mode:'middle',lower:.75,opening:2}];
+     goal=1740;
+   }
+   return;
+ }
  if(type==='motionWall'){
    const p=entries[idx],v=motionInfo(p),a=v.range/2;
    const o={type:'wall',id:p.n,moving:true,lethal:p.lethal,
@@ -524,19 +572,20 @@ function restoreGap(){
  gapSettings[j]=entries[idx].initialWidth;
  refreshGapBar();createLevel();newState();showResult('ready');draw();
 }
-function setPage(n){idx=Math.max(0,Math.min(entries.length-1,n));const p=entries[idx];$('number').textContent=p.n;$('jp').textContent=p.jp;$('en').textContent=p.en;$('tip').textContent=p.tip;$('description').textContent=p.desc;$('specs').innerHTML=p.spec.map(([k,v])=>`<div class="spec"><span>${k}</span><b>${v}</b></div>`).join('');$('prev').disabled=idx===0;$('next').disabled=idx===entries.length-1;refreshCalibrationBar();refreshWallBar();refreshGapBar();refreshNumberBar();refreshPlatformBar();refreshSwitchBar();refreshMotionBar();createLevel();newState();showResult('ready');draw();}
+function setPage(n){idx=Math.max(0,Math.min(entries.length-1,n));const p=entries[idx];$('number').textContent=p.n;$('jp').textContent=p.jp;$('en').textContent=p.en;$('tip').textContent=p.tip;$('description').textContent=p.desc;$('specs').innerHTML=p.spec.map(([k,v])=>`<div class="spec"><span>${k}</span><b>${v}</b></div>`).join('');$('prev').disabled=idx===0;$('next').disabled=idx===entries.length-1;refreshCalibrationBar();refreshWallBar();refreshGapBar();refreshNumberBar();refreshPlatformBar();refreshSwitchBar();refreshMotionBar();$('comboBanner').hidden=p.type!=='combo';createLevel();newState();showResult('ready');draw();}
 function start(){newState();state.status='running';hideResult();ui();}
 function retry(){start()}
-function showResult(kind){const box=$('result');box.classList.add('show');$('resultNext').hidden=(kind!=='win'||idx===entries.length-1);$('retry').textContent=kind==='ready'?'▶ スタート':'↻ リトライ';$('resultTitle').className='result-title '+(kind==='win'?'win':kind==='lose'?'lose':'');if(kind==='ready'){$('resultTitle').textContent='練習 '+entries[idx].n;$('resultCaption').textContent='障害物を避けてGOALへ！ '+entries[idx].tip+'。';}else if(kind==='win'){$('resultTitle').textContent='✓ CLEAR!';$('resultCaption').textContent=entries[idx].type==='calibration'?`トゲ${spikeCounts[idx]}個（${(spikeCounts[idx]*SPIKE_PITCH/GRID_UNIT).toFixed(2)}マス）を突破！ 今回のジャンプ操作：${state.totalJumps}回。長さを変更して再挑戦できます。`:entries[idx].type==='wallCalibration'?`高さ ${(wallSettings[idx-calibrationEntries.length].height/GRID_UNIT).toFixed(2)}マス / 幅 ${(wallSettings[idx-calibrationEntries.length].width/GRID_UNIT).toFixed(1)}マスを${state.totalJumps}回のジャンプで突破！ 調整して再挑戦できます。`:entries[idx].type==='gapCalibration'?`幅 ${(gapSettings[idx-calibrationEntries.length-wallEntries.length-baseEntries.length]/GRID_UNIT).toFixed(2)}マスの穴を${state.totalJumps}回のジャンプで突破！ 穴の幅を調整して再挑戦できます。`:entries[idx].type==='motionWall'?state.motionLandings>0?`動く青枠に${state.motionLandings}回着地してクリア！ 足場と一緒に運ばれた移動も確認しよう。`:`動く壁を接触せずに突破！ 上を飛び越える攻略もOK。`:entries[idx].type==='digitSwitch'?state.switchActivations>0?`数字${entries[idx].required}のスイッチを起動し、仕掛けを突破！ 効果時間も調整できます。`:`スイッチを使わず、障害物を安全に突破！ 回避ルートでもクリアです。`:entries[idx].type==='numberPlatform'?state.platformLandings>0?`数字${entries[idx].required}の足場に着地してクリア！ ジャンプ回数が回復しました。`:`数字${entries[idx].required}の足場の下を、触れずに通過してクリア！` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の壁を突破！ 数字の一致と赤い部分への接触を確認しよう。`:entries[idx].type.startsWith('airB')?state.airBLandings>0?`Bの上面に${state.airBLandings}回着地してクリア！ 着地するとジャンプ回数が回復します。`:`Bに着地せず、接触を避けてクリア！ 回避ルートもOKです。`:'障害物「'+entries[idx].jp+'」を突破！ 同じコースを再挑戦することもできます。';}else if(kind==='paused'){$('resultTitle').textContent='Ⅱ 一時停止';$('resultCaption').textContent='再開すると同じ位置からプレイできます。';$('retry').textContent='▶ 再開';}else{$('resultTitle').textContent='GAME OVER';$('resultCaption').textContent=state.cause||'もう一度ジャンプのタイミングを試してみよう。';}}
+function showResult(kind){const box=$('result');box.classList.add('show');$('resultNext').hidden=(kind!=='win'||idx===entries.length-1);$('retry').textContent=kind==='ready'?'▶ スタート':'↻ リトライ';$('resultTitle').className='result-title '+(kind==='win'?'win':kind==='lose'?'lose':'');if(kind==='ready'){$('resultTitle').textContent='練習 '+entries[idx].n;$('resultCaption').textContent='障害物を避けてGOALへ！ '+entries[idx].tip+'。';}else if(kind==='win'){$('resultTitle').textContent='✓ CLEAR!';$('resultCaption').textContent=entries[idx].type==='calibration'?`トゲ${spikeCounts[idx]}個（${(spikeCounts[idx]*SPIKE_PITCH/GRID_UNIT).toFixed(2)}マス）を突破！ 今回のジャンプ操作：${state.totalJumps}回。長さを変更して再挑戦できます。`:entries[idx].type==='wallCalibration'?`高さ ${(wallSettings[idx-calibrationEntries.length].height/GRID_UNIT).toFixed(2)}マス / 幅 ${(wallSettings[idx-calibrationEntries.length].width/GRID_UNIT).toFixed(1)}マスを${state.totalJumps}回のジャンプで突破！ 調整して再挑戦できます。`:entries[idx].type==='gapCalibration'?`幅 ${(gapSettings[idx-calibrationEntries.length-wallEntries.length-baseEntries.length]/GRID_UNIT).toFixed(2)}マスの穴を${state.totalJumps}回のジャンプで突破！ 穴の幅を調整して再挑戦できます。`:entries[idx].type==='combo'?`複数の障害物を突破！ ジャンプ${state.totalJumps}回、数字の変化や着地も確認しよう。`:entries[idx].type==='motionWall'?state.motionLandings>0?`動く青枠に${state.motionLandings}回着地してクリア！ 足場と一緒に運ばれた移動も確認しよう。`:`動く壁を接触せずに突破！ 上を飛び越える攻略もOK。`:entries[idx].type==='digitSwitch'?state.switchActivations>0?`数字${entries[idx].required}のスイッチを起動し、仕掛けを突破！ 効果時間も調整できます。`:`スイッチを使わず、障害物を安全に突破！ 回避ルートでもクリアです。`:entries[idx].type==='numberPlatform'?state.platformLandings>0?`数字${entries[idx].required}の足場に着地してクリア！ ジャンプ回数が回復しました。`:`数字${entries[idx].required}の足場の下を、触れずに通過してクリア！` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の壁を突破！ 数字の一致と赤い部分への接触を確認しよう。`:entries[idx].type.startsWith('airB')?state.airBLandings>0?`Bの上面に${state.airBLandings}回着地してクリア！ 着地するとジャンプ回数が回復します。`:`Bに着地せず、接触を避けてクリア！ 回避ルートもOKです。`:'障害物「'+entries[idx].jp+'」を突破！ 同じコースを再挑戦することもできます。';}else if(kind==='paused'){$('resultTitle').textContent='Ⅱ 一時停止';$('resultCaption').textContent='再開すると同じ位置からプレイできます。';$('retry').textContent='▶ 再開';}else{$('resultTitle').textContent='GAME OVER';$('resultCaption').textContent=state.cause||'もう一度ジャンプのタイミングを試してみよう。';}}
 function hideResult(){$('result').classList.remove('show')}
 function fail(reason){if(state.status!=='running')return;state.status='lost';state.cause=reason;showResult('lose');ui()}
 function win(){if(state.status!=='running')return;state.status='won';if(!cleared.includes(idx)){cleared.push(idx);save();progress();}showResult('win');ui();}
 function jump(){if(state.status==='ready'){start();return;}if(state.status!=='running')return;const s=state;if(s.air&&s.used>=s.limit)return;if(!s.air){s.limit=s.face;s.used=0;}s.air=true;s.used++;s.totalJumps++;s.vy=JUMP;s.groundH=0;s.turnFrom=s.angle;s.turnTo+=Math.PI/2;s.turn=0;s.face=s.face%4+1;s.groundObject=null;ui();}
 function togglePause(){if(state.status==='running'){state.status='paused';showResult('paused')}else if(state.status==='paused'){state.status='running';hideResult()}last=0;ui()}
 function ui(){const s=state;if(!s)return;let left=s.air?Math.max(0,s.limit-s.used):s.face,total=s.air?s.limit:s.face;$('face').textContent=s.face;$('face').style.color=COLORS[s.face][0];$('jumps').textContent=`${left} / ${total}`;$('distance').textContent=Math.round(Math.min(1,s.distance/(goal-240))*100)+'%';
- if(entries[idx].type==='digitSwitch'){
-  const rem=s.effectTimers[entries[idx].n]||0;
-  $('switchTimer').textContent=rem>0?rem.toFixed(1)+'秒':s.switchTriggered[entries[idx].n]?'終了':'未起動';
+ if(entries[idx].type==='digitSwitch'||entries[idx].type==='combo'&&entries[idx].combo==='switchSpike'){
+  const timerId=entries[idx].type==='combo'?'combo-switch-3':entries[idx].n;
+  const rem=s.effectTimers[timerId]||0;
+  $('switchTimer').textContent=rem>0?rem.toFixed(1)+'秒':s.switchTriggered[timerId]?'終了':'未起動';
   $('switchTimer').style.color=rem>0?'#8dffd4':'#ffc1d6';
  }$('actionHint').textContent=s.status==='running'?(s.y<0&&objs.some(o=>o.type==='gap')?'落下中！ ↑ ジャンプで復帰':entries[idx].type.startsWith('airB')?`B着地 ${s.airBLandings}回 / 避けてもOK`:entries[idx].type==='motionWall'?`壁が${entries[idx].axis==='y'?'上下':'左右'}に移動中！ 青枠なら上に着地OK`:entries[idx].type==='digitSwitch'?`数字${entries[idx].required}で起動／回避できれば起動不要`:entries[idx].type==='numberPlatform'?`数字${entries[idx].required}で着地／下を避けて通過もOK` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の部分を通り抜けよう`:'画面タップでジャンプ'):s.status==='paused'?'一時停止中':s.status==='won'?'クリア！':s.status==='lost'?'もう一度挑戦': 'まずはスタート';$('jump').textContent=s.status==='ready'?'▶ スタート':s.status==='running'?'↑ ジャンプ':s.status==='paused'?'▶ 再開':s.status==='lost'?'↻ リトライ':'次の障害物 ▶';$('jump').disabled=s.status==='running'&&left===0;$('pause').textContent=s.status==='paused'?'▶':'Ⅱ';}
 function action(){if(state.status==='running'||state.status==='ready')jump();else if(state.status==='paused')togglePause();else if(state.status==='won')setPage(Math.min(idx+1,entries.length-1));else retry();}
@@ -951,7 +1000,7 @@ function drawSwitchPlatform(o){
  ctx.fillStyle='#bcffe7';ctx.font='bold 12px system-ui';ctx.textAlign='center';ctx.fillText('LAND / 回復',x+o.width/2,y-14);ctx.restore();
 }
 function drawSwitchGuide(){
- if(entries[idx].type!=='digitSwitch')return;
+ if(entries[idx].type!=='digitSwitch'&&entries[idx].combo!=='switchSpike')return;
  const p=entries[idx],sw=objs.find(o=>o.type==='digitSwitch');if(!sw)return;
  const x=screenX(sw.x-105);if(x>=-30&&x<=W+30){
   ctx.save();ctx.fillStyle='#efc3ff';ctx.strokeStyle='#efc3ff';ctx.textAlign='center';ctx.font='900 12px system-ui';ctx.fillText('▲ ジャンプ目安',x,FLOOR-34);
@@ -978,7 +1027,7 @@ function drawGapWalls(){
 }
 
 function drawMovingWallGuide(){
- if(entries[idx].type!=='motionWall')return;
+ if(!objs.some(v=>v.moving))return;
  const o=objs.find(v=>v.moving);if(!o)return;
  const m=o.motion,a=m.amplitude,top=o.originHeight,base=o.originBase;
  ctx.save();ctx.setLineDash([6,6]);ctx.lineWidth=1.8;
@@ -1061,8 +1110,8 @@ $('jump').addEventListener('pointerdown',e=>{e.preventDefault();action()});$('ju
 window.addEventListener('keydown',e=>{if($('overlay').classList.contains('open')){if(e.key==='Escape')closeCatalog();return;}if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();if(!e.repeat)action();}else if(e.code==='KeyR'){e.preventDefault();retry()}else if(e.code==='KeyP'){e.preventDefault();togglePause()}else if(e.code==='ArrowLeft'){e.preventDefault();setPage(idx-1)}else if(e.code==='ArrowRight'){e.preventDefault();setPage(idx+1)}});
 ['contextmenu','dragstart','selectstart','gesturestart'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
 // Exposed for automated smoke tests; the user-facing game never needs these hooks.
-window.__NRBook={version:'1.5',page:n=>setPage(n),start,jump,step:update,get:()=>({...state,index:idx,goal,obstacles:objs,completed:[...cleared]}),setSilent:v=>silent=!!v,wallSettings:()=>wallSettings.map(v=>({...v})),spikeCount:()=>idx<4?spikeCounts[idx]:null,changeSpikeCount,changeWall,restoreWall,gapSettings:()=>gapSettings.slice(),changeGap,restoreGap,airCount:()=>airEntries.length,numberSettings:()=>numberSettings.map(v=>({...v})),changeNumber,restoreNumber,platformSettings:()=>platformSettings.map(v=>({...v})),changePlatform,restorePlatform,switchSettings:()=>switchSettings.map(v=>({...v})),changeSwitchTime,restoreSwitchTime,motionSettings:()=>motionSettings.map(v=>({...v})),changeMotion,restoreMotion};
-new ResizeObserver(resize).observe(stage);progress();setPage(window.location.hash==='#gap'?22:window.location.hash==='#air'?26:window.location.hash==='#number'?30:window.location.hash==='#platform'?34:window.location.hash==='#switch'?38:window.location.hash==='#motion'?41:0);requestAnimationFrame(loop);
+window.__NRBook={version:'1.6',page:n=>setPage(n),start,jump,step:update,get:()=>({...state,index:idx,goal,obstacles:objs,completed:[...cleared]}),setSilent:v=>silent=!!v,wallSettings:()=>wallSettings.map(v=>({...v})),spikeCount:()=>idx<4?spikeCounts[idx]:null,changeSpikeCount,changeWall,restoreWall,gapSettings:()=>gapSettings.slice(),changeGap,restoreGap,airCount:()=>airEntries.length,numberSettings:()=>numberSettings.map(v=>({...v})),changeNumber,restoreNumber,platformSettings:()=>platformSettings.map(v=>({...v})),changePlatform,restorePlatform,switchSettings:()=>switchSettings.map(v=>({...v})),changeSwitchTime,restoreSwitchTime,motionSettings:()=>motionSettings.map(v=>({...v})),changeMotion,restoreMotion};
+new ResizeObserver(resize).observe(stage);progress();setPage(window.location.hash==='#gap'?22:window.location.hash==='#air'?26:window.location.hash==='#number'?30:window.location.hash==='#platform'?34:window.location.hash==='#switch'?38:window.location.hash==='#motion'?41:window.location.hash==='#combo'?45:0);requestAnimationFrame(loop);
 })();
 </script>
 </body>
