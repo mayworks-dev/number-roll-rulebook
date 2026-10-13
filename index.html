@@ -74,6 +74,28 @@ body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 2
 .number-tools .note-s{font-size:10px;color:#b2baf6}
 @media(max-width:650px){.number-tools{gap:3px 6px;padding:3px 5px;font-size:10px;min-height:31px}.number-tools button{height:24px;min-width:24px}.number-tools .note-s{display:none}}
 @media(max-height:390px) and (orientation:landscape){.number-tools{min-height:28px;padding:2px 5px}.number-tools button{height:22px}}
+/* Keep longer Japanese names inside the title area, particularly on iPhone. */
+.nameblock{flex:1;min-width:0}
+.nameblock>div:last-child{min-width:0;max-width:100%}
+.en{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.tip{flex-shrink:0}
+@media(max-width:600px) and (orientation:portrait){
+ .book-title{flex-direction:column;align-items:stretch;gap:4px}
+ .nameblock{width:100%}
+ .jp{font-size:18px}
+ .tip{max-width:100%;padding-left:42px;text-align:left;font-size:10px}
+ .tip strong{display:none}
+}
+/* Timed digit switches (Ver.1.4) */
+.switch-tools{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 12px;min-height:40px;padding:5px 9px;background:#38283f;border-bottom:1px solid #ac7cd3;font-size:11px;color:#f7e7ff}
+.switch-tools[hidden]{display:none}
+.switch-tools .switch-tag{border:1px solid #dbacff;background:#573968;color:#ffdcff;border-radius:5px;padding:4px 8px;font-weight:900}
+.switch-tools button{border:1px solid #c194df;background:#54396b;color:white;font-weight:900;min-width:28px;height:27px;border-radius:6px;font-size:15px}
+.switch-tools strong{display:inline-block;min-width:53px;text-align:center;font-variant-numeric:tabular-nums}
+.switch-tools .reset{font-size:10px;padding:0 9px}
+.switch-tools .hint-s{font-size:10px;color:#d5b6e6}
+@media(max-width:650px){.switch-tools{padding:3px 5px;min-height:30px;font-size:10px;gap:4px 6px}.switch-tools button{height:24px;min-width:24px}.switch-tools .hint-s{display:none}}
+@media(max-height:390px) and (orientation:landscape){.switch-tools{padding:2px 5px;min-height:27px}.switch-tools button{height:22px}}
 /* Digit platforms (Ver.1.3.1) */
 .platform-tools{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px 11px;min-height:39px;padding:5px 9px;background:#173b3c;border-bottom:1px solid #52bda7;color:#e7fff9;font-size:11px}
 .platform-tools[hidden]{display:none}
@@ -89,7 +111,7 @@ body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 2
 </head>
 <body>
 <main id="app">
-  <div class="top"><div><div class="brand">NUMBER ROLL / LEARNING MODE</div><h1>PLAYABLE RULEBOOK</h1><div class="sub">障害物の特徴を読み、実際に挑戦しよう / 下部の目盛りで幅と距離を確認</div></div><div class="progress">CLEAR<strong id="bookProgress">0 / 38</strong></div></div>
+  <div class="top"><div><div class="brand">NUMBER ROLL / LEARNING MODE</div><h1>PLAYABLE RULEBOOK</h1><div class="sub">障害物の特徴を読み、実際に挑戦しよう / 下部の目盛りで幅と距離を確認</div></div><div class="progress">CLEAR<strong id="bookProgress">0 / 41</strong></div></div>
   <section class="book" aria-label="プレイ型障害物図鑑">
     <div class="book-title"><div class="nameblock"><div class="chapter" id="number">01</div><div><div class="jp" id="jp">単体トゲ</div><div class="en" id="en">SINGLE SPIKE</div></div></div><div class="tip"><strong>攻略のヒント</strong><span id="tip"></span></div></div>
     <div class="calibration-tools" id="calibrationTools" hidden>
@@ -129,16 +151,23 @@ body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 2
       <button type="button" class="reset" id="platformDefault">基準に戻す</button>
       <span class="note-s">高さ0.25・横幅0.5マス刻み</span>
     </div>
+    <div class="switch-tools" id="switchTools" hidden>
+      <span class="switch-tag" id="switchKind">数字スイッチ</span>
+      <span>効果時間</span><button id="switchTimeMinus" type="button" aria-label="効果時間を0.5秒短くする">−</button>
+      <strong id="switchTime">4.0秒</strong><button id="switchTimePlus" type="button" aria-label="効果時間を0.5秒長くする">＋</button>
+      <button class="reset" id="switchDefault" type="button">基準に戻す</button>
+      <span class="hint-s">他の仕掛けには影響しません</span>
+    </div>
     <div class="stage" id="stage"><canvas id="game" aria-label="プレイ画面。タップかスペースキーでジャンプ"></canvas>
-      <div class="stage-hud"><div class="stats-left"><div class="stat"><label>上の数字</label><b id="face">1</b></div><div class="stat"><label>ジャンプ残り</label><b id="jumps">1 / 1</b></div></div><div class="stats-right"><div class="stat slim"><label>進行</label><b id="distance">0%</b></div><div class="game-buttons"><button type="button" id="reset" class="game-icon" aria-label="リトライ">↻</button><button type="button" id="pause" class="game-icon" aria-label="一時停止">Ⅱ</button></div></div></div>
+      <div class="stage-hud"><div class="stats-left"><div class="stat"><label>上の数字</label><b id="face">1</b></div><div class="stat"><label>ジャンプ残り</label><b id="jumps">1 / 1</b></div></div><div class="stats-right"><div class="stat slim" id="switchTimerBox" hidden><label>効果残り</label><b id="switchTimer">未起動</b></div><div class="stat slim"><label>進行</label><b id="distance">0%</b></div><div class="game-buttons"><button type="button" id="reset" class="game-icon" aria-label="リトライ">↻</button><button type="button" id="pause" class="game-icon" aria-label="一時停止">Ⅱ</button></div></div></div>
       <div class="bottom-controls"><div class="hint"><b id="actionHint">画面をタップしてスタート</b><span>タップ / Space / ↑：ジャンプ</span></div><button id="jump" class="jump" type="button">▶ スタート</button></div>
       <div class="result show" id="result"><div class="result-card"><div class="result-title" id="resultTitle">練習 01</div><div class="result-caption" id="resultCaption">障害物を避けてゴールへ。ジャンプすると90°回転し、数字と色が変わります。</div><div class="result-actions"><button class="primary" id="retry" type="button">▶ スタート</button><button class="secondary" id="resultNext" type="button" hidden>次の障害物 ▶</button></div></div></div>
     </div>
     <div class="details"><div class="description" id="description"></div><div class="specs" id="specs"></div></div>
   </section>
   <nav class="footer"><button id="prev" class="nav" type="button">◀ 前の障害物</button><div class="center"><button id="catalogButton" class="nav" type="button">☷ 一覧</button><button id="ruleButton" class="nav" type="button">？ 操作</button></div><button id="next" class="nav" type="button">次の障害物 ▶</button></nav>
-  <div class="note">Ver.1.3.1 数字足場｜数字が一致すれば上面に着地・回復。接触せず下を通るのもOK。</div>
-  <div class="overlay" id="overlay"><div class="overlay-head"><h2 id="overlayTitle">障害物一覧</h2><button class="close" id="close" type="button">✕ 戻る</button></div><div class="catalog" id="catalog"></div><div id="rules" style="display:none;overflow:auto;touch-action:pan-y;color:#d1e5f3;line-height:1.75;font-size:14px;padding:6px 4px"><p><b>自動で右に進む四角形</b>をジャンプで操作します。画面のどこかをタップするか、Space・↑・Wキーでジャンプします。</p><p>ジャンプするたびに四角形は<b>時計回りに90°回転</b>し、上の数字が1→2→3→4→1の順に変わります。数字ごとに色も変わります。</p><p><b>着地した時の数字</b>が、次の着地までに使えるジャンプ回数です。空中で数字が変わっても、途中で回数の上限は変わりません。</p><p>最初の4ページはトゲ1 / 5 / 9 / 13個から検証できます。その次の8ページは、青枠・赤枠の壁を1〜4ジャンプ分の高さで練習できます。穴の幅の調整ページと空中トゲA/Bの単体・複合練習に続き、数字の壁4パターンと数字足場1〜4を試せます。数字の壁は0.5マス幅で、紫の数字エリアは入った瞬間の数字が一致すれば通過できます。赤い部分は常に危険。数字エリアの途中で数字が変わっても判定は維持しますが、赤に接触すると失敗します。数字足場は上面のみ数字が一致すると安全に着地でき、ジャンプ回数が回復します。不一致で着地すると失敗。側面と下面は数字に関係なく危険ですが、十分な隙間があれば接触せずに下を通り抜けてもクリアできます。足場への着地は必須ではありません。縦の高さは見た目のプレイヤーサイズを1マスとして0.25マス刻みで調整します。壁の高さは0.25マス刻み、幅は0.5マス刻みで調整できます。Ver.0.8は壁の高さを「ひとつ少ないジャンプ回数では届かず、目標回数なら余裕がある」中間高度に再設計しました。青枠壁は幅2マス、赤枠は0.75マスを基準にしています。プレイ中の▲1〜4はジャンプする位置の目安です。青枠の壁は上に着地できてジャンプ回数が回復しますが、赤枠の壁は上も側面も危険です。穴の幅は0.25マス単位で調整できます。空中トゲAは全面接触禁止。空中トゲBは緑色の上面に着地可能で、着地するとジャンプ回数が回復します。Bの下面・側面は危険です。トゲ・壁などへの衝突は失敗。穴は落下中でもジャンプ回数が残っていれば復帰可能。穴の左右の側壁への衝突、または四角形が画面下へ完全に消えると失敗。青く光る<b>GOAL</b>を通ればクリア。失敗したら「リトライ」で何度でも練習できます。</p><p>操作：タップ / Space / ↑ / W = ジャンプ、R = リトライ、P = 一時停止、← / → = ページ移動。数字の色は <span style="color:#4fc3f7">1 青</span>・<span style="color:#94df84">2 緑</span>・<span style="color:#ffbc68">3 オレンジ</span>・<span style="color:#be9bff">4 紫</span>。</p></div></div>
+  <div class="note">Ver.1.4 数字スイッチ｜正しい数字で触れると、対応する1つの仕掛けが一定時間だけ変化。</div>
+  <div class="overlay" id="overlay"><div class="overlay-head"><h2 id="overlayTitle">障害物一覧</h2><button class="close" id="close" type="button">✕ 戻る</button></div><div class="catalog" id="catalog"></div><div id="rules" style="display:none;overflow:auto;touch-action:pan-y;color:#d1e5f3;line-height:1.75;font-size:14px;padding:6px 4px"><p><b>自動で右に進む四角形</b>をジャンプで操作します。画面のどこかをタップするか、Space・↑・Wキーでジャンプします。</p><p>ジャンプするたびに四角形は<b>時計回りに90°回転</b>し、上の数字が1→2→3→4→1の順に変わります。数字ごとに色も変わります。</p><p><b>着地した時の数字</b>が、次の着地までに使えるジャンプ回数です。空中で数字が変わっても、途中で回数の上限は変わりません。</p><p>最初の4ページはトゲ1 / 5 / 9 / 13個から検証できます。その次の8ページは、青枠・赤枠の壁を1〜4ジャンプ分の高さで練習できます。穴の幅の調整ページと空中トゲA/Bの単体・複合練習に続き、数字の壁4パターンと数字足場1〜4、数字スイッチ3種類を試せます。数字の壁は0.5マス幅で、紫の数字エリアは入った瞬間の数字が一致すれば通過できます。赤い部分は常に危険。数字エリアの途中で数字が変わっても判定は維持しますが、赤に接触すると失敗します。数字足場は上面のみ数字が一致すると安全に着地でき、ジャンプ回数が回復します。不一致で着地すると失敗。側面と下面は数字に関係なく危険ですが、十分な隙間があれば接触せずに下を通り抜けてもクリアできます。足場への着地は必須ではありません。数字スイッチは上面の数字が一致する状態で触れると、対応する仕掛け1つだけが一定時間変化します。数字が違えばスイッチは素通りでき、何も起きません。壁の消去・穴の足場出現・トゲの後退を試せます。効果時間が切れると元に戻ります。縦の高さは見た目のプレイヤーサイズを1マスとして0.25マス刻みで調整します。壁の高さは0.25マス刻み、幅は0.5マス刻みで調整できます。Ver.0.8は壁の高さを「ひとつ少ないジャンプ回数では届かず、目標回数なら余裕がある」中間高度に再設計しました。青枠壁は幅2マス、赤枠は0.75マスを基準にしています。プレイ中の▲1〜4はジャンプする位置の目安です。青枠の壁は上に着地できてジャンプ回数が回復しますが、赤枠の壁は上も側面も危険です。穴の幅は0.25マス単位で調整できます。空中トゲAは全面接触禁止。空中トゲBは緑色の上面に着地可能で、着地するとジャンプ回数が回復します。Bの下面・側面は危険です。トゲ・壁などへの衝突は失敗。穴は落下中でもジャンプ回数が残っていれば復帰可能。穴の左右の側壁への衝突、または四角形が画面下へ完全に消えると失敗。青く光る<b>GOAL</b>を通ればクリア。失敗したら「リトライ」で何度でも練習できます。</p><p>操作：タップ / Space / ↑ / W = ジャンプ、R = リトライ、P = 一時停止、← / → = ページ移動。数字の色は <span style="color:#4fc3f7">1 青</span>・<span style="color:#94df84">2 緑</span>・<span style="color:#ffbc68">3 オレンジ</span>・<span style="color:#be9bff">4 紫</span>。</p></div></div>
 </main>
 <script>
 (()=>{
@@ -205,7 +234,13 @@ const platformEntries=[
  {n:'P-03',jp:'数字足場 / 数字4',en:'NUMBER PLATFORM · 4',type:'numberPlatform',face:2,required:4,initialHeight:182,initialWidth:192,tip:'数字4で着地・回復、または下を安全に通過',desc:'数字4の高めの足場。2から2回ジャンプで4を作れば上に着地して回復できる。十分な隙間があれば、触れずに下をくぐってもクリア可能。側面・下面への接触はアウト。',spec:[['指定数字','4'],['初期高さ','2.84マス'],['初期幅','3.00マス'],['着地','ジャンプ回復']]},
  {n:'P-04',jp:'数字足場 / 数字1',en:'NUMBER PLATFORM · 1',type:'numberPlatform',face:3,required:1,initialHeight:185,initialWidth:192,tip:'数字1で着地・回復、または下を安全に通過',desc:'数字1の高い足場。3から2回ジャンプして1で上面に着地すると、ジャンプ回数が1回分に回復。足場に触れず下をくぐるのもOK。側面・下面への接触はアウト。',spec:[['指定数字','1'],['初期高さ','2.89マス'],['初期幅','3.00マス'],['着地','ジャンプ回復']]}
 ];
-const entries=[...calibrationEntries,...wallEntries,...baseEntries,...gapEntries,...airEntries,...numberEntries,...platformEntries];
+// Each digit switch controls precisely one target object. Effects are timed and independent.
+const switchEntries=[
+ {n:'S-01',jp:'数字スイッチ / 壁が消える',en:'NUMBER SWITCH · REMOVE WALL',face:1,required:2,type:'digitSwitch',effect:'wall',duration:3.5,tip:'数字2でスイッチに触れると赤い壁が消える',desc:'数字2でスイッチを押すと、その先にある危険な壁だけが3.5秒間消える。数字が違う場合は何も起きず、スイッチをすり抜ける。',spec:[['指定数字','2'],['変化','赤い壁の消去'],['効果時間','初期3.5秒'],['連動先','この壁だけ']]},
+ {n:'S-02',jp:'数字スイッチ / 足場が現れる',en:'NUMBER SWITCH · SPAWN PLATFORM',face:2,required:3,type:'digitSwitch',effect:'platform',duration:5,tip:'数字3で起動し、穴の途中に現れる足場を利用',desc:'数字3でスイッチに触れると、大きな穴の途中に安全な青枠足場が5秒間現れる。着地すると現在の数字でジャンプ回数が回復する。',spec:[['指定数字','3'],['変化','足場が出現'],['効果時間','初期5.0秒'],['練習','足場に着地して対岸へ']]},
+ {n:'S-03',jp:'数字スイッチ / トゲが引っ込む',en:'NUMBER SWITCH · RETRACT SPIKES',face:3,required:4,type:'digitSwitch',effect:'spikes',duration:4,tip:'数字4でスイッチを押し、トゲが消えている間に突破',desc:'数字4でスイッチを押すと、前方の地上トゲだけが4秒間引っ込む。時間が切れると再び出現するので、効果中に安全地帯へ進もう。',spec:[['指定数字','4'],['変化','トゲが引っ込む'],['効果時間','初期4.0秒'],['連動先','このトゲ列だけ']]}
+];
+const entries=[...calibrationEntries,...wallEntries,...baseEntries,...gapEntries,...airEntries,...numberEntries,...platformEntries,...switchEntries];
 const $=id=>document.getElementById(id), stage=$('stage'),canvas=$('game'),ctx=canvas.getContext('2d',{alpha:false});
 const COLORS={1:['#4fc3f7','#123d55'],2:['#94df84','#204e2b'],3:['#ffbc68','#5c3e14'],4:['#be9bff','#36244f']};
 const GRID_UNIT=64; // 横1マス = 64ゲーム単位
@@ -227,6 +262,25 @@ const wallSettings=wallEntries.map(p=>({height:p.initialHeight,width:p.initialWi
 const gapSettings=gapEntries.map(p=>p.initialWidth);
 const numberSettings=numberEntries.map(p=>({opening:p.initialOpening,lower:p.initialLower}));
 const platformSettings=platformEntries.map(p=>({height:p.initialHeight,width:p.initialWidth}));
+const switchSettings=switchEntries.map(p=>({duration:p.duration}));
+function switchInfo(p=entries[idx]){return p.type==='digitSwitch'?switchSettings[switchEntries.indexOf(p)]:null;}
+function switchEffectActive(id){return (state?.effectTimers?.[id]||0)>0;}
+function refreshSwitchBar(){
+ const p=entries[idx],on=p.type==='digitSwitch';$('switchTools').hidden=!on;$('switchTimerBox').hidden=!on;
+ if(!on)return;
+ const v=switchInfo(p),k={wall:'壁消去',platform:'足場出現',spikes:'トゲ後退'};
+ $('switchKind').textContent='数字'+p.required+' / '+k[p.effect];
+ $('switchTime').textContent=v.duration.toFixed(1)+'秒';
+ $('switchTimeMinus').disabled=v.duration<=1.5;
+ $('switchTimePlus').disabled=v.duration>=10;
+}
+function changeSwitchTime(delta){
+ const p=entries[idx];if(p.type!=='digitSwitch')return;
+ const v=switchInfo(p);v.duration=Math.min(10,Math.max(1.5,Math.round((v.duration+delta*.5)*2)/2));
+ createLevel();newState();refreshSwitchBar();showResult('ready');draw();
+}
+function restoreSwitchTime(){const p=entries[idx];if(p.type!=='digitSwitch')return;switchInfo(p).duration=p.duration;createLevel();newState();refreshSwitchBar();showResult('ready');draw();}
+
 function platformInfo(p=entries[idx]){return p.type==='numberPlatform'?platformSettings[platformEntries.indexOf(p)]:null;}
 function refreshPlatformBar(){
  const p=entries[idx],on=p.type==='numberPlatform';$('platformTools').hidden=!on;
@@ -286,6 +340,23 @@ function restoreNumber(){
 }
 function createLevel(){
  const X=240+540;const type=entries[idx].type;
+ if(type==='digitSwitch'){
+   const p=entries[idx],duration=switchInfo(p).duration,switchId=p.n;
+   const sw={type:'digitSwitch',id:switchId,x:X+45,width:70,base:0,height:225,required:p.required,duration};
+   if(p.effect==='wall'){
+     const wx=X+395;
+     objs=[sw,{...rectObj(wx,64,390),lethal:true,switchId}];goal=wx+64+330;
+   }else if(p.effect==='platform'){
+     const gx=X+380;
+     objs=[sw,{type:'gap',x:gx,width:750},{type:'switchPlatform',x:gx+160,width:260,height:120,thickness:35,switchId}];
+     goal=gx+750+275;
+   }else{
+     const sx=X+445;
+     objs=[sw,{...spikeObj(sx,448,8,80),switchId}];goal=sx+448+265;
+   }
+   return;
+ }
+
  if(type==='numberPlatform'){
    const p=entries[idx],v=platformInfo(p);const px=X+150;
    objs=[{type:'numberPlatform',id:p.n,x:px,width:v.width,height:v.height,required:p.required,thickness:36}];
@@ -330,7 +401,7 @@ function createLevel(){
  };
  objs=levels[type];let end=Math.max(...objs.map(o=>o.x+o.width));goal=end+300;
 }
-function newState(){let face=entries[idx].face;state={status:'ready',distance:0,y:0,vy:0,air:false,face,limit:face,used:0,angle:0,turnFrom:0,turnTo:0,turn:1,groundH:0,cause:'',lastLanding:0,totalJumps:0,airBLandings:0,numberLocks:{},numberPasses:0,platformLandings:0};last=0;ui();}
+function newState(){let face=entries[idx].face;state={status:'ready',distance:0,y:0,vy:0,air:false,face,limit:face,used:0,angle:0,turnFrom:0,turnTo:0,turn:1,groundH:0,cause:'',lastLanding:0,totalJumps:0,airBLandings:0,numberLocks:{},numberPasses:0,platformLandings:0,effectTimers:{},switchTriggered:{},switchActivations:0,switchPlatformLandings:0,switchSolved:false};last=0;ui();}
 function refreshCalibrationBar(){
  const active=idx<calibrationEntries.length;const el=$('calibrationTools');el.hidden=!active;
  if(!active)return;
@@ -390,22 +461,27 @@ function restoreGap(){
  gapSettings[j]=entries[idx].initialWidth;
  refreshGapBar();createLevel();newState();showResult('ready');draw();
 }
-function setPage(n){idx=Math.max(0,Math.min(entries.length-1,n));const p=entries[idx];$('number').textContent=p.n;$('jp').textContent=p.jp;$('en').textContent=p.en;$('tip').textContent=p.tip;$('description').textContent=p.desc;$('specs').innerHTML=p.spec.map(([k,v])=>`<div class="spec"><span>${k}</span><b>${v}</b></div>`).join('');$('prev').disabled=idx===0;$('next').disabled=idx===entries.length-1;refreshCalibrationBar();refreshWallBar();refreshGapBar();refreshNumberBar();refreshPlatformBar();createLevel();newState();showResult('ready');draw();}
+function setPage(n){idx=Math.max(0,Math.min(entries.length-1,n));const p=entries[idx];$('number').textContent=p.n;$('jp').textContent=p.jp;$('en').textContent=p.en;$('tip').textContent=p.tip;$('description').textContent=p.desc;$('specs').innerHTML=p.spec.map(([k,v])=>`<div class="spec"><span>${k}</span><b>${v}</b></div>`).join('');$('prev').disabled=idx===0;$('next').disabled=idx===entries.length-1;refreshCalibrationBar();refreshWallBar();refreshGapBar();refreshNumberBar();refreshPlatformBar();refreshSwitchBar();createLevel();newState();showResult('ready');draw();}
 function start(){newState();state.status='running';hideResult();ui();}
 function retry(){start()}
-function showResult(kind){const box=$('result');box.classList.add('show');$('resultNext').hidden=(kind!=='win'||idx===entries.length-1);$('retry').textContent=kind==='ready'?'▶ スタート':'↻ リトライ';$('resultTitle').className='result-title '+(kind==='win'?'win':kind==='lose'?'lose':'');if(kind==='ready'){$('resultTitle').textContent='練習 '+entries[idx].n;$('resultCaption').textContent='障害物を避けてGOALへ！ '+entries[idx].tip+'。';}else if(kind==='win'){$('resultTitle').textContent='✓ CLEAR!';$('resultCaption').textContent=entries[idx].type==='calibration'?`トゲ${spikeCounts[idx]}個（${(spikeCounts[idx]*SPIKE_PITCH/GRID_UNIT).toFixed(2)}マス）を突破！ 今回のジャンプ操作：${state.totalJumps}回。長さを変更して再挑戦できます。`:entries[idx].type==='wallCalibration'?`高さ ${(wallSettings[idx-calibrationEntries.length].height/GRID_UNIT).toFixed(2)}マス / 幅 ${(wallSettings[idx-calibrationEntries.length].width/GRID_UNIT).toFixed(1)}マスを${state.totalJumps}回のジャンプで突破！ 調整して再挑戦できます。`:entries[idx].type==='gapCalibration'?`幅 ${(gapSettings[idx-calibrationEntries.length-wallEntries.length-baseEntries.length]/GRID_UNIT).toFixed(2)}マスの穴を${state.totalJumps}回のジャンプで突破！ 穴の幅を調整して再挑戦できます。`:entries[idx].type==='numberPlatform'?state.platformLandings>0?`数字${entries[idx].required}の足場に着地してクリア！ ジャンプ回数が回復しました。`:`数字${entries[idx].required}の足場の下を、触れずに通過してクリア！` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の壁を突破！ 数字の一致と赤い部分への接触を確認しよう。`:entries[idx].type.startsWith('airB')?`Bの上面に${state.airBLandings}回着地してクリア！ 着地するたびにジャンプ回数が回復します。`:'障害物「'+entries[idx].jp+'」を突破！ 同じコースを再挑戦することもできます。';}else if(kind==='paused'){$('resultTitle').textContent='Ⅱ 一時停止';$('resultCaption').textContent='再開すると同じ位置からプレイできます。';$('retry').textContent='▶ 再開';}else{$('resultTitle').textContent='GAME OVER';$('resultCaption').textContent=state.cause||'もう一度ジャンプのタイミングを試してみよう。';}}
+function showResult(kind){const box=$('result');box.classList.add('show');$('resultNext').hidden=(kind!=='win'||idx===entries.length-1);$('retry').textContent=kind==='ready'?'▶ スタート':'↻ リトライ';$('resultTitle').className='result-title '+(kind==='win'?'win':kind==='lose'?'lose':'');if(kind==='ready'){$('resultTitle').textContent='練習 '+entries[idx].n;$('resultCaption').textContent='障害物を避けてGOALへ！ '+entries[idx].tip+'。';}else if(kind==='win'){$('resultTitle').textContent='✓ CLEAR!';$('resultCaption').textContent=entries[idx].type==='calibration'?`トゲ${spikeCounts[idx]}個（${(spikeCounts[idx]*SPIKE_PITCH/GRID_UNIT).toFixed(2)}マス）を突破！ 今回のジャンプ操作：${state.totalJumps}回。長さを変更して再挑戦できます。`:entries[idx].type==='wallCalibration'?`高さ ${(wallSettings[idx-calibrationEntries.length].height/GRID_UNIT).toFixed(2)}マス / 幅 ${(wallSettings[idx-calibrationEntries.length].width/GRID_UNIT).toFixed(1)}マスを${state.totalJumps}回のジャンプで突破！ 調整して再挑戦できます。`:entries[idx].type==='gapCalibration'?`幅 ${(gapSettings[idx-calibrationEntries.length-wallEntries.length-baseEntries.length]/GRID_UNIT).toFixed(2)}マスの穴を${state.totalJumps}回のジャンプで突破！ 穴の幅を調整して再挑戦できます。`:entries[idx].type==='digitSwitch'?`数字${entries[idx].required}のスイッチを起動し、対応する仕掛けを突破！ 効果時間は調整できます。`:entries[idx].type==='numberPlatform'?state.platformLandings>0?`数字${entries[idx].required}の足場に着地してクリア！ ジャンプ回数が回復しました。`:`数字${entries[idx].required}の足場の下を、触れずに通過してクリア！` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の壁を突破！ 数字の一致と赤い部分への接触を確認しよう。`:entries[idx].type.startsWith('airB')?`Bの上面に${state.airBLandings}回着地してクリア！ 着地するたびにジャンプ回数が回復します。`:'障害物「'+entries[idx].jp+'」を突破！ 同じコースを再挑戦することもできます。';}else if(kind==='paused'){$('resultTitle').textContent='Ⅱ 一時停止';$('resultCaption').textContent='再開すると同じ位置からプレイできます。';$('retry').textContent='▶ 再開';}else{$('resultTitle').textContent='GAME OVER';$('resultCaption').textContent=state.cause||'もう一度ジャンプのタイミングを試してみよう。';}}
 function hideResult(){$('result').classList.remove('show')}
 function fail(reason){if(state.status!=='running')return;state.status='lost';state.cause=reason;showResult('lose');ui()}
 function win(){if(state.status!=='running')return;state.status='won';if(!cleared.includes(idx)){cleared.push(idx);save();progress();}showResult('win');ui();}
 function jump(){if(state.status==='ready'){start();return;}if(state.status!=='running')return;const s=state;if(s.air&&s.used>=s.limit)return;if(!s.air){s.limit=s.face;s.used=0;}s.air=true;s.used++;s.totalJumps++;s.vy=JUMP;s.groundH=0;s.turnFrom=s.angle;s.turnTo+=Math.PI/2;s.turn=0;s.face=s.face%4+1;ui();}
 function togglePause(){if(state.status==='running'){state.status='paused';showResult('paused')}else if(state.status==='paused'){state.status='running';hideResult()}last=0;ui()}
-function ui(){const s=state;if(!s)return;let left=s.air?Math.max(0,s.limit-s.used):s.face,total=s.air?s.limit:s.face;$('face').textContent=s.face;$('face').style.color=COLORS[s.face][0];$('jumps').textContent=`${left} / ${total}`;$('distance').textContent=Math.round(Math.min(1,s.distance/(goal-240))*100)+'%';$('actionHint').textContent=s.status==='running'?(s.y<0&&objs.some(o=>o.type==='gap')?'落下中！ ↑ ジャンプで復帰':entries[idx].type.startsWith('airB')?`B着地 ${s.airBLandings}回 / タップでジャンプ`:entries[idx].type==='numberPlatform'?`数字${entries[idx].required}で着地／下を避けて通過もOK` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の部分を通り抜けよう`:'画面タップでジャンプ'):s.status==='paused'?'一時停止中':s.status==='won'?'クリア！':s.status==='lost'?'もう一度挑戦': 'まずはスタート';$('jump').textContent=s.status==='ready'?'▶ スタート':s.status==='running'?'↑ ジャンプ':s.status==='paused'?'▶ 再開':s.status==='lost'?'↻ リトライ':'次の障害物 ▶';$('jump').disabled=s.status==='running'&&left===0;$('pause').textContent=s.status==='paused'?'▶':'Ⅱ';}
+function ui(){const s=state;if(!s)return;let left=s.air?Math.max(0,s.limit-s.used):s.face,total=s.air?s.limit:s.face;$('face').textContent=s.face;$('face').style.color=COLORS[s.face][0];$('jumps').textContent=`${left} / ${total}`;$('distance').textContent=Math.round(Math.min(1,s.distance/(goal-240))*100)+'%';
+ if(entries[idx].type==='digitSwitch'){
+  const rem=s.effectTimers[entries[idx].n]||0;
+  $('switchTimer').textContent=rem>0?rem.toFixed(1)+'秒':s.switchTriggered[entries[idx].n]?'終了':'未起動';
+  $('switchTimer').style.color=rem>0?'#8dffd4':'#ffc1d6';
+ }$('actionHint').textContent=s.status==='running'?(s.y<0&&objs.some(o=>o.type==='gap')?'落下中！ ↑ ジャンプで復帰':entries[idx].type.startsWith('airB')?`B着地 ${s.airBLandings}回 / タップでジャンプ`:entries[idx].type==='digitSwitch'?`数字${entries[idx].required}で触れて起動／効果は時間制限あり`:entries[idx].type==='numberPlatform'?`数字${entries[idx].required}で着地／下を避けて通過もOK` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の部分を通り抜けよう`:'画面タップでジャンプ'):s.status==='paused'?'一時停止中':s.status==='won'?'クリア！':s.status==='lost'?'もう一度挑戦': 'まずはスタート';$('jump').textContent=s.status==='ready'?'▶ スタート':s.status==='running'?'↑ ジャンプ':s.status==='paused'?'▶ 再開':s.status==='lost'?'↻ リトライ':'次の障害物 ▶';$('jump').disabled=s.status==='running'&&left===0;$('pause').textContent=s.status==='paused'?'▶':'Ⅱ';}
 function action(){if(state.status==='running'||state.status==='ready')jump();else if(state.status==='paused')togglePause();else if(state.status==='won')setPage(Math.min(idx+1,entries.length-1));else retry();}
 // 接触中の足場の高さ。着地の横断判定とは分けて、前フレームと現在の足元を比較する。
 function groundAt(centerX, feet){
  let h=0;
  for(const o of objs){
-  if(!((o.type==='wall'&&!o.lethal)||o.type==='airB'||o.type==='numberPlatform'))continue;
+  if(!((o.type==='wall'&&!o.lethal)||o.type==='airB'||o.type==='numberPlatform'||(o.type==='switchPlatform'&&switchEffectActive(o.switchId))))continue;
   if(centerX+SIZE*.34>o.x&&centerX-SIZE*.34<o.x+o.width&&feet>=o.height-2)h=Math.max(h,o.height);
  }
  return h;
@@ -463,6 +539,7 @@ function hitAirB(o,rc,s){
 }
 function update(dt){if(state.status!=='running')return;const s=state;
  const oldY=s.y;
+ for(const id of Object.keys(s.effectTimers))s.effectTimers[id]=Math.max(0,s.effectTimers[id]-dt);
  s.distance+=SPEED*dt;
  const centerX=240+s.distance;
  if(s.air){s.y+=s.vy*dt-.5*GRAVITY*dt*dt;s.vy-=GRAVITY*dt;}
@@ -472,9 +549,10 @@ function update(dt){if(state.status!=='running')return;const s=state;
   let land=-Infinity;
   if(!isOverGap(centerX)&&oldY>=0&&s.y<=0)land=0;
   for(const o of objs){
-   if(!((o.type==='wall'&&!o.lethal)||o.type==='airB'||o.type==='numberPlatform'))continue;
+   if(!((o.type==='wall'&&!o.lethal)||o.type==='airB'||o.type==='numberPlatform'||(o.type==='switchPlatform'&&switchEffectActive(o.switchId))))continue;
    const overlaps=centerX+SIZE*.34>o.x&&centerX-SIZE*.34<o.x+o.width;
    if(overlaps&&oldY>=o.height-1&&s.y<=o.height+1){
+    if(o.type==='switchPlatform'&&s.groundH!==o.height)s.switchPlatformLandings++;
     if(o.type==='numberPlatform'){
       if(s.face!==o.required){fail('数字が不一致！ 数字'+o.required+'の足場には、'+o.required+'で着地しよう。');return;}
       if(s.groundH!==o.height)s.platformLandings++;
@@ -495,6 +573,15 @@ function update(dt){if(state.status!=='running')return;const s=state;
  }
  if(s.air&&completelyOffscreenBelow(s.y)){fail('画面の下まで落下！ 見えなくなる前にジャンプで復帰しよう。');return;}
  const rc={l:centerX-SIZE*.36,r:centerX+SIZE*.36,b:s.y+5,t:s.y+SIZE/ZOOM-13};
+ // Switches are intangible; each may activate only its linked target, once per attempt.
+ for(const o of objs){
+  if(o.type!=='digitSwitch'||s.switchTriggered[o.id])continue;
+  if(rc.r<=o.x||rc.l>=o.x+o.width||rc.t<=o.base||rc.b>=o.base+o.height)continue;
+  if(s.face===o.required){
+   s.switchTriggered[o.id]=true;s.switchActivations++;s.effectTimers[o.id]=o.duration;
+  }
+ }
+
  for(const o of objs){
   if(o.type!=='numberGate')continue;
   const overlapping=rc.r>o.x&&rc.l<o.x+o.width;
@@ -515,9 +602,16 @@ function update(dt){if(state.status!=='running')return;const s=state;
   }
  }
  for(const o of objs){
+  if(o.switchId&&o.type!=='digitSwitch'){
+    if(o.type==='wall'&&switchEffectActive(o.switchId))continue;
+    if(o.type==='spike'&&switchEffectActive(o.switchId))continue;
+  }
   if(o.type==='numberPlatform'&&rc.r>o.x&&rc.l<o.x+o.width){
     // Only an above-top approach may be safe. Green top does not protect red rim/underside.
     if(s.y<o.height-1&&rc.t>o.height-o.thickness){fail('数字足場の赤い側面・下面に接触！ 緑の上面へ上から着地しよう。');return;}
+  }
+  if(o.type==='switchPlatform'&&switchEffectActive(o.switchId)&&rc.r>o.x&&rc.l<o.x+o.width){
+    if(s.y<o.height-2&&rc.t>o.height-o.thickness){fail('出現した足場の側面・下面に衝突！ 上から着地しよう。');return;}
   }
   if(o.type==='gap'&&hitGapSideWall(o,centerX,s.y)){fail('穴の側壁に衝突！ 対岸の壁に届く前に地面より上へ復帰しよう。');return;}
   if(o.type==='spike'&&hitSpike(o,rc)){fail('トゲに接触！ 高さとタイミングを調整しよう。');return;}
@@ -545,6 +639,10 @@ function update(dt){if(state.status!=='running')return;const s=state;
   }
  }
  if(centerX>=goal){
+   if(entries[idx].type==='digitSwitch'){
+     if(s.switchActivations<1){fail('数字スイッチを起動してからゴールしよう。');return;}
+     if(entries[idx].effect==='platform'&&s.switchPlatformLandings<1){fail('出現した足場に着地して穴を渡る練習です。');return;}
+   }
    if(entries[idx].type==='numberGate'&&s.numberPasses<1){fail('数字の壁の紫色の部分を通ってゴールしよう。');return;}
    if((entries[idx].type==='airBLand'||entries[idx].type==='airBCombo')&&s.airBLandings<1){fail('Bの緑ラインに着地する練習です。上に乗ってからゴールへ！');return;}
    win();return;
@@ -618,7 +716,7 @@ function background(){const g=ctx.createLinearGradient(0,0,0,VH);g.addColorStop(
  const scroll=state.distance*.31;for(let x=-(scroll%69);x<W;x+=69)stroke(x,0,x,FLOOR,'#91bbd211');for(let y=45;y<FLOOR;y+=69)stroke(0,y,W,y,'#91bbd211');for(let x=-(state.distance*.15%210);x<W;x+=210){ctx.fillStyle='#75a8bf0d';ctx.fillRect(x+27,FLOOR-99,50,99)}
  for(let k=0;k<5;k++){let x=W-((state.distance*(.30+k*.07)+k*W*.24)%(W+50));ctx.fillStyle='#92c7e326';ctx.fillRect(x,FLOOR-115-k*57,42+k*9,2)}
 }
-function drawBlock(o){const x=screenX(o.x),y=scrY(o.height),w=o.width,h=o.height*ZOOM;const lethal=!!o.lethal;ctx.save();ctx.shadowColor=lethal?'#ff7891':'#73c4ff';ctx.shadowBlur=13;round(x,y,w,h,4);ctx.fillStyle=lethal?'#3b1d2b':'#19334e';ctx.fill();ctx.strokeStyle=lethal?'#ff8fa4':'#a2e2ff';ctx.lineWidth=3;ctx.stroke();ctx.shadowBlur=0;ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();for(let k=-h;k<w+h;k+=25)stroke(x+k,y+h,x+k+h,y,lethal?'#ff7e9730':'#76a8d02f',5);ctx.restore();if(!lethal){ctx.shadowColor='#79ffd6';ctx.shadowBlur=6;stroke(x+3,y+1,x+w-3,y+1,'#74ffd0',4);ctx.shadowBlur=0;}if(lethal){ctx.strokeStyle='#ffd8df';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x+6,y+h-6);ctx.lineTo(x+w-6,y+6);ctx.moveTo(x+6,y+h*.62);ctx.lineTo(x+w*.62,y+6);ctx.moveTo(x+w*.38,y+h-6);ctx.lineTo(x+w-6,y+h*.38);ctx.stroke();}ctx.restore()}
+function drawBlock(o){if(o.switchId&&switchEffectActive(o.switchId)){drawEffectGhost(o,'消去中');return;}const x=screenX(o.x),y=scrY(o.height),w=o.width,h=o.height*ZOOM;const lethal=!!o.lethal;ctx.save();ctx.shadowColor=lethal?'#ff7891':'#73c4ff';ctx.shadowBlur=13;round(x,y,w,h,4);ctx.fillStyle=lethal?'#3b1d2b':'#19334e';ctx.fill();ctx.strokeStyle=lethal?'#ff8fa4':'#a2e2ff';ctx.lineWidth=3;ctx.stroke();ctx.shadowBlur=0;ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();for(let k=-h;k<w+h;k+=25)stroke(x+k,y+h,x+k+h,y,lethal?'#ff7e9730':'#76a8d02f',5);ctx.restore();if(!lethal){ctx.shadowColor='#79ffd6';ctx.shadowBlur=6;stroke(x+3,y+1,x+w-3,y+1,'#74ffd0',4);ctx.shadowBlur=0;}if(lethal){ctx.strokeStyle='#ffd8df';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x+6,y+h-6);ctx.lineTo(x+w-6,y+6);ctx.moveTo(x+6,y+h*.62);ctx.lineTo(x+w*.62,y+6);ctx.moveTo(x+w*.38,y+h-6);ctx.lineTo(x+w-6,y+h*.38);ctx.stroke();}ctx.restore()}
 function drawNumberGate(o){
  const x=screenX(o.x),w=o.width,topLimit=-70,bottom=FLOOR;
  const yLow=o.mode==='full'?0:o.lower*NUMBER_GATE_VERTICAL_UNIT;
@@ -660,7 +758,7 @@ function drawNumberPlatform(o){
  ctx.font='bold 11px system-ui';ctx.fillStyle='#b6f8d3';ctx.fillText('LAND '+o.required,x+w/2,y-15);
  ctx.restore();
 }
-function drawSpike(o){const dw=o.width/o.count;ctx.save();ctx.shadowColor='#ff7794';ctx.shadowBlur=13;for(let k=0;k<o.count;k++){let x=screenX(o.x+k*dw),x2=x+dw,cy=scrY(o.base),tip=scrY(o.base+(o.down?-o.height:o.height));ctx.beginPath();ctx.moveTo(x,cy);ctx.lineTo(x+dw/2,tip);ctx.lineTo(x2,cy);ctx.closePath();ctx.fillStyle='#6b1d38';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#ff8da2';ctx.stroke();}ctx.restore()}
+function drawSpike(o){if(o.switchId&&switchEffectActive(o.switchId)){drawEffectGhost(o,'収納中');return;}const dw=o.width/o.count;ctx.save();ctx.shadowColor='#ff7794';ctx.shadowBlur=13;for(let k=0;k<o.count;k++){let x=screenX(o.x+k*dw),x2=x+dw,cy=scrY(o.base),tip=scrY(o.base+(o.down?-o.height:o.height));ctx.beginPath();ctx.moveTo(x,cy);ctx.lineTo(x+dw/2,tip);ctx.lineTo(x2,cy);ctx.closePath();ctx.fillStyle='#6b1d38';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#ff8da2';ctx.stroke();}ctx.restore()}
 // 実際にゴールできた入力タイミングの中央付近（start秒 / 追加ジャンプ間隔秒）。
 // 操作の個人差を吸収するため厳密な正解位置ではなく目安として表示。
 const JUMP_GUIDES={
@@ -743,6 +841,41 @@ function drawAirB(o){
  ctx.shadowColor='#81ffd3';ctx.shadowBlur=8;stroke(x+3,top,x+w-3,top,'#81ffd3',4);
  ctx.shadowBlur=0;ctx.font='900 11px system-ui';ctx.fillStyle='#a2ffd9';ctx.textAlign='center';ctx.fillText('B  ✓ LAND',x+w/2,top-12);ctx.restore();
 }
+function drawEffectGhost(o,label){
+ const x=screenX(o.x),w=o.width,y=o.type==='wall'?scrY(o.height):scrY(o.height||80),h=o.type==='wall'?o.height*ZOOM:Math.max(18,(o.height||80)*ZOOM);
+ ctx.save();ctx.fillStyle='#82e7be13';ctx.strokeStyle='#82ffd4';ctx.lineWidth=2;ctx.setLineDash([6,6]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);
+ ctx.fillStyle='#a8ffe0';ctx.font='900 12px system-ui';ctx.textAlign='center';ctx.fillText(label,x+w/2,y-12);ctx.restore();
+}
+function drawDigitSwitch(o){
+ const x=screenX(o.x),y=scrY(o.base+o.height),h=o.height*ZOOM,w=o.width,active=!!state.switchTriggered[o.id];
+ ctx.save();ctx.shadowColor=active?'#8cffc7':'#e7a6ff';ctx.shadowBlur=16;
+ ctx.fillStyle=active?'#164a43aa':'#54336988';ctx.strokeStyle=active?'#79ffca':'#d2a4ff';ctx.lineWidth=2.5;
+ round(x,y,w,h,7);ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+ ctx.fillStyle=active?'#a7ffdb':'#ffe9ff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 34px system-ui';ctx.fillText(String(o.required),x+w/2,y+h*.5);
+ ctx.font='bold 12px system-ui';ctx.fillText(active?'ON':'SWITCH',x+w/2,y-14);ctx.restore();
+}
+function drawSwitchPlatform(o){
+ if(!switchEffectActive(o.switchId)){
+  const x=screenX(o.x),y=scrY(o.height);ctx.save();ctx.setLineDash([7,7]);ctx.strokeStyle='#86c3e477';ctx.lineWidth=2;ctx.strokeRect(x,y,o.width,o.thickness*ZOOM);ctx.setLineDash([]);ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.fillStyle='#8baaba';ctx.fillText('待機中',x+o.width/2,y-9);ctx.restore();return;
+ }
+ const x=screenX(o.x),y=scrY(o.height),h=o.thickness*ZOOM;
+ ctx.save();ctx.shadowColor='#8effd1';ctx.shadowBlur=12;ctx.fillStyle='#1b4961';ctx.fillRect(x,y,o.width,h);
+ ctx.strokeStyle='#81dfff';ctx.lineWidth=2.5;ctx.strokeRect(x,y,o.width,h);
+ stroke(x+3,y,x+o.width-3,y,'#77ffcd',4);ctx.shadowBlur=0;
+ ctx.fillStyle='#bcffe7';ctx.font='bold 12px system-ui';ctx.textAlign='center';ctx.fillText('LAND / 回復',x+o.width/2,y-14);ctx.restore();
+}
+function drawSwitchGuide(){
+ if(entries[idx].type!=='digitSwitch')return;
+ const p=entries[idx],sw=objs.find(o=>o.type==='digitSwitch');if(!sw)return;
+ const x=screenX(sw.x-105);if(x>=-30&&x<=W+30){
+  ctx.save();ctx.fillStyle='#efc3ff';ctx.strokeStyle='#efc3ff';ctx.textAlign='center';ctx.font='900 12px system-ui';ctx.fillText('▲ ジャンプ目安',x,FLOOR-34);
+  ctx.beginPath();ctx.moveTo(x,FLOOR-5);ctx.lineTo(x-8,FLOOR-21);ctx.lineTo(x+8,FLOOR-21);ctx.closePath();ctx.fill();ctx.restore();
+ }
+ const swcx=screenX(sw.x+sw.width/2),other=objs.find(o=>o.switchId===sw.id);
+ if(other){const dest=screenX(other.x+other.width/2);
+  if(swcx<W+30&&dest>-30){ctx.save();ctx.strokeStyle='#e1aeff88';ctx.lineWidth=2;ctx.setLineDash([5,5]);const arcY=Math.max(90,scrY(sw.height)-55);ctx.beginPath();ctx.moveTo(swcx,arcY+25);ctx.quadraticCurveTo((swcx+dest)/2,arcY-23,dest,arcY+25);ctx.stroke();ctx.setLineDash([]);ctx.restore();}
+ }
+}
 function drawGapWalls(){
  // 赤い縦ライン＝穴の側壁は危険。地面を歩く方向にある対岸の壁に触れるとアウト。
  ctx.save();ctx.lineWidth=3;ctx.shadowColor='#ff627d';ctx.shadowBlur=8;
@@ -762,12 +895,13 @@ function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);b
  const gaps=objs.filter(o=>o.type==='gap');function floor(a,b){if(b<=a)return;ctx.fillStyle='#13283d';ctx.fillRect(a,FLOOR,b-a,VH-FLOOR);stroke(a,FLOOR,b,FLOOR,'#c1e7fa',3);}
  if(!gaps.length)floor(0,W);else{let cursor=0;for(const o of gaps){let l=screenX(o.x),r=l+o.width;floor(cursor,Math.min(W,l));cursor=Math.max(cursor,r);stroke(l,FLOOR,l,VH,'#4d9fd577',2);stroke(r,FLOOR,r,VH,'#4d9fd577',2);}floor(cursor,W)}
  let off=-(state.distance%51);for(let x=off;x<W;x+=51){if(gaps.some(o=>x>screenX(o.x)&&x<screenX(o.x)+o.width))continue;stroke(x,FLOOR+22,x+19,FLOOR+22,'#4b708b',3)}
- for(const o of objs){if(o.type==='wall')drawBlock(o);if(o.type==='spike')drawSpike(o);if(o.type==='airA')drawAirA(o);if(o.type==='airB')drawAirB(o);if(o.type==='numberGate')drawNumberGate(o);if(o.type==='numberPlatform')drawNumberPlatform(o);if(o.type==='ceiling'){let roof={type:'wall',x:o.x,width:o.width,height:0};let x=screenX(o.x),y=scrY(o.base),top=y-32;ctx.fillStyle='#14273f';ctx.fillRect(x,top,o.width,32);stroke(x,top,x+o.width,top,'#7caac9',3);drawSpike({type:'spike',x:o.x,width:o.width,count:Math.round(o.width/75),height:o.spikeH,base:o.base,down:true})}}
+ for(const o of objs){if(o.type==='digitSwitch')drawDigitSwitch(o);if(o.type==='switchPlatform')drawSwitchPlatform(o);if(o.type==='wall')drawBlock(o);if(o.type==='spike')drawSpike(o);if(o.type==='airA')drawAirA(o);if(o.type==='airB')drawAirB(o);if(o.type==='numberGate')drawNumberGate(o);if(o.type==='numberPlatform')drawNumberPlatform(o);if(o.type==='ceiling'){let roof={type:'wall',x:o.x,width:o.width,height:0};let x=screenX(o.x),y=scrY(o.base),top=y-32;ctx.fillStyle='#14273f';ctx.fillRect(x,top,o.width,32);stroke(x,top,x+o.width,top,'#7caac9',3);drawSpike({type:'spike',x:o.x,width:o.width,count:Math.round(o.width/75),height:o.spikeH,base:o.base,down:true})}}
  drawGoal();
  drawJumpGuide();
  drawGapGuide();
  drawNumberGateGuide();
  drawPlatformGuide();
+ drawSwitchGuide();
  drawObjectMeasures();
  drawMeasureBand();
  drawGapWalls();
@@ -800,13 +934,16 @@ $('platformHeightPlus').onclick=()=>changePlatform('height',1);
 $('platformWidthMinus').onclick=()=>changePlatform('width',-1);
 $('platformWidthPlus').onclick=()=>changePlatform('width',1);
 $('platformDefault').onclick=restorePlatform;
+$('switchTimeMinus').onclick=()=>changeSwitchTime(-1);
+$('switchTimePlus').onclick=()=>changeSwitchTime(1);
+$('switchDefault').onclick=restoreSwitchTime;
 $('prev').onclick=()=>setPage(idx-1);$('next').onclick=()=>setPage(idx+1);$('catalogButton').onclick=()=>catalog('catalog');$('ruleButton').onclick=()=>catalog('rules');$('close').onclick=closeCatalog;$('retry').onclick=()=>state.status==='paused'?togglePause():retry();$('resultNext').onclick=()=>setPage(idx+1);$('reset').onclick=retry();$('pause').onclick=togglePause;
 $('jump').addEventListener('pointerdown',e=>{e.preventDefault();action()});$('jump').addEventListener('click',e=>{if(e.detail===0)action()});stage.addEventListener('pointerdown',e=>{if(e.target.closest('button')||e.target.closest('.result'))return;e.preventDefault();action()});
 window.addEventListener('keydown',e=>{if($('overlay').classList.contains('open')){if(e.key==='Escape')closeCatalog();return;}if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();if(!e.repeat)action();}else if(e.code==='KeyR'){e.preventDefault();retry()}else if(e.code==='KeyP'){e.preventDefault();togglePause()}else if(e.code==='ArrowLeft'){e.preventDefault();setPage(idx-1)}else if(e.code==='ArrowRight'){e.preventDefault();setPage(idx+1)}});
 ['contextmenu','dragstart','selectstart','gesturestart'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
 // Exposed for automated smoke tests; the user-facing game never needs these hooks.
-window.__NRBook={version:'1.3.1',page:n=>setPage(n),start,jump,step:update,get:()=>({...state,index:idx,goal,obstacles:objs,completed:[...cleared]}),setSilent:v=>silent=!!v,wallSettings:()=>wallSettings.map(v=>({...v})),spikeCount:()=>idx<4?spikeCounts[idx]:null,changeSpikeCount,changeWall,restoreWall,gapSettings:()=>gapSettings.slice(),changeGap,restoreGap,airCount:()=>airEntries.length,numberSettings:()=>numberSettings.map(v=>({...v})),changeNumber,restoreNumber,platformSettings:()=>platformSettings.map(v=>({...v})),changePlatform,restorePlatform};
-new ResizeObserver(resize).observe(stage);progress();setPage(window.location.hash==='#gap'?22:window.location.hash==='#air'?26:window.location.hash==='#number'?30:window.location.hash==='#platform'?34:0);requestAnimationFrame(loop);
+window.__NRBook={version:'1.4',page:n=>setPage(n),start,jump,step:update,get:()=>({...state,index:idx,goal,obstacles:objs,completed:[...cleared]}),setSilent:v=>silent=!!v,wallSettings:()=>wallSettings.map(v=>({...v})),spikeCount:()=>idx<4?spikeCounts[idx]:null,changeSpikeCount,changeWall,restoreWall,gapSettings:()=>gapSettings.slice(),changeGap,restoreGap,airCount:()=>airEntries.length,numberSettings:()=>numberSettings.map(v=>({...v})),changeNumber,restoreNumber,platformSettings:()=>platformSettings.map(v=>({...v})),changePlatform,restorePlatform,switchSettings:()=>switchSettings.map(v=>({...v})),changeSwitchTime,restoreSwitchTime};
+new ResizeObserver(resize).observe(stage);progress();setPage(window.location.hash==='#gap'?22:window.location.hash==='#air'?26:window.location.hash==='#number'?30:window.location.hash==='#platform'?34:window.location.hash==='#switch'?38:0);requestAnimationFrame(loop);
 })();
 </script>
 </body>
