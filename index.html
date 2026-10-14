@@ -1,84 +1,1280 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Life Rhythm｜5活動推薦デモ</title><style>
-:root{font-family:system-ui,-apple-system,"Noto Sans JP",sans-serif;color:#182d41;background:#f3f7fb}*{box-sizing:border-box}body{margin:0}main{max-width:970px;margin:32px auto;padding:0 18px}h1{font-size:29px;margin:0 0 7px}p{line-height:1.65}.muted{color:#64748b}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{background:white;border:1px solid #e0e8f0;border-radius:15px;padding:20px;margin:16px 0;box-shadow:0 5px 20px #18324b09}label{display:block;font-weight:650;margin:12px 0 6px}select,input{width:100%;padding:11px;border:1px solid #cbd5e1;border-radius:8px;font-size:16px;background:white}button{background:#1660b6;color:white;border:0;border-radius:9px;padding:13px 24px;font-weight:700;font-size:16px;cursor:pointer;margin-top:17px}button:hover{background:#0e4c95}table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:11px;border-bottom:1px solid #e2e8f0;text-align:left}th{background:#edf4fc}.pill{display:inline-block;border-radius:6px;background:#e8f1fd;padding:4px 8px;margin:2px;font-size:13px}.score{font-weight:700;color:#1660b6}.small{font-size:13px}.timeline{border-left:3px solid #2c76c6;margin-left:9px;padding-left:20px}.event{margin:15px 0;position:relative}.event:before{content:"";position:absolute;left:-28px;top:5px;background:#2c76c6;width:13px;height:13px;border-radius:50%}@media(max-width:700px){.grid{grid-template-columns:1fr}h1{font-size:23px}} </style></head>
-<body><main><h1>Life Rhythm｜5活動 推薦デモ</h1><p class="muted">検証版 v3｜内容ベースで休憩候補を評価し、時間・順番を別途最適化</p>
-<div class="grid"><section class="panel"><h2>ユーザー設定</h2><label for="who">利用者</label><select id="who"><option value="A">A：課題を先に済ませたい</option><option value="B">B：入浴後に課題を進めたい</option></select><label for="start">予定開始時刻</label><select id="start"><option value="17">17:00</option><option value="18" selected>18:00</option><option value="19">19:00</option></select><label for="load">希望する活動の負荷（0～10）</label><input id="load" type="range" min="0" max="10" value="3"><div class="small muted">現在値：<span id="loadValue">3</span></div><label for="recovery">希望する活動の回復度（0～10）</label><input id="recovery" type="range" min="0" max="10" value="7"><div class="small muted">現在値：<span id="recoveryValue">7</span></div><label for="gap">夕食後、入浴までの希望間隔</label><select id="gap"><option value="0">指定しない</option><option value="20" selected>20分以上（試作用の希望）</option><option value="40">40分以上（試作用の希望）</option></select><button id="run">推薦を計算</button></section>
-<section class="panel"><h2>活動データ（仮値）</h2><table><thead><tr><th>ID</th><th>活動</th><th>負荷</th><th>回復</th><th>分</th></tr></thead><tbody id="items"></tbody></table><p class="small muted">既存50活動のIDを維持。睡眠は23:00開始・480分固定。残り4活動の順番を比較します。</p></section></div>
-<section class="panel"><h2>内容ベース推薦：類似度</h2><p class="small muted">希望する負荷・回復の特徴と各活動を比較。類似度は任意活動「休憩」の採用判定に使います。課題・夕食・入浴・睡眠は必須として除外しません。負荷・回復は0～1に正規化しています。</p><div id="similarity"></div></section>
-<section class="panel"><h2>推薦されたスケジュール</h2><p class="muted small" id="explain"></p><div class="timeline" id="schedule"></div><p id="summary" class="score"></p></section>
-<section class="panel"><h2>仕組みと限界</h2><p>① 必須の課題・夕食・入浴と、任意の休憩を分ける。② 負荷・回復の類似度と課題による疲労を使い休憩の採用を判定。③ 予定の全順列を比較し、23時就寝・夕食の時間帯・希望した夕食後の間隔を満たす候補だけ残す。④ 時間帯・隣接相性・個人の順序希望・疲労蓄積で比較。⑤ 休憩採用と順番の理由を数値で表示します。</p><p class="small muted">これは学内説明用の試作です。負荷・回復・優先度・相性は採点基準を統一した仮説値であり、実測値ではありません。完了履歴からの自動学習、締切入力、実際の食後間隔の医学的判断は未実装です。食後の待機時間は利用者が指定する試作用の制約で、医学的推奨値ではありません。実行結果は保存しません。</p></section>
-</main><script>
-const items=[
-{id:"001",name:"課題",load:5,rec:0,d:60,time:[8,8,6,2]},
-{id:"014",name:"夕食",load:1,rec:2,d:30,time:[0,1,9,4]},
-{id:"021",name:"入浴",load:1,rec:5,d:25,time:[4,4,8,6]},
-{id:"027",name:"休憩",load:0,rec:5,d:15,time:[7,7,7,6]},
-{id:"025",name:"睡眠",load:0,rec:9,d:480,time:[0,0,3,10]}
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#091524">
+<meta name="application-name" content="NUMBER ROLL">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="NUMBER ROLL">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+<title>NUMBER ROLL — UI Alpha Ver.2.0</title>
+<style>
+:root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
+*{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
+body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 20%,#19344a,#060e18 75%)}
+#app{display:flex;flex-direction:column;gap:9px;width:min(100vw,1120px);height:min(100dvh,840px);padding:12px;background:linear-gradient(153deg,#0d1f31,#071421);overflow:hidden}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto;padding:2px 2px 1px}.brand{font-weight:900;color:#75dcfc;letter-spacing:.18em;font-size:11px}.top h1{font-size:clamp(17px,2.7vw,26px);letter-spacing:.13em;margin:1px 0;font-weight:830}.sub{font-size:10px;color:#8da9bc;letter-spacing:.05em}.progress{font-size:12px;white-space:nowrap;color:#9fc5d9;font-weight:800;text-align:right}.progress strong{font-size:17px;color:white;display:block}.book{display:flex;flex-direction:column;flex:1;min-height:0;border:1px solid var(--line);background:#091625;border-radius:12px;overflow:hidden}
+.book-title{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-bottom:1px solid #263d51;flex:0 0 auto}.nameblock{display:flex;align-items:center;gap:12px;min-width:0}.chapter{display:grid;place-items:center;border:1px solid #45a2c9;color:#64d6ff;border-radius:7px;font-size:19px;font-weight:950;width:47px;height:43px;flex:0 0 47px;background:#102c42}.jp{font-size:clamp(18px,2.8vw,26px);font-weight:820;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.en{font-size:9px;font-weight:800;color:#8caabd;letter-spacing:.14em;white-space:nowrap}.tip{color:#cee4f3;font-size:11px;text-align:right;max-width:55%;line-height:1.4}.tip strong{display:block;color:#8ad7ef;font-size:9px;letter-spacing:.1em}
+.stage{position:relative;flex:1;min-height:115px;overflow:hidden;background:#12263a;touch-action:none;isolation:isolate}canvas{width:100%;height:100%;display:block;touch-action:none}
+.stage-hud{position:absolute;top:8px;left:9px;right:9px;display:flex;justify-content:space-between;gap:4px;pointer-events:none}.stats-left,.stats-right{display:flex;align-items:start;gap:5px}.stat{padding:6px 9px;border-radius:7px;background:#071625cb;border:1px solid #39576e9c;min-width:76px;backdrop-filter:blur(3px)}.stat label{display:block;font-size:9px;color:#a8bfce;white-space:nowrap}.stat b{font-size:17px;line-height:1.25;letter-spacing:.01em;font-variant-numeric:tabular-nums}.stat.slim{min-width:64px}.game-buttons{pointer-events:auto;display:flex;gap:5px}.game-icon{min-width:35px;height:34px;border-radius:7px;background:#10273ccf;color:#e5f7ff;border:1px solid #4d7591;font-size:16px;font-weight:750}.game-icon:active,.nav:active,.primary:active{filter:brightness(1.18)}
+.bottom-controls{position:absolute;bottom:10px;left:12px;right:12px;display:flex;align-items:end;justify-content:space-between;gap:8px;pointer-events:none}.hint{font-size:10px;color:#b2d0e0;line-height:1.5;text-shadow:0 2px 7px #000;max-width:60%}.hint b{display:block;font-size:11px;color:#ebf7ff}.jump{pointer-events:auto;padding:10px 18px;border:1px solid #b8f4ff;color:#082235;font-weight:900;font-size:14px;border-radius:10px;background:#5bc8ee;box-shadow:0 4px #145b78;min-width:117px;min-height:47px}.jump:disabled{opacity:.45}.jump:active{transform:translateY(2px);box-shadow:0 2px #145b78}
+.result{position:absolute;inset:0;z-index:3;display:none;align-items:center;justify-content:center;background:#071421af;backdrop-filter:blur(2px);padding:10px}.result.show{display:flex}.result-card{width:min(93%,380px);background:#0b1f30f5;border:1px solid #50738b;border-radius:13px;padding:16px 19px;text-align:center;box-shadow:0 12px 30px #0006}.result-title{font-size:clamp(18px,2.5vw,27px);font-weight:950;margin:4px 0;color:#f1faff}.result-title.win{color:#7ce4b4}.result-title.lose{color:#ff9aaf}.result-caption{color:#abc7d9;font-size:12px;line-height:1.55;margin:6px 0 12px}.result-actions{display:flex;gap:9px;justify-content:center}.primary,.secondary{padding:11px 13px;min-width:110px;min-height:41px;border-radius:8px;font-weight:820;font-size:12px}.primary{background:#56c6ed;border:1px solid #a9ecff;color:#09283c}.secondary{background:#193449;border:1px solid #4e7891;color:#e5f5ff}
+.details{flex:0 0 auto;display:grid;grid-template-columns:1.2fr 1fr;min-height:93px;border-top:1px solid var(--line)}.description{padding:9px 13px;border-right:1px solid var(--line);font-size:12px;line-height:1.55;color:#c7dce8;display:flex;align-items:center}.description strong{color:#69d1f0}.specs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.spec{border-bottom:1px solid #274155;padding:7px 10px;display:flex;align-items:center;justify-content:space-between;gap:5px;font-size:11px}.spec:nth-last-child(-n+2){border-bottom:0}.spec span{color:#8faabd}.spec b{color:#dcefff;text-align:right}
+.footer{flex:0 0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;align-items:center;gap:8px}.nav{border:1px solid #477089;color:#e6f5ff;background:#122b40;border-radius:8px;min-height:45px;font-size:12px;font-weight:830;letter-spacing:.02em}.center{display:flex;gap:6px;justify-content:center}.center .nav{padding:0 9px;border-color:#3c596e;background:#0c2132;color:#acd7e9;font-size:11px}.note{color:#7999ac;font-size:10px;text-align:center;flex:0 0 auto;line-height:1.3}
+.overlay{position:absolute;inset:0;background:#071320fa;z-index:9;display:none;flex-direction:column;gap:12px;padding:18px}.overlay.open{display:flex}.overlay-head{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #36556c;padding-bottom:11px}.overlay h2{font-size:18px;margin:0}.catalog{overflow:auto;touch-action:pan-y;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-content:start;gap:9px;padding-bottom:10px}.catalog button{position:relative;text-align:left;border:1px solid #385a73;border-radius:8px;background:#10273a;padding:10px 12px;min-height:66px;color:#e9f8ff}.catalog button.active{border-color:#63cef1;background:#183d54}.catalog .n{font-weight:900;color:#67d7fc;font-size:11px;letter-spacing:.08em}.catalog .nm{display:block;font-size:14px;font-weight:780;margin-top:4px}.catalog .done{position:absolute;right:10px;top:8px;font-size:13px;color:#79e1af}.close{padding:9px 13px;border-radius:7px;color:#e8f5fd;border:1px solid #4a6c84;background:#173448}
+@media(max-width:600px){#app{padding:8px;gap:6px}.brand{font-size:9px}.top h1{font-size:17px}.sub{font-size:9px}.progress strong{font-size:14px}.book-title{padding:7px 8px}.chapter{width:35px;height:37px;flex-basis:35px;font-size:14px}.nameblock{gap:7px}.jp{font-size:19px}.en{font-size:8px}.tip{font-size:10px}.stat{padding:4px 6px;min-width:52px}.stat label{font-size:8px}.stat b{font-size:14px}.game-icon{height:29px;min-width:29px;font-size:13px}.bottom-controls{left:8px;right:8px;bottom:8px}.jump{min-width:100px;font-size:12px;min-height:42px;padding:9px 12px}.details{min-height:0;grid-template-columns:1fr}.description{padding:7px 10px;border-right:0;border-bottom:1px solid var(--line);font-size:11px}.spec{font-size:10px;padding:5px 8px}.footer{gap:5px}.nav{min-height:41px;font-size:11px}.center .nav{padding:0 7px;font-size:10px}.note{font-size:9px}}
+@media(max-height:570px) and (orientation:landscape){#app{max-width:none;width:100vw;height:100dvh;padding:max(5px,env(safe-area-inset-top)) max(8px,env(safe-area-inset-right)) max(4px,env(safe-area-inset-bottom)) max(8px,env(safe-area-inset-left));gap:3px}.top{padding:0}.brand{font-size:8px}.top h1{font-size:14px;margin:0}.sub{display:none}.progress{font-size:9px}.progress strong{display:inline;font-size:12px;margin-left:6px}.book-title{padding:3px 9px}.chapter{height:26px;width:30px;flex-basis:30px;font-size:12px}.jp{font-size:17px}.en{font-size:8px}.tip{font-size:9px;max-width:56%}.tip strong{display:inline;margin-right:6px}.stage{min-height:130px}.stat{padding:3px 6px}.stat b{font-size:14px}.stat label{font-size:8px}.bottom-controls{bottom:6px}.jump{padding:6px 13px;min-height:37px;font-size:12px}.hint{font-size:9px}.hint b{font-size:10px}.details{min-height:0;display:grid;grid-template-columns:1.05fr 1fr}.description{padding:4px 8px;border-right:1px solid var(--line);border-bottom:0;font-size:10px;line-height:1.3}.spec{padding:3px 7px;font-size:9px}.footer{gap:8px}.nav{min-height:30px;font-size:11px}.center .nav{font-size:10px}.note{display:none}.result-card{padding:10px}.result-title{font-size:20px}.result-caption{font-size:10px;margin:4px 0 7px}.primary,.secondary{min-height:35px;padding:6px 10px}}
+@media(max-height:375px) and (orientation:landscape){.description{font-size:9px}.tip{display:none}.details{min-height:0}.top h1{font-size:12px}.book-title{padding:2px 8px}.footer .nav{min-height:28px}}
+@media(min-width:700px){.catalog{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+.calibration-tools{flex:0 0 auto;display:flex;align-items:center;justify-content:center;gap:10px;padding:7px 11px;background:#0e2940;border-bottom:1px solid #396782;color:#d7f1ff;font-size:12px;min-height:42px}
+.calibration-tools[hidden]{display:none}
+.calibration-label{font-weight:800;color:#76d6f8;letter-spacing:.025em}
+.calibration-tools button{min-width:32px;height:30px;border-radius:6px;border:1px solid #5b99b7;background:#143d56;color:white;font-size:18px;font-weight:850;padding:2px 8px}
+.calibration-tools button:disabled{opacity:.32}
+.calibration-tools strong{min-width:32px;text-align:center;font-variant-numeric:tabular-nums}
+.calibration-tools .width-label{color:#b9dbed;white-space:nowrap}
+.calibration-tools .calibration-reset{font-size:10px;padding:0 10px;white-space:nowrap}
+.calibration-hint{color:#90b6ca;font-size:10px}
+.wall-tools{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:6px 13px;min-height:40px;padding:5px 9px;background:#0e2940;border-bottom:1px solid #396782;font-size:11px}
+.wall-tools[hidden]{display:none}
+.wall-tools .set{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.wall-tools strong{font-variant-numeric:tabular-nums;min-width:60px;text-align:center;font-size:11px;color:#d7f4ff}
+.wall-tools .adjust{font-weight:900;min-width:29px;height:28px;border-radius:6px;border:1px solid #5b99b7;background:#143d56;color:#fff;font-size:16px}
+.wall-tools .reset{border-radius:6px;border:1px solid #587993;background:#183750;color:#fff;font-size:10px;height:28px;padding:0 9px}
+.wall-tools .wall-kind{font-weight:900;padding:4px 8px;border-radius:5px}
+.wall-tools .wall-kind.safe{background:#143b52;color:#b3efff;border:1px solid #5dc9f7}
+.wall-tools .wall-kind.deadly{background:#3b1c2d;color:#ffafbc;border:1px solid #ff718d}
+@media(max-width:650px){.wall-tools{gap:4px 7px;font-size:10px;padding:3px 5px}.wall-tools strong{min-width:55px;font-size:10px}.wall-tools .adjust{height:25px;min-width:25px;padding:0}.wall-tools .reset{height:25px;padding:0 6px}}
+@media(max-height:390px) and (orientation:landscape){.wall-tools{min-height:28px;gap:3px 9px;padding:2px 6px}.wall-tools .adjust,.wall-tools .reset{height:23px}.wall-tools .wall-kind{padding:2px 5px}}
+@media(max-width:700px){.calibration-tools{gap:6px;padding:4px 5px;font-size:10px;min-height:32px}.calibration-label{font-size:10px}.calibration-tools button{min-width:26px;height:26px;padding:0 5px}.calibration-tools .calibration-reset{padding:0 5px;font-size:9px}.calibration-hint{display:none}}
+@media(max-height:390px) and (orientation:landscape){.calibration-tools{padding:2px 5px;min-height:27px}.calibration-tools button{height:23px}}
+
+/* Ver.0.9: gap-width calibration */
+.gap-tools{flex:0 0 auto;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:7px 12px;padding:6px 10px;background:#102c40;border-bottom:1px solid #3b7790;color:#d8f4ff;font-size:12px;min-height:40px}
+.gap-tools[hidden]{display:none}
+.gap-tools strong{font-variant-numeric:tabular-nums;min-width:83px;text-align:center;color:#e2f9ff}
+.gap-tools .adjust{min-width:31px;height:29px;background:#184862;border:1px solid #58b7d7;border-radius:6px;color:white;font-weight:900;font-size:17px}
+.gap-tools .reset{font-size:10px;height:29px;padding:0 10px;background:#15384f;border:1px solid #54778c;color:#f0f8ff;border-radius:6px}
+.gap-tools .target{color:#a1e2ff;font-weight:900}
+.gap-tools .message{color:#aac8d9;font-size:10px}
+@media(max-width:700px){.gap-tools{padding:4px 6px;gap:4px 8px;font-size:10px;min-height:32px}.gap-tools .adjust{height:25px;min-width:26px}.gap-tools .reset{height:25px;padding:0 6px}.gap-tools .message{display:none}}
+@media(max-height:390px) and (orientation:landscape){.gap-tools{min-height:28px;padding:2px 6px}.gap-tools .adjust,.gap-tools .reset{height:23px}}
+/* Number gates (Ver.1.2): all-through / lower / upper / middle */
+.number-tools{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px 11px;min-height:39px;padding:5px 9px;background:#1b2349;border-bottom:1px solid #7069c5;color:#ebe9ff;font-size:11px}
+.number-tools[hidden]{display:none}
+.number-tools .number-tag{background:#39336c;border:1px solid #a99bff;padding:4px 8px;border-radius:5px;font-weight:900}
+.number-tools .set{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.number-tools strong{min-width:62px;text-align:center;font-variant-numeric:tabular-nums}
+.number-tools button{min-width:28px;height:27px;border-radius:6px;background:#353e6c;border:1px solid #898bce;color:#fff;font-weight:900;font-size:15px}
+.number-tools .reset{font-size:10px;padding:0 9px}
+.number-tools .note-s{font-size:10px;color:#b2baf6}
+@media(max-width:650px){.number-tools{gap:3px 6px;padding:3px 5px;font-size:10px;min-height:31px}.number-tools button{height:24px;min-width:24px}.number-tools .note-s{display:none}}
+@media(max-height:390px) and (orientation:landscape){.number-tools{min-height:28px;padding:2px 5px}.number-tools button{height:22px}}
+/* Keep longer Japanese names inside the title area, particularly on iPhone. */
+.nameblock{flex:1;min-width:0}
+.nameblock>div:last-child{min-width:0;max-width:100%}
+.en{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.tip{flex-shrink:0}
+@media(max-width:600px) and (orientation:portrait){
+ .book-title{flex-direction:column;align-items:stretch;gap:4px}
+ .nameblock{width:100%}
+ .jp{font-size:18px}
+ .tip{max-width:100%;padding-left:42px;text-align:left;font-size:10px}
+ .tip strong{display:none}
+}
+/* Timed digit switches (Ver.1.4) */
+.switch-tools{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:6px 12px;min-height:40px;padding:5px 9px;background:#38283f;border-bottom:1px solid #ac7cd3;font-size:11px;color:#f7e7ff}
+.switch-tools[hidden]{display:none}
+.switch-tools .switch-tag{border:1px solid #dbacff;background:#573968;color:#ffdcff;border-radius:5px;padding:4px 8px;font-weight:900}
+.switch-tools button{border:1px solid #c194df;background:#54396b;color:white;font-weight:900;min-width:28px;height:27px;border-radius:6px;font-size:15px}
+.switch-tools strong{display:inline-block;min-width:53px;text-align:center;font-variant-numeric:tabular-nums}
+.switch-tools .reset{font-size:10px;padding:0 9px}
+.switch-tools .hint-s{font-size:10px;color:#d5b6e6}
+@media(max-width:650px){.switch-tools{padding:3px 5px;min-height:30px;font-size:10px;gap:4px 6px}.switch-tools button{height:24px;min-width:24px}.switch-tools .hint-s{display:none}}
+@media(max-height:390px) and (orientation:landscape){.switch-tools{padding:2px 5px;min-height:27px}.switch-tools button{height:22px}}
+/* Digit platforms (Ver.1.3.1) */
+.platform-tools{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px 11px;min-height:39px;padding:5px 9px;background:#173b3c;border-bottom:1px solid #52bda7;color:#e7fff9;font-size:11px}
+.platform-tools[hidden]{display:none}
+.platform-tools .platform-tag{background:#205a57;border:1px solid #75d9bd;padding:4px 8px;border-radius:5px;font-weight:900}
+.platform-tools .set{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.platform-tools strong{min-width:63px;text-align:center;font-variant-numeric:tabular-nums}
+.platform-tools button{min-width:28px;height:27px;border-radius:6px;background:#235b5c;border:1px solid #6ecbb8;color:#fff;font-weight:900;font-size:15px}
+.platform-tools .reset{font-size:10px;padding:0 9px}
+.platform-tools .note-s{font-size:10px;color:#a4e9d6}
+@media(max-width:650px){.platform-tools{gap:3px 6px;padding:3px 5px;font-size:10px;min-height:31px}.platform-tools button{height:24px;min-width:24px}.platform-tools .note-s{display:none}}
+@media(max-height:390px) and (orientation:landscape){.platform-tools{min-height:28px;padding:2px 5px}.platform-tools button{height:22px}}
+
+/* Ver.1.5 moving walls */
+.motion-tools{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:5px 12px;min-height:40px;padding:5px 9px;background:#173146;border-bottom:1px solid #61a5cc;color:#e2f8ff;font-size:11px}
+.motion-tools[hidden]{display:none}
+.motion-tools .motion-tag{border:1px solid #8ad9f6;color:#d4f6ff;background:#1d4961;padding:4px 8px;border-radius:5px;font-weight:900}
+.motion-tools .motion-set{display:flex;align-items:center;gap:5px;white-space:nowrap}
+.motion-tools strong{min-width:63px;text-align:center;font-variant-numeric:tabular-nums}
+.motion-tools button{border:1px solid #73b7d9;background:#1b4861;color:#fff;border-radius:6px;height:28px;min-width:29px;font-size:15px;font-weight:900}
+.motion-tools .reset{font-size:10px;padding:0 9px}
+.motion-tools .smallnote{font-size:10px;color:#a8cfe2}
+@media(max-width:650px){.motion-tools{gap:4px 7px;padding:3px 5px;font-size:10px;min-height:31px}.motion-tools button{height:24px;min-width:24px}.motion-tools .smallnote{display:none}}
+@media(max-height:390px) and (orientation:landscape){.motion-tools{padding:2px 5px;min-height:26px}.motion-tools button{height:22px}}
+
+.combo-banner{background:linear-gradient(90deg,#24364f,#203f49);border-bottom:1px solid #5fb3b1;color:#dcf9ef;padding:7px 12px;display:flex;gap:13px;align-items:center;flex-wrap:wrap;font-size:12px}
+.combo-banner[hidden]{display:none}
+.combo-banner span{font-size:10px;letter-spacing:1.3px;color:#bce9d7;font-weight:900}
+.combo-banner b{font-size:12px}.combo-banner small{color:#a9c9d2}
+@media(max-width:650px){.combo-banner{padding:5px 7px;gap:4px 10px}.combo-banner small{display:none}}
+
+
+/* UI integration alpha: intentionally retains the verified game physics and rulebook. */
+@media (min-width:700px) and (max-height:850px){.door{height:110px}.door-grid{gap:12px}}
+#front{position:fixed;inset:0;z-index:100;overflow:auto;overscroll-behavior:contain;color:#edf5ff;isolation:isolate;background:#14253d}
+#front[hidden]{display:none}
+#front::before{content:"";position:fixed;inset:-28px;z-index:-2;background-image:linear-gradient(180deg,#0c1c3f70,#10294940 35%,#07152ed9 97%),url('data:image/webp;base64,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');background-position:center;background-size:cover;filter:saturate(.9)}
+#front::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:radial-gradient(ellipse at 50% 38%,transparent 30%,#09182a77 96%)}
+.front-screen{display:flex;flex-direction:column;gap:clamp(13px,2.6vh,24px);max-width:1080px;min-height:100dvh;margin:auto;padding:max(20px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));align-items:stretch;justify-content:center}
+.front-screen[hidden]{display:none}
+.front-top{display:flex;align-items:center;justify-content:space-between;gap:14px}.front-kicker{color:#b3c8e8;letter-spacing:.23em;text-transform:uppercase;font-size:11px;font-weight:750}.front-title{font-weight:900;letter-spacing:.095em;text-shadow:0 4px 19px #02102370;line-height:1.13;font-size:clamp(31px,5.9vw,65px);margin:5px 0}.front-title span{color:#9ff4d4}.front-sub{color:#c0d5e6;font-size:clamp(12px,1.3vw,16px);line-height:1.55;margin:0}.glass{border:1px solid #a7d6ff5c;background:linear-gradient(135deg,#152e50dc,#0c1b34e8);border-radius:20px;box-shadow:0 15px 32px #020e2382, inset 0 1px #d7f1ff1e;backdrop-filter:blur(15px)}
+.front-button{border:1px solid #90b9db78;background:#243d60dc;color:#eaf4ff;min-height:49px;border-radius:13px;font-size:14px;font-weight:760;letter-spacing:.02em;padding:11px 22px;box-shadow:0 4px 12px #05132e55;transition:transform .12s,filter .12s,border-color .12s}.front-button:hover{filter:brightness(1.12);border-color:#bde0ffaf}.front-button:active{transform:scale(.98)}.front-button.main{background:linear-gradient(100deg,#b0ffe0,#75dbc6);border-color:#ceffef;color:#123c4e;box-shadow:0 6px 0 #1d726e8a,0 12px 22px #071e2c50;font-size:clamp(18px,2vw,25px);min-height:62px}
+.front-button:focus-visible,.door:focus-visible,.control-row input:focus-visible,.control-row select:focus-visible{outline:3px solid #fff7bd;outline-offset:3px}
+.home-screen{text-align:center;align-items:center;gap:14px}.home-screen .front-kicker{margin-top:5px}.home-screen .front-title{font-size:clamp(36px,7.7vw,90px)}.home-screen .front-sub{letter-spacing:.12em}.home-cube{position:relative;display:grid;place-items:center;flex:0 0 auto;width:clamp(122px,24vh,220px);height:clamp(122px,24vh,220px);margin:clamp(3px,2vh,14px) 0;border-radius:50%;background:radial-gradient(circle,#bafcf543 1%,#69a2ea10 55%,transparent 70%)}.home-cube::before,.home-cube::after{position:absolute;content:"";inset:12%;border:1px dashed #b1fff388;border-radius:50%;transform:rotate(-15deg)}.home-cube::after{inset:22%;border:1px solid #b9cafe32;transform:rotate(35deg)}.cube-face{height:clamp(75px,13vh,128px);width:clamp(75px,13vh,128px);border:8px solid #d8edff;border-radius:20%;background:linear-gradient(142deg,#8bcbff,#d1e6ff 55%,#84aafb);transform:rotate(-12deg);box-shadow:12px 15px 0 #41649eaa,0 0 35px #8fe4e466;display:grid;place-items:center;font-size:clamp(42px,8vh,74px);font-weight:900;color:#22477c}.home-actions{width:min(480px,100%);display:grid;gap:10px}.home-actions-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}.home-trial{font-size:11px;color:#a9c5d5}
+.door-head{display:flex;align-items:center;justify-content:space-between;gap:10px}.door-head h2,.settings-head h2{font-size:clamp(25px,4vw,38px);letter-spacing:.09em;margin:0}.door-progress{font-size:13px;color:#b8e7db;background:#0b2943b8;border:1px solid #74d4c35c;border-radius:999px;padding:10px 15px;white-space:nowrap}
+.doors-screen{max-width:930px;justify-content:flex-start;gap:18px}.doors-intro{text-align:center;color:#bed5e6;font-size:12px}.door-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(10px,2.4vw,18px);width:100%;max-width:620px;margin:0 auto}.door{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;height:clamp(114px,17vh,159px);border:1px solid #7794b568;border-radius:14px;background:linear-gradient(165deg,#152a48cc,#0e1e35b8);cursor:pointer;color:#f1f8ff;transition:transform .15s,background .15s,border .15s;overflow:hidden}.door:hover:not(:disabled){transform:translateY(-2px);border-color:#a3fae5}.door.current{border-color:#9bffe7;box-shadow:0 0 21px #8cffe326,inset 0 0 22px #6de2ce19}.door.locked{filter:saturate(.65);opacity:.77;cursor:default}.arch{width:75px;height:84px;position:relative;border-radius:43px 43px 5px 5px;border:10px solid #718ba3;border-bottom:7px solid #708ea9;background:linear-gradient(90deg,#1b2e4e,#304b68,#1a2c44);box-shadow:inset 0 0 0 4px #14243b,inset 0 10px 30px #020817af,0 7px 4px #00102277}.arch::before{content:"";position:absolute;inset:-10px;border-radius:43px 43px 5px 5px;border:2px solid #b7c5d488;pointer-events:none}.arch::after{content:"";position:absolute;left:13px;right:13px;top:13px;bottom:3px;border:1px solid #8ea3bc5b;border-radius:19px 19px 2px 2px;background:repeating-linear-gradient(0deg,#8dacc515 0 2px,transparent 2px 18px)}.door.open .arch{background:radial-gradient(ellipse at 50% 70%,#fff8cd,#bdeade 64%,#7ca6d3);border-color:#a8aa99;box-shadow:inset 0 0 25px #ffe7a5,0 0 15px #ffecd14a}.door.open .arch::after{display:none}.door.current .arch{border-color:#a2c7ce;box-shadow:inset 0 0 0 3px #30557a,0 0 22px #72f5dc6e}.arch-symbol{position:absolute;z-index:2;inset:0;display:grid;place-items:center;color:#e8f3ff;font-size:24px;font-weight:900;text-shadow:0 2px 5px #0a2143}.door.open .arch-symbol{color:#215d61;text-shadow:0 0 9px #fff}.door-number{font-size:11px;font-weight:850;color:#dfedff}.door.locked .door-number{color:#a3b5c6}.door-page-controls{display:flex;justify-content:center;align-items:center;gap:22px;margin-top:3px}.door-page-controls .front-button{min-height:42px}.page-indicator{color:#c6e4ef;font-size:13px}.door-page-controls[hidden]{display:none}.door-footnote{max-width:620px;margin:0 auto;text-align:center;font-size:11px;color:#a3bfcc;line-height:1.55}
+.settings-screen{max-width:700px;justify-content:flex-start}.settings-head{display:flex;align-items:center;gap:16px}.settings-panel{padding:clamp(14px,3vw,28px);display:grid;gap:8px}.control-row{display:grid;grid-template-columns:minmax(100px,1fr) minmax(80px,1.2fr) auto;gap:14px;align-items:center;min-height:61px;border-bottom:1px solid #7aacc52b}.control-row:last-child{border-bottom:0}.control-row label{font-weight:780;font-size:14px}.control-row input[type=range]{width:100%;accent-color:#9cf7d5;min-width:40px;cursor:pointer}.control-row select{background:#263d60;color:#e8f7ff;padding:10px;border-radius:9px;border:1px solid #7598b7;font-size:13px}.control-row .sw{width:52px;height:29px;position:relative;border-radius:99px;background:#39536a;border:1px solid #6a8aa7;cursor:pointer}.control-row .sw[aria-checked=true]{background:#6edcc1;border-color:#b9ffeb}.control-row .sw::before{position:absolute;content:"";top:3px;left:4px;width:21px;height:21px;border-radius:50%;background:#f0f8ff;transition:transform .18s}.control-row .sw[aria-checked=true]::before{transform:translateX(22px)}.setting-note{font-size:11px;color:#bdd2df;line-height:1.6}.setting-note a{color:#bdebdc}
+.mode-story #app{display:flex;width:100vw;max-width:none;height:100dvh;max-height:none;padding:0;gap:0;background:#091726}.mode-story #app .top,.mode-story #app .book-title,.mode-story #app .details,.mode-story #app .footer,.mode-story #app .note,.mode-story #app .calibration-tools,.mode-story #app .wall-tools,.mode-story #app .gap-tools,.mode-story #app .number-tools,.mode-story #app .platform-tools,.mode-story #app .switch-tools,.mode-story #app .motion-tools,.mode-story #app .combo-banner{display:none!important}.mode-story #app .book{border:0;border-radius:0;flex:1}.mode-story #app .stage{min-height:0}.mode-story #app .result-card{width:min(92%,470px);border-color:#a2d4df8a;background:linear-gradient(135deg,#1a3451f5,#0b1d35f5);border-radius:20px;padding:clamp(18px,4vw,30px)}.mode-story #app .result-title{font-size:clamp(25px,4vw,38px)}.mode-story #app .result-caption{font-size:clamp(12px,1.6vw,15px)}.mode-story #app .primary,.mode-story #app .jump{background:linear-gradient(110deg,#b3f9d8,#79dcc6);color:#143c4b;border-color:#dbfff0}.mode-story #app .result-actions{flex-wrap:wrap}.mode-story #app .stat{background:#132a46d8;border-color:#8da9d35e;border-radius:11px}.mode-story #app #storyHome,.mode-story #app #resultHome{display:inline-flex}.mode-practice #app{display:flex}.mode-practice #storyHome,.mode-practice #resultHome{display:none!important}.mode-story .stat b{font-size:clamp(15px,2.7vw,21px)}.mode-story .stage-hud{top:clamp(8px,3vh,25px);left:clamp(8px,2vw,28px);right:clamp(8px,2vw,28px)}
+#storyStageBox{display:none}.mode-story #storyStageBox{display:block}#storyHome{display:none}
+#resultHome{display:none;align-items:center;justify-content:center}
+body.motion-reduced .front-button,body.motion-reduced .door,body.motion-reduced .sw::before{transition:none!important}body.motion-reduced .home-cube::before{border-style:solid;opacity:.45}
+@media(max-width:480px){.front-screen{padding:16px 13px}.door-grid{gap:8px}.door{height:117px}.door-head h2{font-size:23px}.door-progress{padding:8px;font-size:11px}.arch{transform:scale(.86);margin:-4px 0}.control-row{grid-template-columns:1fr minmax(72px,1fr) auto;gap:7px}.control-row label{font-size:12px}.settings-panel{padding:13px}.mode-story #app .game-buttons{gap:3px}}
+@media(max-height:500px) and (orientation:landscape){.home-screen{gap:7px}.home-screen .front-title{font-size:clamp(31px,8vh,50px)}.home-screen .front-sub{font-size:11px}.home-cube{height:90px;width:90px;margin:0}.cube-face{height:65px;width:65px;border-width:5px;font-size:40px}.home-actions{max-width:520px}.home-actions .front-button.main{min-height:42px;font-size:18px}.home-actions .front-button{min-height:36px;padding:6px}.home-trial{font-size:9px}.doors-screen{gap:8px}.door{height:92px}.arch{transform:scale(.7);margin:-12px 0}.door-number{font-size:10px}.settings-screen{gap:8px}.settings-panel{padding:11px 20px}.control-row{min-height:37px}.settings-head h2{font-size:22px}.control-row label{font-size:12px}}
+/* Fit the complete two-column, four-row stage selection on ordinary portrait and desktop viewports. */
+@media (min-height:521px){
+ .doors-screen{gap:clamp(7px,1.2vh,14px)}
+ .door-grid{gap:clamp(8px,1.7vh,14px)}
+ .door{height:clamp(94px,14vh,130px)}
+}
+/* Mobile-landscape readability: same eight doors, arranged in two rows instead of needing vertical scrolling. */
+@media (orientation:landscape) and (max-height:520px){
+ .doors-screen{gap:5px;justify-content:flex-start;padding:7px 16px 8px;min-height:100dvh}
+ .door-head .front-button{min-height:30px;padding:4px 12px;font-size:11px}
+ .door-head h2{font-size:18px}
+ .doors-screen h2{font-size:19px!important;margin:0!important}
+ .doors-intro{font-size:10px}
+ .door-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 9px;max-width:780px}
+ .door{height:clamp(84px,24vh,112px);gap:0;padding:2px}
+ .arch{transform:scale(.69);margin:-12px 0 -10px}
+ .door-number{font-size:10px}
+ .door-page-controls{margin:0;gap:12px}
+ .door-page-controls .front-button{min-height:26px;padding:2px 10px}
+ .door-footnote{font-size:9px;line-height:1.25}
+}
+body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidden]{display:none!important} .mode-story #app .result-actions #resultHome{display:inline-flex!important}</style>
+</head>
+<body>
+<main id="app">
+  <div class="top"><div><div class="brand">NUMBER ROLL / LEARNING MODE</div><h1>PLAYABLE RULEBOOK</h1><div class="sub">障害物の特徴を読み、実際に挑戦しよう / 下部の目盛りで幅と距離を確認</div></div><div class="progress">CLEAR<strong id="bookProgress">0 / 51</strong></div></div>
+  <section class="book" aria-label="プレイ型障害物図鑑">
+    <div class="book-title"><div class="nameblock"><div class="chapter" id="number">01</div><div><div class="jp" id="jp">単体トゲ</div><div class="en" id="en">SINGLE SPIKE</div></div></div><div class="tip"><strong>攻略のヒント</strong><span id="tip"></span></div></div>
+    <div class="calibration-tools" id="calibrationTools" hidden>
+      <span class="calibration-label">トゲ長さの調整</span>
+      <button type="button" id="spikeMinus" aria-label="トゲを1つ減らす">−</button>
+      <strong><span id="spikeCount">1</span>個</strong>
+      <button type="button" id="spikePlus" aria-label="トゲを1つ増やす">＋</button>
+      <span class="width-label">横幅 <b id="spikeWidth">0.0</b> マス</span>
+      <button type="button" class="calibration-reset" id="spikeDefault">基準に戻す</button>
+      <span class="calibration-hint">変更後は最初から再挑戦</span>
+    </div>
+    <div class="wall-tools" id="wallTools" hidden>
+      <span class="wall-kind safe" id="wallKind">青枠：着地可能</span>
+      <span class="set">高さ <button type="button" class="adjust" id="wallHeightMinus" aria-label="壁の高さを減らす">−</button><strong id="wallHeight">—</strong><button type="button" class="adjust" id="wallHeightPlus" aria-label="壁の高さを増やす">＋</button></span>
+      <span class="set">横幅 <button type="button" class="adjust" id="wallWidthMinus" aria-label="壁の幅を減らす">−</button><strong id="wallWidth">—</strong><button type="button" class="adjust" id="wallWidthPlus" aria-label="壁の幅を増やす">＋</button></span>
+      <button type="button" class="reset" id="wallDefault">基準に戻す</button>
+    </div>
+    <div class="gap-tools" id="gapTools" hidden>
+      <span class="target" id="gapKind">穴 / 1ジャンプ用</span>
+      <span>幅</span><button type="button" class="adjust" id="gapWidthMinus" aria-label="穴の幅を0.25マス減らす">−</button>
+      <strong id="gapWidth">2.25 マス</strong>
+      <button type="button" class="adjust" id="gapWidthPlus" aria-label="穴の幅を0.25マス増やす">＋</button>
+      <button type="button" class="reset" id="gapDefault">基準に戻す</button>
+      <span class="message">0.25マス刻み・変更後は再スタート</span>
+    </div>
+    <div class="number-tools" id="numberTools" hidden>
+      <span class="number-tag" id="numberKind">数字壁 3</span>
+      <span class="set" id="numberHeightSet">通過部分の縦幅 <button type="button" id="numberHeightMinus" aria-label="数字部分を低くする">−</button><strong id="numberHeight">2.00マス</strong><button type="button" id="numberHeightPlus" aria-label="数字部分を高くする">＋</button></span>
+      <span class="set" id="numberPositionSet">通過位置 <button type="button" id="numberPositionMinus" aria-label="通過部分を下げる">−</button><strong id="numberPosition">0.00マス</strong><button type="button" id="numberPositionPlus" aria-label="通過部分を上げる">＋</button></span>
+      <button type="button" class="reset" id="numberDefault">基準に戻す</button>
+      <span class="note-s">縦0.25マス刻み・高さと位置を調整できます</span>
+    </div>
+    <div class="platform-tools" id="platformTools" hidden>
+      <span class="platform-tag" id="platformKind">数字足場 2</span>
+      <span class="set">高さ <button type="button" id="platformHeightMinus" aria-label="数字足場を低くする">−</button><strong id="platformHeight">1.17マス</strong><button type="button" id="platformHeightPlus" aria-label="数字足場を高くする">＋</button></span>
+      <span class="set">横幅 <button type="button" id="platformWidthMinus" aria-label="数字足場を短くする">−</button><strong id="platformWidth">3.00マス</strong><button type="button" id="platformWidthPlus" aria-label="数字足場を長くする">＋</button></span>
+      <button type="button" class="reset" id="platformDefault">基準に戻す</button>
+      <span class="note-s">高さ0.25・横幅0.5マス刻み</span>
+    </div>
+    <div class="switch-tools" id="switchTools" hidden>
+      <span class="switch-tag" id="switchKind">数字スイッチ</span>
+      <span>効果時間</span><button id="switchTimeMinus" type="button" aria-label="効果時間を0.5秒短くする">−</button>
+      <strong id="switchTime">4.0秒</strong><button id="switchTimePlus" type="button" aria-label="効果時間を0.5秒長くする">＋</button>
+      <button class="reset" id="switchDefault" type="button">基準に戻す</button>
+      <span class="hint-s">他の仕掛けには影響しません</span>
+    </div>
+
+    <div class="motion-tools" id="motionTools" hidden>
+      <span class="motion-tag" id="motionKind">青枠 / 上下</span>
+      <span class="motion-set">移動範囲 <button type="button" id="motionRangeMinus" aria-label="移動範囲を減らす">−</button><strong id="motionRange">2.00マス</strong><button type="button" id="motionRangePlus" aria-label="移動範囲を増やす">＋</button></span>
+      <span class="motion-set">往復周期 <button type="button" id="motionPeriodMinus" aria-label="移動周期を短くする">−</button><strong id="motionPeriod">3.0秒</strong><button type="button" id="motionPeriodPlus" aria-label="移動周期を長くする">＋</button></span>
+      <button type="button" class="reset" id="motionDefault">基準に戻す</button>
+      <span class="smallnote">距離0.25マス・周期0.5秒刻み</span>
+    </div>
+    <div class="combo-banner" id="comboBanner" hidden><span>COMBO CHALLENGE</span><b>安全にGOALへ進めばクリア！</b><small>別ルート・スイッチ未起動・着地なしでもOK</small></div>
+    <div class="stage" id="stage"><canvas id="game" aria-label="プレイ画面。タップかスペースキーでジャンプ"></canvas>
+      <div class="stage-hud"><div class="stats-left"><div class="stat" id="storyStageBox"><label>STAGE</label><b id="storyHudStage">01</b></div><div class="stat"><label>上の数字</label><b id="face">1</b></div><div class="stat"><label>ジャンプ残り</label><b id="jumps">1 / 1</b></div></div><div class="stats-right"><div class="stat slim" id="switchTimerBox" hidden><label>効果残り</label><b id="switchTimer">未起動</b></div><div class="stat slim"><label>進行</label><b id="distance">0%</b></div><div class="game-buttons"><button type="button" id="storyHome" class="game-icon" aria-label="ホーム">⌂</button><button type="button" id="reset" class="game-icon" aria-label="リトライ">↻</button><button type="button" id="pause" class="game-icon" aria-label="一時停止">Ⅱ</button></div></div></div>
+      <div class="bottom-controls"><div class="hint"><b id="actionHint">画面をタップしてスタート</b><span>タップ / Space / ↑：ジャンプ</span></div><button id="jump" class="jump" type="button">▶ スタート</button></div>
+      <div class="result show" id="result"><div class="result-card"><div class="result-title" id="resultTitle">練習 01</div><div class="result-caption" id="resultCaption">障害物を避けてゴールへ。ジャンプすると90°回転し、数字と色が変わります。</div><div class="result-actions"><button class="primary" id="retry" type="button">▶ スタート</button><button class="secondary" id="resultNext" type="button" hidden>次の障害物 ▶</button><button class="secondary" id="resultHome" type="button">⌂ HOME</button></div></div></div>
+    </div>
+    <div class="details"><div class="description" id="description"></div><div class="specs" id="specs"></div></div>
+  </section>
+  <nav class="footer"><button id="prev" class="nav" type="button">◀ 前の障害物</button><div class="center"><button id="catalogButton" class="nav" type="button">☷ 一覧</button><button id="ruleButton" class="nav" type="button">？ 操作</button></div><button id="next" class="nav" type="button">次の障害物 ▶</button></nav>
+  <div class="note">Ver.2.0 UI統合版 / Ver.1.6 複合コース対応｜接触せず飛び越え・通り抜けできればクリア。スイッチの起動や足場着地は必須ではありません。</div>
+  <div class="overlay" id="overlay"><div class="overlay-head"><h2 id="overlayTitle">障害物一覧</h2><button class="close" id="close" type="button">✕ 戻る</button></div><div class="catalog" id="catalog"></div><div id="rules" style="display:none;overflow:auto;touch-action:pan-y;color:#d1e5f3;line-height:1.75;font-size:14px;padding:6px 4px"><p><b>自動で右に進む四角形</b>をジャンプで操作します。画面のどこかをタップするか、Space・↑・Wキーでジャンプします。</p><p>ジャンプするたびに四角形は<b>時計回りに90°回転</b>し、上の数字が1→2→3→4→1の順に変わります。数字ごとに色も変わります。</p><p><b>着地した時の数字</b>が、次の着地までに使えるジャンプ回数です。空中で数字が変わっても、途中で回数の上限は変わりません。</p><p>最初の4ページはトゲ1 / 5 / 9 / 13個から検証できます。その次の8ページは、青枠・赤枠の壁を1〜4ジャンプ分の高さで練習できます。穴の幅の調整ページと空中トゲA/Bの単体・複合練習に続き、数字の壁4パターンと数字足場1〜4、数字スイッチ3種類を試せます。数字の壁は0.5マス幅で、紫の数字エリアは入った瞬間の数字が一致すれば通過できます。赤い部分は常に危険。数字エリアの途中で数字が変わっても判定は維持しますが、赤に接触すると失敗します。数字足場は上面のみ数字が一致すると安全に着地でき、ジャンプ回数が回復します。不一致で着地すると失敗。側面と下面は数字に関係なく危険ですが、十分な隙間があれば接触せずに下を通り抜けてもクリアできます。足場への着地は必須ではありません。数字スイッチは上面の数字が一致する状態で触れると、対応する仕掛け1つだけが一定時間変化します。スイッチを起動しなくても、仕掛けを安全に飛び越えたり回避できればクリアです。数字が違えばスイッチは素通りでき、何も起きません。壁の消去・穴の足場出現・トゲの後退を試せます。効果時間が切れると元に戻ります。縦の高さは見た目のプレイヤーサイズを1マスとして0.25マス刻みで調整します。壁の高さは0.25マス刻み、幅は0.5マス刻みで調整できます。Ver.0.8は壁の高さを「ひとつ少ないジャンプ回数では届かず、目標回数なら余裕がある」中間高度に再設計しました。青枠壁は幅2マス、赤枠は0.75マスを基準にしています。プレイ中の▲1〜4はジャンプする位置の目安です。青枠の壁は上に着地できてジャンプ回数が回復しますが、赤枠の壁は上も側面も危険です。穴の幅は0.25マス単位で調整できます。空中トゲAは全面接触禁止。空中トゲBは緑色の上面に着地可能で、着地するとジャンプ回数が回復します。Bの下面・側面は危険です。Bに着地せず、接触を避けて通過できてもクリアです。トゲ・壁などへの衝突は失敗。ただし、安全に上を飛び越えたり触れずに通過できればクリアです。数字の壁は画面上まで続くため、数字の一致で通過する必要があります。穴は落下中でもジャンプ回数が残っていれば復帰可能。穴の左右の側壁への衝突、または四角形が画面下へ完全に消えると失敗。青く光る<b>GOAL</b>を通ればクリア。失敗したら「リトライ」で何度でも練習できます。</p><p>Ver.1.6では、青枠壁＋トゲ、穴＋数字足場、数字壁＋トゲ、数字スイッチ＋トゲ、移動壁＋穴、天井トゲ＋中央数字壁の6つの複合練習コースを追加しています。複合コースは障害物を安全に避けてGOALへ到達すればクリアです。<b>特定の仕掛けを必ず使う必要はありません。</b></p><p>操作：タップ / Space / ↑ / W = ジャンプ、R = リトライ、P = 一時停止、← / → = ページ移動。数字の色は <span style="color:#4fc3f7">1 青</span>・<span style="color:#94df84">2 緑</span>・<span style="color:#ffbc68">3 オレンジ</span>・<span style="color:#be9bff">4 紫</span>。</p></div></div>
+</main>
+
+<div id="front" aria-label="NUMBER ROLL メニュー">
+  <section id="homeScreen" class="front-screen home-screen">
+    <div class="front-kicker">MAY WORKS · ORIGINAL GAME</div>
+    <div class="front-title">NUMBER <span>ROLL</span></div>
+    <p class="front-sub" id="homeSubtitle">数字で、道をひらく。</p>
+    <div class="home-cube" aria-hidden="true"><div class="cube-face">3</div></div>
+    <div class="home-actions"><button type="button" id="homePlay" class="front-button main">▶　PLAY</button><div class="home-actions-row"><button type="button" id="homeDoors" class="front-button">▤　STAGES</button><button type="button" id="homeSettings" class="front-button">⚙　SETTINGS</button></div><button type="button" id="homePractice" class="front-button">◇　障害物の練習（51種類）</button></div>
+    <div class="home-trial">UI試作版 · 体験ステージ8個 · ステージ内容は仮構成</div>
+  </section>
+  <section id="doorsScreen" class="front-screen doors-screen" hidden>
+    <div class="door-head"><button type="button" id="doorsBack" class="front-button" aria-label="ホームに戻る">‹　HOME</button><div class="door-progress" id="doorProgress">0 / 8 CLEAR</div></div>
+    <div style="text-align:center"><h2 style="letter-spacing:.12em;font-size:clamp(25px,4vw,37px);margin:3px 0">STAGE SELECT</h2><div class="doors-intro">開いた扉はクリア済み。光る扉から次に挑戦。</div></div>
+    <div id="doorGrid" class="door-grid"></div>
+    <div class="door-page-controls"><button id="doorsPrev" type="button" class="front-button" aria-label="前のページ">‹</button><span id="pageIndicator" class="page-indicator">1 / 1</span><button id="doorsNext" type="button" class="front-button" aria-label="次のページ">›</button></div>
+    <div class="door-footnote">石の扉をタップして挑戦。ステージの正式な構成はあとから調整できます。</div>
+  </section>
+  <section id="settingsScreen" class="front-screen settings-screen" hidden>
+    <div class="settings-head"><button type="button" id="settingsBack" class="front-button">‹　戻る</button><h2>SETTINGS</h2></div>
+    <div class="glass settings-panel">
+      <div class="control-row"><label for="musicVolume">BGM</label><input id="musicVolume" type="range" min="0" max="100" step="5" value="25" aria-label="BGM音量"><button id="musicToggle" type="button" class="sw" role="switch" aria-label="BGM ON/OFF" aria-checked="true"></button></div>
+      <div class="control-row"><label for="sfxVolume">効果音</label><input id="sfxVolume" type="range" min="0" max="100" step="5" value="40" aria-label="効果音音量"><button id="sfxToggle" type="button" class="sw" role="switch" aria-label="効果音 ON/OFF" aria-checked="true"></button></div>
+      <div class="control-row"><label>振動</label><span class="setting-note">対応端末のみ</span><button id="vibrationToggle" type="button" class="sw" role="switch" aria-label="振動 ON/OFF" aria-checked="false"></button></div>
+      <div class="control-row"><label>演出の軽減</label><span class="setting-note">光・アニメーションを控えめに</span><button id="reduceToggle" type="button" class="sw" role="switch" aria-label="演出軽減 ON/OFF" aria-checked="false"></button></div>
+      <div class="control-row"><label for="languageSelect">言語</label><select id="languageSelect" aria-label="メニュー言語"><option value="ja">日本語</option><option value="en">English（メニューのみ）</option></select><span></span></div>
+    </div>
+    <div class="setting-note" style="max-width:630px">※ 音楽・効果音は試作用の簡易音です。正式な楽曲や各画面の翻訳は今後追加します。音の再生には最初のタップが必要です。</div>
+  </section>
+</div>
+
+<script>
+(()=>{
+'use strict';
+const calibrationEntries=[
+ {n:'T-01',jp:'トゲ / 1ジャンプ用',en:'SPIKE TEST · 1 JUMP',face:1,type:'calibration',target:1,initialCount:1,tip:'1回のジャンプで越えられるか確認',desc:'1段ジャンプで飛び越えるトゲの幅を測ろう。個数を増減して、無理なく飛べる上限を確認する。',spec:[['目標','1段ジャンプ'],['初期トゲ','1個'],['調整','±1個'],['基準','1マス=64']]},
+ {n:'T-02',jp:'トゲ / 2ジャンプ用',en:'SPIKE TEST · 2 JUMPS',face:2,type:'calibration',target:2,initialCount:5,tip:'着地前の空中ジャンプで距離を伸ばす',desc:'5個の連続トゲを2回のジャンプで越えられるか検証する。ジャンプの間隔によって飛距離が変わる。',spec:[['目標','2段ジャンプ'],['初期トゲ','5個'],['調整','±1個'],['基準','1マス=64']]},
+ {n:'T-03',jp:'トゲ / 3ジャンプ用',en:'SPIKE TEST · 3 JUMPS',face:3,type:'calibration',target:3,initialCount:9,tip:'飛び始めと追加ジャンプのタイミングを合わせよう',desc:'9個の連続トゲを3回のジャンプで越える検証。失敗する場合は個数を減らして安全な長さを探そう。',spec:[['目標','3段ジャンプ'],['初期トゲ','9個'],['調整','±1個'],['基準','1マス=64']]},
+ {n:'T-04',jp:'トゲ / 4ジャンプ用',en:'SPIKE TEST · 4 JUMPS',face:4,type:'calibration',target:4,initialCount:13,tip:'4回を一度に使わず、空中での間隔を考える',desc:'13個の連続トゲを4回のジャンプで越える検証。現段階は仮の長さなので操作して上限を見つけよう。',spec:[['目標','4段ジャンプ'],['初期トゲ','13個'],['調整','±1個'],['基準','1マス=64']]}
 ];
-const base={"001>027":4,"027>001":2,"001>021":1,"021>001":0,"014>001":0,"001>014":0,"014>021":0,"021>014":0,"014>027":1,"027>021":0};
-// 順序に関する好みは、隣接していなくても一度だけ評価する。逆向きの減点を重ねない。
-const prefs={A:[{before:"001",after:"021",score:3},{before:"001",after:"014",score:3}],B:[{before:"021",after:"001",score:4},{before:"014",after:"021",score:2}]};
-const fmt=m=>String(Math.floor(m/60)%24).padStart(2,"0")+":"+String(m%60).padStart(2,"0");
-function permutations(a){if(!a.length)return [[]];return a.flatMap((x,i)=>permutations(a.filter((_,j)=>j!==i)).map(p=>[x,...p]));}
-function cosine(a,b){const n=Math.hypot(...a)*Math.hypot(...b);return n?(a[0]*b[0]+a[1]*b[1])/n:0;}
-function band(min){const h=Math.floor(min/60)%24;return h>=5&&h<11?0:h>=11&&h<17?1:2;}
-function chooseRest(desired){const rest=items.find(x=>x.id==="027");const similarity=cosine(desired,[rest.load/10,rest.rec/10]);
- // 明示的なルール。休憩は任意。負荷のある課題の後、回復を求めるなら候補に入れる。
- const needed=items.find(x=>x.id==="001").load>=5 && desired[1]>=0.4 && similarity>=0.7;
- return {needed,similarity};}
-function scoreOrder(order,who,start,gap){
- let t=start, fatigue=0, total=0,steps=[], breakdown={time:0,adjacency:0,personal:0,fatigue:0};
- const mealIndex=order.findIndex(x=>x.id==="014"),bathIndex=order.findIndex(x=>x.id==="021");
- const mealBeforeBath=mealIndex<bathIndex;
- let mealEnd=null,prev=null;
- for(const x of order){
-  // 夕食の後に入浴する場合、指定した間隔を必須条件として挿入
-  if(x.id==="021"&&mealBeforeBath&&mealEnd!==null&&t<mealEnd+gap){
-   steps.push({name:"自由時間（待機）",start:t,end:mealEnd+gap,detail:"夕食後の希望間隔"});t=mealEnd+gap;
+// 各段の理論最高高度 = 700² / (2×1850) × 段数 = 約132.4 × 段数 (world units)
+// (n-1)段では届かずn段で余裕を残せる中間値を採用する。
+const WALL_PRESETS=[65,154,275,402];
+const wallEntries=[
+ {n:'B-01',jp:'青枠の壁 / 1ジャンプ用',en:'BLUE LANDING WALL · 1 JUMP',face:1,type:'wallCalibration',lethal:false,target:1,initialHeight:65,initialWidth:128,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を調整し、必要ジャンプ回数と操作の余裕を確認しよう。',spec:[['目標','1段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','1.02マス'],['初期の幅','2マス']]},
+ {n:'B-02',jp:'青枠の壁 / 2ジャンプ用',en:'BLUE LANDING WALL · 2 JUMPS',face:2,type:'wallCalibration',lethal:false,target:2,initialHeight:154,initialWidth:128,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を調整し、必要ジャンプ回数と操作の余裕を確認しよう。',spec:[['目標','2段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','2.41マス'],['初期の幅','2マス']]},
+ {n:'B-03',jp:'青枠の壁 / 3ジャンプ用',en:'BLUE LANDING WALL · 3 JUMPS',face:3,type:'wallCalibration',lethal:false,target:3,initialHeight:275,initialWidth:128,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を調整し、必要ジャンプ回数と操作の余裕を確認しよう。',spec:[['目標','3段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','4.30マス'],['初期の幅','2マス']]},
+ {n:'B-04',jp:'青枠の壁 / 4ジャンプ用',en:'BLUE LANDING WALL · 4 JUMPS',face:4,type:'wallCalibration',lethal:false,target:4,initialHeight:402,initialWidth:128,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を調整し、必要ジャンプ回数と操作の余裕を確認しよう。',spec:[['目標','4段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','6.28マス'],['初期の幅','2マス']]},
+ {n:'R-01',jp:'赤枠の壁 / 1ジャンプ用',en:'RED DANGER WALL · 1 JUMP',face:1,type:'wallCalibration',lethal:true,target:1,initialHeight:65,initialWidth:48,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を調整し、必要ジャンプ回数と操作の余裕を確認しよう。',spec:[['目標','1段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','1.02マス'],['初期の幅','0.75マス']]},
+ {n:'R-02',jp:'赤枠の壁 / 2ジャンプ用',en:'RED DANGER WALL · 2 JUMPS',face:2,type:'wallCalibration',lethal:true,target:2,initialHeight:154,initialWidth:48,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を調整し、必要ジャンプ回数と操作の余裕を確認しよう。',spec:[['目標','2段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','2.41マス'],['初期の幅','0.75マス']]},
+ {n:'R-03',jp:'赤枠の壁 / 3ジャンプ用',en:'RED DANGER WALL · 3 JUMPS',face:3,type:'wallCalibration',lethal:true,target:3,initialHeight:275,initialWidth:48,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を調整し、必要ジャンプ回数と操作の余裕を確認しよう。',spec:[['目標','3段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','4.30マス'],['初期の幅','0.75マス']]},
+ {n:'R-04',jp:'赤枠の壁 / 4ジャンプ用',en:'RED DANGER WALL · 4 JUMPS',face:4,type:'wallCalibration',lethal:true,target:4,initialHeight:402,initialWidth:48,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を調整し、必要ジャンプ回数と操作の余裕を確認しよう。',spec:[['目標','4段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','6.28マス'],['初期の幅','0.75マス']]}
+];
+const baseEntries=[
+ {n:'01',jp:'単体トゲ',en:'SINGLE SPIKE',face:1,type:'single',tip:'トゲの手前で1回ジャンプ',desc:'最も基本的な障害物。タイミングよくジャンプして単体トゲを飛び越えよう。',spec:[['種類','地上'],['推奨','1回ジャンプ'],['危険','接触'],['難易度','★☆☆']]},
+ {n:'02',jp:'連続トゲ',en:'SPIKE ROW',face:2,type:'row',tip:'空中ジャンプで距離を伸ばす',desc:'トゲが横に連なる。連続ジャンプを使って、安全な地面まで届かせよう。',spec:[['種類','地上'],['推奨','1〜2回'],['危険','接触'],['難易度','★★☆']]},
+ {n:'03',jp:'低い壁',en:'LOW WALL',face:1,type:'low',tip:'壁に当たる前に飛び越える',desc:'一段ジャンプで越えられる高さ。側面にぶつかると失敗。上には着地できる。',spec:[['種類','壁'],['推奨','1回ジャンプ'],['判定','側面衝突'],['難易度','★☆☆']]},
+ {n:'04',jp:'高い壁',en:'HIGH WALL',face:4,type:'high',tip:'空中で複数回タップ',desc:'高い壁を越すには空中ジャンプが必要。ジャンプの高度を積み上げよう。',spec:[['種類','壁'],['推奨','3回程度'],['判定','側面衝突'],['難易度','★★★']]},
+ {n:'05',jp:'小さな穴',en:'SMALL PIT',face:2,type:'smallPit',tip:'少し落ちてもジャンプで復帰可能',desc:'短い地面の切れ目。落ちても画面外へ消える前ならジャンプで復帰できる。ただし対岸の垂直な壁に当たると失敗。',spec:[['種類','地形'],['推奨','1回ジャンプ'],['危険','壁接触・画面外'],['難易度','★☆☆']]},
+ {n:'06',jp:'大きな穴',en:'LARGE PIT',face:4,type:'largePit',tip:'落ちても残り回数で復帰を狙える',desc:'大きな穴でも、落下中に残りのジャンプを使える。対岸の側壁へぶつかる前に地面より上まで戻ろう。',spec:[['種類','地形'],['推奨','2〜4回'],['危険','壁接触・画面外'],['難易度','★★★']]},
+ {n:'07',jp:'天井トゲ',en:'CEILING SPIKES',face:3,type:'ceiling',tip:'ジャンプしなければ安全',desc:'上から下向きに伸びるトゲ。余計なジャンプはしないで低い位置を通ろう。',spec:[['種類','天井'],['推奨','ジャンプ不要'],['危険','高い位置'],['難易度','★☆☆']]},
+ {n:'08',jp:'空中トゲ',en:'FLOATING SPIKES',face:2,type:'floating',tip:'飛んでいる途中の高度に注意',desc:'空中に浮いたトゲ。地上なら避けられる配置でも、空中では接触の危険がある。',spec:[['種類','空中'],['推奨','高さを調整'],['危険','空中衝突'],['難易度','★★☆']]},
+ {n:'09',jp:'狭い通路',en:'NARROW CORRIDOR',face:2,type:'corridor',tip:'床トゲを越えたら着地して低く進む',desc:'床のトゲと天井のトゲが続く。最初に跳んで、その後は天井に当たらないよう進もう。',spec:[['種類','複合'],['推奨','1回＋低空'],['危険','上下のトゲ'],['難易度','★★★']]},
+ {n:'10',jp:'階段状の壁',en:'STAIRCASE WALL',face:4,type:'stairs',tip:'段の上に着地すると回数が回復',desc:'だんだん高くなる足場。各段に着地しながら、ジャンプ回数を補充して進もう。',spec:[['種類','地形'],['推奨','連続ジャンプ'],['判定','壁の側面'],['難易度','★★★']]}
+];
+// 穴調整の基準幅：前のジャンプ段数の理論飛距離以上・必要回数なら余裕。
+// 1マス=64、速度285、初速700、重力1850。幅はプレイしながら調整できる。
+const gapEntries=[
+ {n:'G-01',jp:'穴 / 1ジャンプ用',en:'PIT TEST · 1 JUMP',face:1,type:'gapCalibration',target:1,initialWidth:144,tip:'穴の直前からジャンプして対岸に着地',desc:'最初の穴。踏み切り位置を変えながら、1回のジャンプで安定して渡れる幅を探そう。',spec:[['目標','1段ジャンプ'],['基準幅','2.25マス'],['調整','±0.25マス'],['判定','穴の側壁 / 画面外']]},
+ {n:'G-02',jp:'穴 / 2ジャンプ用',en:'PIT TEST · 2 JUMPS',face:2,type:'gapCalibration',target:2,initialWidth:304,tip:'途中で2回目のジャンプを入れて距離を伸ばす',desc:'1回では届かない長さ。着地前に空中ジャンプを追加し、余裕を持って渡れる幅を確かめよう。',spec:[['目標','2段ジャンプ'],['基準幅','4.75マス'],['調整','±0.25マス'],['判定','穴の側壁 / 画面外']]},
+ {n:'G-03',jp:'穴 / 3ジャンプ用',en:'PIT TEST · 3 JUMPS',face:3,type:'gapCalibration',target:3,initialWidth:496,tip:'飛行中にジャンプを2回追加して対岸へ',desc:'2回分の最大飛距離では足りない穴。ジャンプの間隔を調整して余裕を持って渡ろう。',spec:[['目標','3段ジャンプ'],['基準幅','7.75マス'],['調整','±0.25マス'],['判定','穴の側壁 / 画面外']]},
+ {n:'G-04',jp:'穴 / 4ジャンプ用',en:'PIT TEST · 4 JUMPS',face:4,type:'gapCalibration',target:4,initialWidth:688,tip:'4回のジャンプを適度な間隔で使って渡る',desc:'3回分では届かない長さ。最後のジャンプに余裕を残し、落ち着いて向こう岸まで渡ろう。',spec:[['目標','4段ジャンプ'],['基準幅','10.75マス'],['調整','±0.25マス'],['判定','穴の側壁 / 画面外']]}
+];
+const airEntries=[
+ {n:'A-01',jp:'空中トゲA / 回避練習',en:'AIR SPIKE A · DODGE',face:2,type:'airADodge',tip:'空中トゲの下を通過した後、地上のトゲをジャンプ',desc:'赤い空中トゲは全面危険。飛ぶタイミングを早くしすぎると空中で接触する。トゲの下を通過してから地上トゲを避けよう。',spec:[['上面','接触禁止'],['側面・下面','接触禁止'],['安全なルート','下を通過'],['ジャンプ','地上トゲで使う']]},
+ {n:'B-01',jp:'空中トゲB / 着地練習',en:'AIR SPIKE B · LAND',face:2,type:'airBLand',tip:'緑ラインに着地して回復、または接触せず回避',desc:'上の緑ラインだけ安全。側面・下面の赤トゲは危険。上に着地できたら、その時点の数字でジャンプ回数が回復する。',spec:[['上面','着地できる'],['側面・下面','接触禁止'],['着地','回数が回復'],['回避','触れずに進めばOK']]},
+ {n:'A-02',jp:'空中トゲA / 壁と組み合わせ',en:'AIR SPIKE A · WALL COMBO',face:2,type:'airACombo',tip:'壁を越えて着地後、次のジャンプを急がない',desc:'先に青枠の壁を突破し、その先の赤い空中トゲを回避。多段ジャンプを余計に使うと頭上のトゲに当たる。',spec:[['構成','青枠壁＋空中A'],['上面','接触禁止'],['安全な進み方','高度を下げる'],['難易度','中']]},
+ {n:'B-02',jp:'空中トゲB / 大きな穴',en:'AIR SPIKE B · GAP COMBO',face:2,type:'airBCombo',tip:'Bに着地して回復。着地せず渡れればそれもOK',desc:'普通の2段ジャンプだけでは渡りきれない大きな穴。途中のBに着地するとジャンプ回数を回復できる。もし触れずに渡れる別ルートがあれば、それでもクリア。',spec:[['構成','大きな穴＋空中B'],['上面','着地できる'],['着地','回数が回復'],['目標','接触せず対岸へ']]}
+];
+// A number gate fills the entire screen height. Only the numbered interval is passable.
+// Vertical grid units use the rendered player's visible height (SIZE / ZOOM),
+// so a 2-square opening is visibly twice as tall as the player.
+const numberEntries=[
+ {n:'N-01',jp:'数字の壁 / 全面型',en:'NUMBER GATE · FULL',type:'numberGate',mode:'full',face:1,required:2,initialOpening:2,initialLower:0,tip:'1回ジャンプして上面を2に合わせる',desc:'すべてが数字2の壁。接触する瞬間に上面が2ならすり抜ける。ほかの数字で入ると失敗。壁の途中で数字が変わっても通過判定は維持する。',spec:[['必要数字','2'],['横幅','0.50マス'],['数字部分','画面全体'],['飛び越え','不可能']]},
+ {n:'N-02',jp:'数字の壁 / 下部型',en:'NUMBER GATE · LOWER',type:'numberGate',mode:'lower',face:2,required:3,initialOpening:2,initialLower:0,tip:'早めに数字3を作り、低い通路を通る',desc:'下2マスが数字3、上は全面危険の赤壁。数字が合っていても上の赤い部分に触れたら失敗。',spec:[['必要数字','3'],['数字部分','下から2マス'],['赤い部分','上は危険'],['縦幅','調整可能']]},
+ {n:'N-03',jp:'数字の壁 / 上部型',en:'NUMBER GATE · UPPER',type:'numberGate',mode:'upper',face:3,required:2,initialOpening:2,initialLower:1.75,tip:'3回ジャンプで2を作り、上の数字部分へ',desc:'下は全面危険の赤壁。上の数字2の通路を目指してジャンプする。横に抜けるまで赤い部分には触れられない。',spec:[['必要数字','2'],['数字部分','上部2マス'],['赤い部分','下・上は危険'],['縦幅','調整可能']]},
+ {n:'N-04',jp:'数字の壁 / 中央型',en:'NUMBER GATE · MIDDLE',type:'numberGate',mode:'middle',face:2,required:4,initialOpening:2,initialLower:0.75,tip:'2回ジャンプで4を作り、中央の通路へ',desc:'赤い壁に上下を挟まれた数字4の通路。数字と高さの両方を合わせ、通過中も赤い部分を避けよう。',spec:[['必要数字','4'],['数字部分','中央2マス'],['赤い部分','上下とも危険'],['縦幅','調整可能']]}
+];
+// P-01..P-04: safe landing requires the target number, but going below without touching is also valid.
+// Height is stored in vertical world units; calibration bar changes it by a quarter lateral grid.
+const platformEntries=[
+ {n:'P-01',jp:'数字足場 / 数字2',en:'NUMBER PLATFORM · 2',type:'numberPlatform',face:1,required:2,initialHeight:75,initialWidth:192,tip:'1回ジャンプして「2」で緑ラインに着地',desc:'数字2の足場。上面に2で着地したときだけ安全。1や3などで着地すると失敗。側面・下面は常に危険。正しく着地すれば2回分にジャンプ回数が回復する。',spec:[['指定数字','2'],['初期高さ','1.17マス'],['初期幅','3.00マス'],['着地','ジャンプ回復']]},
+ {n:'P-02',jp:'数字足場 / 数字3',en:'NUMBER PLATFORM · 3',type:'numberPlatform',face:2,required:3,initialHeight:85,initialWidth:192,tip:'1回ジャンプして「3」で上から着地',desc:'数字3の足場。正しく上から着地すると3回分に回復。低い位置から側面に接触すると数字が合っていても失敗する。',spec:[['指定数字','3'],['初期高さ','1.33マス'],['初期幅','3.00マス'],['着地','ジャンプ回復']]},
+ {n:'P-03',jp:'数字足場 / 数字4',en:'NUMBER PLATFORM · 4',type:'numberPlatform',face:2,required:4,initialHeight:182,initialWidth:192,tip:'数字4で着地・回復、または下を安全に通過',desc:'数字4の高めの足場。2から2回ジャンプで4を作れば上に着地して回復できる。十分な隙間があれば、触れずに下をくぐってもクリア可能。側面・下面への接触はアウト。',spec:[['指定数字','4'],['初期高さ','2.84マス'],['初期幅','3.00マス'],['着地','ジャンプ回復']]},
+ {n:'P-04',jp:'数字足場 / 数字1',en:'NUMBER PLATFORM · 1',type:'numberPlatform',face:3,required:1,initialHeight:185,initialWidth:192,tip:'数字1で着地・回復、または下を安全に通過',desc:'数字1の高い足場。3から2回ジャンプして1で上面に着地すると、ジャンプ回数が1回分に回復。足場に触れず下をくぐるのもOK。側面・下面への接触はアウト。',spec:[['指定数字','1'],['初期高さ','2.89マス'],['初期幅','3.00マス'],['着地','ジャンプ回復']]}
+];
+// Each digit switch controls precisely one target object. Effects are timed and independent.
+const switchEntries=[
+ {n:'S-01',jp:'数字スイッチ / 壁が消える',en:'NUMBER SWITCH · REMOVE WALL',face:1,required:2,type:'digitSwitch',effect:'wall',duration:3.5,tip:'数字2で起動して壁を消去。越えられれば起動不要',desc:'数字2でスイッチを押すと、その先にある危険な壁だけが3.5秒間消える。数字が違う場合は何も起きず、スイッチをすり抜ける。',spec:[['指定数字','2'],['変化','赤い壁の消去'],['効果時間','初期3.5秒'],['連動先','この壁だけ']]},
+ {n:'S-02',jp:'数字スイッチ / 足場が現れる',en:'NUMBER SWITCH · SPAWN PLATFORM',face:2,required:3,type:'digitSwitch',effect:'platform',duration:5,tip:'足場を出して穴を渡る。足場なしで渡れればOK',desc:'数字3でスイッチに触れると、大きな穴の途中に安全な青枠足場が5秒間現れる。着地すると現在の数字でジャンプ回数が回復する。',spec:[['指定数字','3'],['変化','足場が出現'],['効果時間','初期5.0秒'],['練習','接触せず対岸へ']]},
+ {n:'S-03',jp:'数字スイッチ / トゲが引っ込む',en:'NUMBER SWITCH · RETRACT SPIKES',face:3,required:4,type:'digitSwitch',effect:'spikes',duration:4,tip:'スイッチでトゲを収納、または直接飛び越える',desc:'数字4でスイッチを押すと、前方の地上トゲだけが4秒間引っ込む。時間切れで戻るが、トゲを飛び越えられるならスイッチの起動は不要。接触しなければクリア。',spec:[['指定数字','4'],['変化','トゲが引っ込む'],['効果時間','初期4.0秒'],['連動先','このトゲ列だけ']]}
+];
+
+// Ver.1.5: moving walls. Movement range is the full end-to-end distance (2 * amplitude).
+// Red = deadly all sides; blue = safe from above, carries player while standing.
+const motionEntries=[
+ {n:'M-01',jp:'移動する壁 / 赤枠・上下',en:'MOVING WALL · RED / VERTICAL',type:'motionWall',lethal:true,axis:'y',face:2,initialX:940,initialHeight:205,initialBase:80,width:72,range:160,period:3.4,phase:-1.1,tip:'赤い壁が上がるタイミングで下を抜けるか、上を飛び越える',desc:'危険な赤い壁が上下に往復。上・横・下のどの面に触れても失敗。壁が十分高く浮けば下をくぐれる。ジャンプで飛び越えてもOK。',spec:[['種類','赤枠（全面危険）'],['方向','上下往復'],['回避方法','下抜け・飛び越え'],['接触','即アウト']]},
+ {n:'M-02',jp:'移動する壁 / 赤枠・左右',en:'MOVING WALL · RED / HORIZONTAL',type:'motionWall',lethal:true,axis:'x',face:2,initialX:970,initialHeight:168,initialBase:0,width:56,range:128,period:4.0,phase:0,tip:'前後に動く赤い壁を、タイミングよくジャンプで越える',desc:'赤い壁が左右に往復する。全面接触禁止。追いつくタイミングが変わるので、ジャンプの位置に注意。上を飛び越えればクリア。',spec:[['種類','赤枠（全面危険）'],['方向','左右往復'],['飛び越え','OK'],['接触','即アウト']]},
+ {n:'M-03',jp:'移動する壁 / 青枠・上下',en:'MOVING WALL · BLUE / VERTICAL',type:'motionWall',lethal:false,axis:'y',face:3,initialX:1000,initialHeight:175,initialBase:85,width:235,range:144,period:3.8,phase:-.7,tip:'緑ラインに着地すると、壁の上下移動に乗って運ばれる',desc:'青い壁が上下に往復。上面に着地するとジャンプ回数が回復し、足場と一緒に上下する。横・下面にぶつかると失敗。触れずに飛び越えてもOK。',spec:[['種類','青枠（上面安全）'],['方向','上下往復'],['着地','ジャンプ回復'],['移動中','上下に運ばれる']]},
+ {n:'M-04',jp:'移動する壁 / 青枠・左右',en:'MOVING WALL · BLUE / HORIZONTAL',type:'motionWall',lethal:false,axis:'x',face:3,initialX:1010,initialHeight:138,initialBase:45,width:240,range:224,period:3.6,phase:-.8,tip:'青い壁の上に乗ると、左右の移動分だけ一緒に運ばれる',desc:'青い壁が左右に往復。上面に着地している間は、オートランの前進に加えて壁の横移動分も反映。側面・下面は危険。安全に飛び越える・下を通る方法もOK。',spec:[['種類','青枠（上面安全）'],['方向','左右往復'],['着地','ジャンプ回復'],['移動中','前進＋壁の横移動']]}
+];
+
+// Ver.1.6: multiple basic and number-based hazards in a single practical course.
+// All six courses follow the free-route rule: finish safely, no mandatory switch or platform flags.
+const comboEntries=[
+ {n:'C-01',jp:'複合① 青枠の壁＋地上トゲ',en:'COMBO · BLUE WALL + SPIKES',type:'combo',combo:'wallSpike',face:2,tip:'青枠の上に着地して回復しても、飛び越えてもOK',desc:'青い壁のあとに地上トゲがある。上面に着地するとジャンプ回数が回復。続くトゲは接触せず飛び越えればOK。',spec:[['構成','青枠壁＋地上トゲ'],['開始数字','2'],['着地','回復可能'],['自由な攻略','着地は必須ではない']]},
+ {n:'C-02',jp:'複合② 穴＋数字足場',en:'COMBO · GAP + NUMBER PLATFORM',type:'combo',combo:'gapPlatform',face:2,tip:'数字3で足場に着地すると回復。渡れれば別ルートもOK',desc:'長い穴の途中に数字3の足場が浮かぶ。足場の上に数字3で着地すればジャンプ回数を補給できる。横・下面には触れないように。',spec:[['構成','穴＋数字足場3'],['開始数字','2'],['上面','数字3でのみ安全'],['クリア','対岸まで無事に渡る']]},
+ {n:'C-03',jp:'複合③ 数字の壁＋地上トゲ',en:'COMBO · NUMBER GATE + SPIKES',type:'combo',combo:'gateSpike',face:1,tip:'まず数字2で壁を通過し、着地してからトゲを越える',desc:'通過数字2の全面数字壁の先に地上トゲ。数字壁は指定数字でしか通れないが、トゲはジャンプで避ければいい。',spec:[['構成','数字壁2＋トゲ'],['開始数字','1'],['数字壁','数字2で通過'],['トゲ','触れずに回避']]},
+ {n:'C-04',jp:'複合④ 数字スイッチ＋トゲ列',en:'COMBO · SWITCH + SPIKE ROW',type:'combo',combo:'switchSpike',face:2,tip:'数字3のスイッチでトゲを収納。飛び越えられるなら未起動でもOK',desc:'数字3で触れると対応するトゲ列だけが一時的に引っ込む。スイッチを使う方法と、ジャンプで安全に飛び越える方法のどちらも有効。',spec:[['構成','数字スイッチ3＋地上トゲ'],['効果','トゲが4.0秒収納'],['スイッチ','起動は任意'],['クリア','接触せずにGOAL']]},
+ {n:'C-05',jp:'複合⑤ 移動する青枠壁＋穴',en:'COMBO · MOVING BLUE + GAP',type:'combo',combo:'motionGap',face:3,tip:'上下に動く青枠に乗っても、そのまま跳び越えてもOK',desc:'上下に移動する青枠壁と、すぐ先の穴を連続で突破する。壁上への着地は回復と持ち上げに使えるが、必須ではない。',spec:[['構成','上下移動の青枠壁＋穴'],['開始数字','3'],['移動壁','上面のみ安全'],['ゴール','穴の対岸']]},
+ {n:'C-06',jp:'複合⑥ 天井トゲ＋中央数字壁',en:'COMBO · CEILING + MIDDLE GATE',type:'combo',combo:'ceilingGate',face:2,tip:'天井トゲの下を抜けてから2回ジャンプし、数字4の窓を通る',desc:'天井のトゲがある間は高くジャンプしすぎない。その先にある数字4の中央通路へ、高さと数字を合わせて進む。',spec:[['構成','天井トゲ＋数字壁4'],['開始数字','2'],['前半','天井トゲを回避'],['後半','高さと数字4を合わせる']]}
+];
+const entries=[...calibrationEntries,...wallEntries,...baseEntries,...gapEntries,...airEntries,...numberEntries,...platformEntries,...switchEntries,...motionEntries,...comboEntries];
+const $=id=>document.getElementById(id), stage=$('stage'),canvas=$('game'),ctx=canvas.getContext('2d',{alpha:false});
+const COLORS={1:['#4fc3f7','#123d55'],2:['#94df84','#204e2b'],3:['#ffbc68','#5c3e14'],4:['#be9bff','#36244f']};
+const GRID_UNIT=64; // 横1マス = 64ゲーム単位
+const GRAVITY=1850, JUMP=700, SPEED=285, ZOOM=.49, SIZE=64, VH=540, FLOOR=426;
+const NUMBER_GATE_VERTICAL_UNIT=SIZE/ZOOM; // number gate: 1 visual-square of height; declaration initialized after SIZE
+let idx=0, W=960, scale=1, dpr=1,last=0, state,objs=[],goal=0,cleared=[],silent=false;
+let uiMode="home", storyNumber=1,doorPage=0,screenBeforeSettings="home";
+const STORY_INDEX=[22,0,23,4,8,30,34,38];
+let storyCleared=[];try{storyCleared=JSON.parse(localStorage.getItem("numberRollStoryProgressV20")||"[]");if(!Array.isArray(storyCleared))storyCleared=[]}catch{storyCleared=[];}
+
+try{
+ const saved=localStorage.getItem('numberRollRulebookClear13') || localStorage.getItem('numberRollRulebookClear12') || localStorage.getItem('numberRollRulebookClear10') || localStorage.getItem('numberRollRulebookClear09') || localStorage.getItem('numberRollRulebookClear05');
+ if(saved){cleared=JSON.parse(saved)}
+ else {const old=JSON.parse(localStorage.getItem('numberRollRulebookClear04')||'[]');cleared=Array.isArray(old)?old.filter(n=>Number.isInteger(n)&&n>=0&&n<14).map(n=>n>=4?n+8:n):[];}
+ if(!Array.isArray(cleared))cleared=[];
+} catch{cleared=[];}
+const max=(a,b)=>Math.max(a,b),min=(a,b)=>Math.min(a,b);
+function save(){try{localStorage.setItem('numberRollRulebookClear13',JSON.stringify(cleared));}catch{}}
+function progress(){$('bookProgress').textContent=cleared.length+' / '+entries.length;}
+const SPIKE_PITCH=56; // 検証用トゲ1個の幅。0.875マス。まず固定して数で比較
+const spikeCounts=calibrationEntries.map(p=>p.initialCount);
+const wallSettings=wallEntries.map(p=>({height:p.initialHeight,width:p.initialWidth}));
+const gapSettings=gapEntries.map(p=>p.initialWidth);
+const numberSettings=numberEntries.map(p=>({opening:p.initialOpening,lower:p.initialLower}));
+const platformSettings=platformEntries.map(p=>({height:p.initialHeight,width:p.initialWidth}));
+const switchSettings=switchEntries.map(p=>({duration:p.duration}));
+const motionSettings=motionEntries.map(p=>({range:p.range,period:p.period}));
+function motionInfo(p=entries[idx]){return p.type==='motionWall'?motionSettings[motionEntries.indexOf(p)]:null;}
+function refreshMotionBar(){
+ const p=entries[idx],on=p.type==='motionWall';$('motionTools').hidden=!on;if(!on)return;
+ const v=motionInfo(p);$('motionKind').textContent=(p.lethal?'赤枠':'青枠')+' / '+(p.axis==='y'?'上下':'左右');
+ $('motionRange').textContent=(v.range/GRID_UNIT).toFixed(2)+'マス';
+ $('motionPeriod').textContent=v.period.toFixed(1)+'秒';
+ $('motionRangeMinus').disabled=v.range<=32;$('motionRangePlus').disabled=v.range>=448;
+ $('motionPeriodMinus').disabled=v.period<=1.5;$('motionPeriodPlus').disabled=v.period>=8;
+}
+function changeMotion(setting,delta){
+ const p=entries[idx];if(p.type!=='motionWall')return;
+ const v=motionInfo(p);if(setting==='range')v.range=Math.max(32,Math.min(448,v.range+delta*16));
+ else v.period=Math.max(1.5,Math.min(8,Math.round((v.period+delta*.5)*2)/2));
+ createLevel();newState();refreshMotionBar();showResult('ready');draw();
+}
+function restoreMotion(){
+ const p=entries[idx];if(p.type!=='motionWall')return;
+ motionSettings[motionEntries.indexOf(p)]={range:p.range,period:p.period};
+ createLevel();newState();refreshMotionBar();showResult('ready');draw();
+}
+
+function switchInfo(p=entries[idx]){return p.type==='digitSwitch'?switchSettings[switchEntries.indexOf(p)]:null;}
+function switchEffectActive(id){return (state?.effectTimers?.[id]||0)>0;}
+function refreshSwitchBar(){
+ const p=entries[idx],on=p.type==='digitSwitch';$('switchTools').hidden=!on;$('switchTimerBox').hidden=!(on||p.type==='combo'&&p.combo==='switchSpike');
+ if(!on)return;
+ const v=switchInfo(p),k={wall:'壁消去',platform:'足場出現',spikes:'トゲ後退'};
+ $('switchKind').textContent='数字'+p.required+' / '+k[p.effect];
+ $('switchTime').textContent=v.duration.toFixed(1)+'秒';
+ $('switchTimeMinus').disabled=v.duration<=1.5;
+ $('switchTimePlus').disabled=v.duration>=10;
+}
+function changeSwitchTime(delta){
+ const p=entries[idx];if(p.type!=='digitSwitch')return;
+ const v=switchInfo(p);v.duration=Math.min(10,Math.max(1.5,Math.round((v.duration+delta*.5)*2)/2));
+ createLevel();newState();refreshSwitchBar();showResult('ready');draw();
+}
+function restoreSwitchTime(){const p=entries[idx];if(p.type!=='digitSwitch')return;switchInfo(p).duration=p.duration;createLevel();newState();refreshSwitchBar();showResult('ready');draw();}
+
+function platformInfo(p=entries[idx]){return p.type==='numberPlatform'?platformSettings[platformEntries.indexOf(p)]:null;}
+function refreshPlatformBar(){
+ const p=entries[idx],on=p.type==='numberPlatform';$('platformTools').hidden=!on;
+ if(!on)return;
+ const v=platformInfo(p);$('platformKind').textContent='数字 '+p.required+' の足場';
+ $('platformHeight').textContent=(v.height/GRID_UNIT).toFixed(2)+'マス';
+ $('platformWidth').textContent=(v.width/GRID_UNIT).toFixed(2)+'マス';
+ $('platformHeightMinus').disabled=v.height<=32;$('platformHeightPlus').disabled=v.height>=430;
+ $('platformWidthMinus').disabled=v.width<=GRID_UNIT;$('platformWidthPlus').disabled=v.width>=GRID_UNIT*8;
+ $('description').textContent=p.desc+'【現在の高さ '+(v.height/GRID_UNIT).toFixed(2)+'マス・幅 '+(v.width/GRID_UNIT).toFixed(2)+'マス】';
+}
+function changePlatform(setting,delta){
+ const p=entries[idx];if(p.type!=='numberPlatform')return;
+ const v=platformInfo(p);
+ if(setting==='height')v.height=Math.max(32,Math.min(430,v.height+delta*16));
+ else v.width=Math.max(GRID_UNIT,Math.min(GRID_UNIT*8,v.width+delta*GRID_UNIT*.5));
+ createLevel();newState();refreshPlatformBar();showResult('ready');draw();
+}
+function restorePlatform(){
+ const p=entries[idx];if(p.type!=='numberPlatform')return;
+ platformSettings[platformEntries.indexOf(p)]={height:p.initialHeight,width:p.initialWidth};
+ createLevel();newState();refreshPlatformBar();showResult('ready');draw();
+}
+function rectObj(x,width,height){return {type:'wall',x,width,height}}
+function spikeObj(x,width,count,height,base=0,down=false){return {type:'spike',x,width,count,height,base,down}}
+// A: all sides hazardous. B: green safe platform top and hazardous undersurface/sides.
+function airA(x,width,base,height){return {type:'airA',x,width,base,height}}
+function airB(x,width,height,spikeH=74){return {type:'airB',x,width,height,spikeH,landings:0}}
+function numberInfo(p=entries[idx]){
+ if(p.type!=='numberGate')return null;
+ return numberSettings[numberEntries.indexOf(p)];
+}
+function refreshNumberBar(){
+ const p=entries[idx],on=p.type==='numberGate';$('numberTools').hidden=!on;
+ if(!on)return;
+ const v=numberInfo(p),full=p.mode==='full';
+ $('numberKind').textContent='数字 '+p.required+' / '+(p.mode==='full'?'全面':p.mode==='lower'?'下部':p.mode==='upper'?'上部':'中央');
+ $('numberHeightSet').hidden=full;$('numberPositionSet').hidden=full||p.mode==='lower';
+ $('numberHeight').textContent=v.opening.toFixed(2)+'マス';
+ $('numberPosition').textContent=v.lower.toFixed(2)+'マス';
+ $('numberHeightMinus').disabled=v.opening<=1.25;
+ $('numberHeightPlus').disabled=v.opening>=4;
+ $('numberPositionMinus').disabled=v.lower<=.25;
+ $('numberPositionPlus').disabled=v.lower>=5;
+}
+function changeNumber(setting,delta){
+ const p=entries[idx];if(p.type!=='numberGate'||p.mode==='full')return;
+ const v=numberInfo(p);
+ if(setting==='opening')v.opening=Math.min(4,Math.max(1.25,Math.round((v.opening+delta*.25)*4)/4));
+ else if(p.mode!=='lower')v.lower=Math.min(5,Math.max(.25,Math.round((v.lower+delta*.25)*4)/4));
+ createLevel();newState();refreshNumberBar();showResult('ready');draw();
+}
+function restoreNumber(){
+ const p=entries[idx];if(p.type!=='numberGate')return;
+ const v=numberInfo(p);v.opening=p.initialOpening;v.lower=p.initialLower;
+ createLevel();newState();refreshNumberBar();showResult('ready');draw();
+}
+function createLevel(){
+ const X=240+540;const type=entries[idx].type;
+
+ if(type==='combo'){
+   const p=entries[idx];
+   if(p.combo==='wallSpike'){
+     objs=[{...rectObj(925,128,154),lethal:false},spikeObj(1300,112,2,75)];
+     goal=1675;
+   }else if(p.combo==='gapPlatform'){
+     objs=[{type:'gap',x:960,width:520},{type:'numberPlatform',id:'combo-platform-3',x:1050,width:210,height:110,required:3,thickness:34}];
+     goal=1710;
+   }else if(p.combo==='gateSpike'){
+     objs=[{type:'numberGate',id:'combo-gate-2',x:925,width:32,required:2,mode:'full',lower:0,opening:2},spikeObj(1230,112,2,75)];
+     goal=1590;
+   }else if(p.combo==='switchSpike'){
+     const sw='combo-switch-3';
+     objs=[{type:'digitSwitch',id:sw,x:920,width:72,base:0,height:225,required:3,duration:4},
+           {...spikeObj(1250,256,5,80),switchId:sw}];
+     goal=1770;
+   }else if(p.combo==='motionGap'){
+     const wall={type:'wall',id:'combo-moving-blue',moving:true,lethal:false,x:930,width:190,height:118,base:0,
+       originX:930,originHeight:118,originBase:0,motion:{axis:'y',amplitude:30,period:3.8,phase:-.5}};
+     const displacement=wall.motion.amplitude*Math.sin(wall.motion.phase);
+     wall.height+=displacement;wall.base+=displacement;wall.oldX=wall.x;wall.oldHeight=wall.height;wall.oldBase=wall.base;
+     objs=[wall,{type:'gap',x:1330,width:350}];goal=1900;
+   }else if(p.combo==='ceilingGate'){
+     objs=[{type:'ceiling',x:835,width:282,base:335,spikeH:78},
+       {type:'numberGate',id:'combo-gate-4',x:1450,width:32,required:4,mode:'middle',lower:.75,opening:2}];
+     goal=1740;
+   }
+   return;
+ }
+ if(type==='motionWall'){
+   const p=entries[idx],v=motionInfo(p),a=v.range/2;
+   const o={type:'wall',id:p.n,moving:true,lethal:p.lethal,
+     x:p.initialX,width:p.width,height:p.initialHeight,base:p.initialBase,
+     originX:p.initialX,originHeight:p.initialHeight,originBase:p.initialBase,
+     motion:{axis:p.axis,amplitude:a,period:v.period,phase:p.phase}};
+   // Store the actual initial position, not just the midpoint of the motion.
+   const d=a*Math.sin(p.phase);
+   if(p.axis==='x')o.x+=d;else{o.height+=d;o.base+=d;}
+   o.oldX=o.x;o.oldHeight=o.height;o.oldBase=o.base;
+   objs=[o];goal=p.initialX+p.width+a+330;return;
+ }
+ if(type==='digitSwitch'){
+   const p=entries[idx],duration=switchInfo(p).duration,switchId=p.n;
+   const sw={type:'digitSwitch',id:switchId,x:X+45,width:70,base:0,height:225,required:p.required,duration};
+   if(p.effect==='wall'){
+     const wx=X+395;
+     objs=[sw,{...rectObj(wx,64,390),lethal:true,switchId}];goal=wx+64+330;
+   }else if(p.effect==='platform'){
+     const gx=X+380;
+     objs=[sw,{type:'gap',x:gx,width:750},{type:'switchPlatform',x:gx+160,width:260,height:120,thickness:35,switchId}];
+     goal=gx+750+275;
+   }else{
+     const sx=X+445;
+     objs=[sw,{...spikeObj(sx,448,8,80),switchId}];goal=sx+448+265;
+   }
+   return;
+ }
+
+ if(type==='numberPlatform'){
+   const p=entries[idx],v=platformInfo(p);const px=X+150;
+   objs=[{type:'numberPlatform',id:p.n,x:px,width:v.width,height:v.height,required:p.required,thickness:36}];
+   goal=px+v.width+320;return;
+ }
+ if(type==='numberGate'){
+   const p=entries[idx],s=numberInfo(p);
+   objs=[{type:'numberGate',id:p.n,x:X+140,width:GRID_UNIT*.5,required:p.required,mode:p.mode,lower:s.lower,opening:s.opening}];
+   goal=X+140+GRID_UNIT*.5+325;return;
+ }
+ if(type==='calibration'){const count=spikeCounts[idx]||entries[idx].initialCount;objs=[spikeObj(X,count*SPIKE_PITCH,count,80)];goal=X+count*SPIKE_PITCH+300;return;}
+ if(type==='wallCalibration'){const p=entries[idx],v=wallSettings[idx-calibrationEntries.length];const wallX=X+140;objs=[{...rectObj(wallX,v.width,v.height),lethal:p.lethal}];goal=wallX+v.width+300;return;}
+ if(type==='gapCalibration'){const v=gapSettings[idx-calibrationEntries.length-wallEntries.length-baseEntries.length];objs=[{type:'gap',x:X,width:v}];goal=X+v+300;return;}
+ if(type==='airADodge'){
+   // First pass under red suspended hazard, THEN jump over short floor spikes.
+   objs=[airA(X,100,162,82),spikeObj(X+245,112,2,65)];goal=X+620;return;
+ }
+ if(type==='airBLand'){
+   // Two jumps reach platform H154; crossing its top from above refills jumps.
+   objs=[airB(X+100,175,154,70)];goal=X+100+175+300;return;
+ }
+ if(type==='airACombo'){
+   // Blue wall must be climbed before passing the red air hazard.
+   objs=[rectObj(X,128,154),airA(X+175,125,330,66)];goal=X+665;return;
+ }
+ if(type==='airBCombo'){
+   // Gap is too wide for 2 jumps; landing on B is necessary to bridge it.
+   objs=[{type:'gap',x:X,width:730},airB(X+245,175,154,74)];goal=X+730+240;return;
+ }
+
+ const levels={
+  single:[spikeObj(X,75,1,80)],
+  row:[spikeObj(X,310,5,80)],
+  low:[rectObj(X,83,70)],
+  high:[rectObj(X,105,312)],
+  smallPit:[{type:'gap',x:X,width:170}],
+  largePit:[{type:'gap',x:X,width:520}],
+  ceiling:[{type:'ceiling',x:X,width:460,base:320,spikeH:85}],
+  floating:[spikeObj(X,85,1,68,252,true),spikeObj(X+215,90,1,70,325,true)],
+  corridor:[spikeObj(X,115,3,45),{type:'ceiling',x:X+260,width:305,base:315,spikeH:105}],
+  stairs:[rectObj(X,118,72),rectObj(X+118,118,145),rectObj(X+236,118,213),rectObj(X+354,118,275)]
+ };
+ objs=levels[type];let end=Math.max(...objs.map(o=>o.x+o.width));goal=end+300;
+}
+function newState(){let face=entries[idx].face;state={status:'ready',distance:0,y:0,vy:0,air:false,face,limit:face,used:0,angle:0,turnFrom:0,turnTo:0,turn:1,groundH:0,cause:'',lastLanding:0,totalJumps:0,airBLandings:0,numberLocks:{},numberPasses:0,platformLandings:0,effectTimers:{},switchTriggered:{},switchActivations:0,switchPlatformLandings:0,switchSolved:false,elapsed:0,groundObject:null,motionLandings:0,motionCarryX:0,motionCarryY:0};last=0;ui();}
+function refreshCalibrationBar(){
+ const active=idx<calibrationEntries.length;const el=$('calibrationTools');el.hidden=!active;
+ if(!active)return;
+ const count=spikeCounts[idx];$('spikeCount').textContent=count;
+ $('spikeWidth').textContent=(count*SPIKE_PITCH/GRID_UNIT).toFixed(2);
+ $('spikeMinus').disabled=count<=1;$('spikePlus').disabled=count>=24;
+ const p=entries[idx];
+ $('description').textContent=p.desc+'【現在 '+count+'個・横幅 '+(count*SPIKE_PITCH/GRID_UNIT).toFixed(2)+'マス】';
+}
+function changeSpikeCount(delta){
+ if(idx>=calibrationEntries.length)return;
+ spikeCounts[idx]=Math.max(1,Math.min(24,spikeCounts[idx]+delta));
+ refreshCalibrationBar();createLevel();newState();showResult('ready');draw();
+}
+function refreshWallBar(){
+ const p=entries[idx],on=p.type==='wallCalibration';$('wallTools').hidden=!on;
+ if(!on)return;
+ const v=wallSettings[idx-calibrationEntries.length],k=$('wallKind');
+ k.textContent=p.lethal?'赤枠：上も接触禁止':'青枠：上に着地可能';k.className='wall-kind '+(p.lethal?'deadly':'safe');
+ $('wallHeight').textContent=(v.height/GRID_UNIT).toFixed(2)+'マス';$('wallWidth').textContent=(v.width/GRID_UNIT).toFixed(1)+'マス';
+ $('wallHeightMinus').disabled=v.height<=40;$('wallHeightPlus').disabled=v.height>=560;
+ $('wallWidthMinus').disabled=v.width<=GRID_UNIT*.5;$('wallWidthPlus').disabled=v.width>=GRID_UNIT*12;
+ $('description').textContent=p.desc+' 【現在の高さ '+(v.height/GRID_UNIT).toFixed(2)+'マス・横幅 '+(v.width/GRID_UNIT).toFixed(1)+'マス】 地面の▲1〜4は実測したジャンプ位置の目安。';
+}
+function changeWall(setting,delta){
+ const p=entries[idx];if(p.type!=='wallCalibration')return;
+ const v=wallSettings[idx-calibrationEntries.length];
+ if(setting==='height')v.height=Math.max(40,Math.min(560,v.height+delta*16));
+ if(setting==='width')v.width=Math.max(GRID_UNIT*.5,Math.min(GRID_UNIT*12,v.width+delta*GRID_UNIT*.5));
+ refreshWallBar();createLevel();newState();showResult('ready');draw();
+}
+function restoreWall(){
+ const p=entries[idx];if(p.type!=='wallCalibration')return;
+ wallSettings[idx-calibrationEntries.length]={height:p.initialHeight,width:p.initialWidth};
+ refreshWallBar();createLevel();newState();showResult('ready');draw();
+}
+function refreshGapBar(){
+ const p=entries[idx],isGap=p.type==='gapCalibration';$('gapTools').hidden=!isGap;
+ if(!isGap)return;
+ const j=idx-calibrationEntries.length-wallEntries.length-baseEntries.length;
+ const v=gapSettings[j];
+ $('gapKind').textContent='穴 / '+p.target+'ジャンプ用';
+ $('gapWidth').textContent=(v/GRID_UNIT).toFixed(2)+' マス';
+ $('gapWidthMinus').disabled=v<=GRID_UNIT*.5;
+ $('gapWidthPlus').disabled=v>=GRID_UNIT*20;
+ $('description').textContent=p.desc+' 【現在の穴の幅 '+(v/GRID_UNIT).toFixed(2)+'マス】 '+'落下中も残りのジャンプで復帰できる。赤い側壁に触れるか、画面下に消えるとアウト。';
+}
+function changeGap(delta){
+ if(entries[idx].type!=='gapCalibration')return;
+ const j=idx-calibrationEntries.length-wallEntries.length-baseEntries.length;
+ gapSettings[j]=Math.max(GRID_UNIT*.5,Math.min(GRID_UNIT*20,gapSettings[j]+delta*GRID_UNIT*.25));
+ refreshGapBar();createLevel();newState();showResult('ready');draw();
+}
+function restoreGap(){
+ if(entries[idx].type!=='gapCalibration')return;
+ const j=idx-calibrationEntries.length-wallEntries.length-baseEntries.length;
+ gapSettings[j]=entries[idx].initialWidth;
+ refreshGapBar();createLevel();newState();showResult('ready');draw();
+}
+function setPage(n){idx=Math.max(0,Math.min(entries.length-1,n));const p=entries[idx];$('number').textContent=p.n;$('jp').textContent=p.jp;$('en').textContent=p.en;$('tip').textContent=p.tip;$('description').textContent=p.desc;$('specs').innerHTML=p.spec.map(([k,v])=>`<div class="spec"><span>${k}</span><b>${v}</b></div>`).join('');$('prev').disabled=idx===0;$('next').disabled=idx===entries.length-1;refreshCalibrationBar();refreshWallBar();refreshGapBar();refreshNumberBar();refreshPlatformBar();refreshSwitchBar();refreshMotionBar();$('comboBanner').hidden=p.type!=='combo';createLevel();newState();showResult('ready');draw();}
+function start(){newState();state.status='running';hideResult();ui();}
+function retry(){start()}
+function showResult(kind){const box=$('result');box.classList.add('show');$('resultNext').hidden=(kind!=='win'||idx===entries.length-1);$('retry').textContent=kind==='ready'?'▶ スタート':'↻ リトライ';$('resultTitle').className='result-title '+(kind==='win'?'win':kind==='lose'?'lose':'');if(kind==='ready'){$('resultTitle').textContent='練習 '+entries[idx].n;$('resultCaption').textContent='障害物を避けてGOALへ！ '+entries[idx].tip+'。';}else if(kind==='win'){$('resultTitle').textContent='✓ CLEAR!';$('resultCaption').textContent=entries[idx].type==='calibration'?`トゲ${spikeCounts[idx]}個（${(spikeCounts[idx]*SPIKE_PITCH/GRID_UNIT).toFixed(2)}マス）を突破！ 今回のジャンプ操作：${state.totalJumps}回。長さを変更して再挑戦できます。`:entries[idx].type==='wallCalibration'?`高さ ${(wallSettings[idx-calibrationEntries.length].height/GRID_UNIT).toFixed(2)}マス / 幅 ${(wallSettings[idx-calibrationEntries.length].width/GRID_UNIT).toFixed(1)}マスを${state.totalJumps}回のジャンプで突破！ 調整して再挑戦できます。`:entries[idx].type==='gapCalibration'?`幅 ${(gapSettings[idx-calibrationEntries.length-wallEntries.length-baseEntries.length]/GRID_UNIT).toFixed(2)}マスの穴を${state.totalJumps}回のジャンプで突破！ 穴の幅を調整して再挑戦できます。`:entries[idx].type==='combo'?`複数の障害物を突破！ ジャンプ${state.totalJumps}回、数字の変化や着地も確認しよう。`:entries[idx].type==='motionWall'?state.motionLandings>0?`動く青枠に${state.motionLandings}回着地してクリア！ 足場と一緒に運ばれた移動も確認しよう。`:`動く壁を接触せずに突破！ 上を飛び越える攻略もOK。`:entries[idx].type==='digitSwitch'?state.switchActivations>0?`数字${entries[idx].required}のスイッチを起動し、仕掛けを突破！ 効果時間も調整できます。`:`スイッチを使わず、障害物を安全に突破！ 回避ルートでもクリアです。`:entries[idx].type==='numberPlatform'?state.platformLandings>0?`数字${entries[idx].required}の足場に着地してクリア！ ジャンプ回数が回復しました。`:`数字${entries[idx].required}の足場の下を、触れずに通過してクリア！` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の壁を突破！ 数字の一致と赤い部分への接触を確認しよう。`:entries[idx].type.startsWith('airB')?state.airBLandings>0?`Bの上面に${state.airBLandings}回着地してクリア！ 着地するとジャンプ回数が回復します。`:`Bに着地せず、接触を避けてクリア！ 回避ルートもOKです。`:'障害物「'+entries[idx].jp+'」を突破！ 同じコースを再挑戦することもできます。';}else if(kind==='paused'){$('resultTitle').textContent='Ⅱ 一時停止';$('resultCaption').textContent='再開すると同じ位置からプレイできます。';$('retry').textContent='▶ 再開';}else{$('resultTitle').textContent='GAME OVER';$('resultCaption').textContent=state.cause||'もう一度ジャンプのタイミングを試してみよう。';};storyResult(kind);}
+function storyResult(kind){
+ if(uiMode!=='story')return;
+ $('resultHome').style.display='inline-flex';
+ if(kind==='ready'){$('resultTitle').textContent='STAGE '+storyNumber;$('resultCaption').textContent=storyDescriptions[storyNumber-1]+'　画面をタップして開始。';}
+ else if(kind==='win'){$('resultTitle').textContent='✦ STAGE CLEAR';$('resultCaption').textContent=storyNumber>=STORY_INDEX.length?'ステージ'+storyNumber+'をクリア！ 体験ステージをすべて突破しました。':'ステージ'+storyNumber+'をクリア！ 次の石の扉が開きました。';}
+ else if(kind==='lose'){$('resultTitle').textContent='GAME OVER';}
+ else if(kind==='paused'){$('resultTitle').textContent='Ⅱ PAUSED';}
+ $('resultNext').hidden=kind!=='win'||storyNumber>=STORY_INDEX.length;
+ $('resultNext').textContent='次のステージ ▶';
+}
+function hideResult(){$('result').classList.remove('show')}
+function fail(reason){if(state.status!=='running')return;state.status='lost';state.cause=reason;showResult('lose');sfx('fail');haptic(35);ui()}
+function win(){if(state.status!=='running')return;state.status='won';if(!cleared.includes(idx)){cleared.push(idx);save();progress();}if(uiMode==='story')onStoryClear();showResult('win');sfx('clear');haptic(28);ui();}
+function jump(){if(state.status==='ready'){start();return;}if(state.status!=='running')return;const s=state;if(s.air&&s.used>=s.limit)return;if(!s.air){s.limit=s.face;s.used=0;}s.air=true;s.used++;s.totalJumps++;s.vy=JUMP;s.groundH=0;s.turnFrom=s.angle;s.turnTo+=Math.PI/2;s.turn=0;s.face=s.face%4+1;s.groundObject=null;sfx('jump');ui();}
+function togglePause(){if(state.status==='running'){state.status='paused';showResult('paused')}else if(state.status==='paused'){state.status='running';hideResult()}last=0;ui()}
+function ui(){const s=state;if(!s)return;let left=s.air?Math.max(0,s.limit-s.used):s.face,total=s.air?s.limit:s.face;$('face').textContent=s.face;$('face').style.color=COLORS[s.face][0];$('jumps').textContent=`${left} / ${total}`;$('distance').textContent=Math.round(Math.min(1,s.distance/(goal-240))*100)+'%';
+ if(entries[idx].type==='digitSwitch'||entries[idx].type==='combo'&&entries[idx].combo==='switchSpike'){
+  const timerId=entries[idx].type==='combo'?'combo-switch-3':entries[idx].n;
+  const rem=s.effectTimers[timerId]||0;
+  $('switchTimer').textContent=rem>0?rem.toFixed(1)+'秒':s.switchTriggered[timerId]?'終了':'未起動';
+  $('switchTimer').style.color=rem>0?'#8dffd4':'#ffc1d6';
+ }$('actionHint').textContent=s.status==='running'?(s.y<0&&objs.some(o=>o.type==='gap')?'落下中！ ↑ ジャンプで復帰':entries[idx].type.startsWith('airB')?`B着地 ${s.airBLandings}回 / 避けてもOK`:entries[idx].type==='motionWall'?`壁が${entries[idx].axis==='y'?'上下':'左右'}に移動中！ 青枠なら上に着地OK`:entries[idx].type==='digitSwitch'?`数字${entries[idx].required}で起動／回避できれば起動不要`:entries[idx].type==='numberPlatform'?`数字${entries[idx].required}で着地／下を避けて通過もOK` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の部分を通り抜けよう`:'画面タップでジャンプ'):s.status==='paused'?'一時停止中':s.status==='won'?'クリア！':s.status==='lost'?'もう一度挑戦': 'まずはスタート';$('jump').textContent=s.status==='ready'?'▶ スタート':s.status==='running'?'↑ ジャンプ':s.status==='paused'?'▶ 再開':s.status==='lost'?'↻ リトライ':'次の障害物 ▶';$('jump').disabled=s.status==='running'&&left===0;$('pause').textContent=s.status==='paused'?'▶':'Ⅱ';}
+function action(){if(state.status==='running'||state.status==='ready')jump();else if(state.status==='paused')togglePause();else if(state.status==='won'){if(uiMode==='story')storyNumber<STORY_INDEX.length?playStory(storyNumber+1):showScreen('doors');else setPage(Math.min(idx+1,entries.length-1));}else retry();}
+// 接触中の足場の高さ。着地の横断判定とは分けて、前フレームと現在の足元を比較する。
+function groundAt(centerX, feet){
+ let h=0;
+ for(const o of objs){
+  if(!((o.type==='wall'&&!o.lethal)||o.type==='airB'||o.type==='numberPlatform'||(o.type==='switchPlatform'&&switchEffectActive(o.switchId))))continue;
+  if(centerX+SIZE*.34>o.x&&centerX-SIZE*.34<o.x+o.width&&feet>=o.height-2)h=Math.max(h,o.height);
+ }
+ return h;
+}
+function isOverGap(centerX){return objs.some(o=>o.type==='gap'&&centerX+SIZE*.24>o.x&&centerX-SIZE*.24<o.x+o.width)}
+// Ver.1.1: 歩いて穴へ落ちてもジャンプできる。穴の幅と従来の踏み切り判定は維持する。
+// 自動走行は右向きだけなので、左縁からの踏み外しは側壁衝突として扱わない。
+// 向こう岸の垂直な壁は、地面の下でプレイヤーの当たり判定が触れた瞬間アウト。
+function hitGapSideWall(o,centerX,feet){
+ if(feet>=0)return false;
+ const half=SIZE/2,farEdge=o.x+o.width;
+ return centerX>o.x && centerX-half<farEdge && centerX+half>=farEdge;
+}
+// 描画しているプレイヤーは64px四方。上端が画面の下端より下に出たら完全に見えない。
+function completelyOffscreenBelow(feet){return scrY(feet)-SIZE>=VH;}
+
+function triangleHit(points, rect){ // SAT for a triangle against a rectangular player box
+ const poly=[...points], box=[[rect.l,rect.b],[rect.r,rect.b],[rect.r,rect.t],[rect.l,rect.t]];
+ for(const P of [poly,box])for(let i=0;i<P.length;i++){
+   const a=P[i],b=P[(i+1)%P.length],nx=-(b[1]-a[1]),ny=b[0]-a[0];
+   let amin=Infinity,amax=-Infinity,bmin=Infinity,bmax=-Infinity;
+   for(const p of poly){let d=p[0]*nx+p[1]*ny;amin=min(amin,d);amax=max(amax,d)}
+   for(const p of box){let d=p[0]*nx+p[1]*ny;bmin=min(bmin,d);bmax=max(bmax,d)}
+   if(amax<bmin||bmax<amin)return false;
+ }return true;
+}
+function hitSpike(o,rect){const width=o.width/o.count;for(let k=0;k<o.count;k++){
+ const a=o.x+k*width,b=a+width;
+ if(b<rect.l||a>rect.r)continue;
+ let tri=o.down?[[a,o.base],[b,o.base],[a+width/2,o.base-o.height]]:[[a,o.base],[b,o.base],[a+width/2,o.base+o.height]];
+ if(triangleHit(tri,rect))return true;
+ }return false;}
+function hitAirA(o,rc){
+ // A is a hazardous floating diamond. Exact polygon versus player rectangle.
+ const cx=o.x+o.width/2,cy=o.base+o.height/2;
+ return triangleHit([[cx,o.base+o.height],[o.x+o.width,cy],[cx,o.base]],rc) ||
+        triangleHit([[cx,o.base+o.height],[cx,o.base],[o.x,cy]],rc);
+}
+function hitAirB(o,rc,s){
+ if(rc.r<=o.x||rc.l>=o.x+o.width)return false;
+ const safeOnTop=s.groundH===o.height&&!s.air&&Math.abs(s.y-o.height)<3;
+ if(safeOnTop)return false;
+ // Thick underside rim and triangular spikes are red hazard.
+ if(rc.b<o.height-4&&rc.t>o.height-18)return true;
+ const pitch=o.width/3;
+ for(let j=0;j<3;j++){
+  const lx=o.x+j*pitch;
+  const poly=[[lx,o.height-15],[lx+pitch/2,o.height-15-o.spikeH],[lx+pitch,o.height-15]];
+  if(triangleHit(poly,rc))return true;
+ }
+ // At a side, green top may be safely landed on from above; low side contacts fail.
+ const nearSide=(rc.r>o.x&&rc.l<o.x+8)||(rc.r>o.x+o.width-8&&rc.l<o.x+o.width);
+ if(nearSide&&rc.b<o.height-2&&rc.t>o.height-14-o.spikeH)return true;
+ return false;
+}
+function update(dt){if(state.status!=='running')return;const s=state;
+ const oldY=s.y;
+ s.elapsed+=dt;
+ // Animate all walls before collision. Capture the preceding position for landing and carrying.
+ for(const o of objs){
+  if(!o.moving)continue;
+  o.oldX=o.x;o.oldHeight=o.height;o.oldBase=o.base;
+  const m=o.motion, displacement=m.amplitude*Math.sin(s.elapsed*Math.PI*2/m.period+m.phase);
+  if(m.axis==='x'){o.x=o.originX+displacement;}
+  else{o.height=o.originHeight+displacement;o.base=o.originBase+displacement;}
+ }
+ // A grounded player is carried by the wall's actual movement as well as moving forward.
+ // The visual camera continues to follow the player at a stable screen position.
+ if(!s.air&&s.groundObject){
+  const platform=objs.find(o=>o.id===s.groundObject&&o.moving);
+  if(platform){
+   const dx=platform.x-platform.oldX,dy=platform.height-platform.oldHeight;
+   s.distance+=dx;s.y+=dy;s.groundH=s.y;
+   s.motionCarryX+=dx;s.motionCarryY+=dy;
   }
-  if(t+x.d>1380)return null;
-  if(x.id==="014"&&(t<1020||t+x.d>1260))return null; // 夕食は17:00～21:00に完了
-  const ts=x.time[band(t)];
-  const adj=prev?(base[prev.id+">"+x.id]||0):0;
-  // 蓄積負荷が高いまま次の負荷が加わると減点。回復活動で低下。
-  const fPenalty=x.load>0&&fatigue>=4?Math.min(3,fatigue-3):0;
-  fatigue=Math.max(0,fatigue+x.load-x.rec);
-  breakdown.time+=ts;breakdown.adjacency+=adj;breakdown.fatigue-=fPenalty;
-  steps.push({name:x.name,id:x.id,start:t,end:t+x.d,detail:`時間帯 ${ts} / 隣接相性 ${adj} / 疲労ペナルティ -${fPenalty} / 残疲労 ${fatigue}`});
-  if(x.id==="014")mealEnd=t+x.d;
-  prev=x;t+=x.d;
  }
- for(const p of prefs[who]){
-  const i=order.findIndex(x=>x.id===p.before),j=order.findIndex(x=>x.id===p.after);
-  breakdown.personal+=i<j?p.score:-p.score;
+ for(const id of Object.keys(s.effectTimers))s.effectTimers[id]=Math.max(0,s.effectTimers[id]-dt);
+ s.distance+=SPEED*dt;
+ const centerX=240+s.distance;
+ if(s.air){s.y+=s.vy*dt-.5*GRAVITY*dt*dt;s.vy-=GRAVITY*dt;}
+ // 上から下降して壁の上面を通過した瞬間は、壁に少し入り込む前に着地として確定する。
+ // 旧実装の「今の足元が壁面より高い」チェックは速い下降で飛び越してしまうことがあった。
+ if(s.air&&s.vy<=0){
+  let land=-Infinity,landingObj=null;
+  if(!isOverGap(centerX)&&oldY>=0&&s.y<=0)land=0;
+  for(const o of objs){
+   if(!((o.type==='wall'&&!o.lethal)||o.type==='airB'||o.type==='numberPlatform'||(o.type==='switchPlatform'&&switchEffectActive(o.switchId))))continue;
+   const overlaps=centerX+SIZE*.34>o.x&&centerX-SIZE*.34<o.x+o.width;
+   const oldTop=o.moving?o.oldHeight:o.height;
+   if(overlaps&&oldY>=oldTop-1&&s.y<=o.height+1){
+    if(o.type==='switchPlatform'&&s.groundH!==o.height)s.switchPlatformLandings++;
+    if(o.type==='numberPlatform'){
+      if(s.face!==o.required){fail('数字が不一致！ 数字'+o.required+'の足場には、'+o.required+'で着地しよう。');return;}
+      if(s.groundH!==o.height)s.platformLandings++;
+    }
+    if(o.height>land){land=o.height;landingObj=o;}
+    if(o.type==='airB'&&s.groundH!==o.height){s.airBLandings++;}
+   }
+  }
+  if(land!==-Infinity){
+   s.y=land;s.vy=0;s.air=false;s.used=0;s.limit=s.face;
+   s.groundH=land;s.groundObject=landingObj?.moving?landingObj.id:null;
+   if(landingObj?.moving)s.motionLandings++;
+   s.lastLanding=.3;
+  }
  }
- total=Object.values(breakdown).reduce((a,b)=>a+b,0);
- return {order,steps,total,breakdown,end:t};
+ // 壁の上を走り抜けたら落下開始。地面との高低差も自然に落ちる。
+ if(!s.air){
+  const topH=groundAt(centerX,s.y);
+  if(s.groundH>0&&topH<s.groundH-2){s.air=true;s.vy=0;s.groundH=0;s.groundObject=null;}
+  else if(s.groundH===0&&isOverGap(centerX)){s.air=true;s.vy=0;s.groundObject=null;}
+ }
+ if(s.air&&completelyOffscreenBelow(s.y)){fail('画面の下まで落下！ 見えなくなる前にジャンプで復帰しよう。');return;}
+ const rc={l:centerX-SIZE*.36,r:centerX+SIZE*.36,b:s.y+5,t:s.y+SIZE/ZOOM-13};
+ // Switches are intangible; each may activate only its linked target, once per attempt.
+ for(const o of objs){
+  if(o.type!=='digitSwitch'||s.switchTriggered[o.id])continue;
+  if(rc.r<=o.x||rc.l>=o.x+o.width||rc.t<=o.base||rc.b>=o.base+o.height)continue;
+  if(s.face===o.required){
+   s.switchTriggered[o.id]=true;s.switchActivations++;s.effectTimers[o.id]=o.duration;
+  }
+ }
+
+ for(const o of objs){
+  if(o.type!=='numberGate')continue;
+  const overlapping=rc.r>o.x&&rc.l<o.x+o.width;
+  if(!overlapping){
+   if(s.numberLocks[o.id]&&rc.l>=o.x+o.width){
+    s.numberPasses++;delete s.numberLocks[o.id];
+   }
+   continue;
+  }
+  const bottom=o.mode==='full'?-Infinity:o.lower*NUMBER_GATE_VERTICAL_UNIT;
+  const top=o.mode==='full'?Infinity:(o.lower+o.opening)*NUMBER_GATE_VERTICAL_UNIT;
+  // The colored numbered window is safe only when the *whole* player fits.
+  // No invisible collision forgiveness inside red parts.
+  if(rc.b<bottom||rc.t>top){fail('数字の壁の赤い部分に接触！ 数字だけでなく高さも合わせよう。');return;}
+  if(!s.numberLocks[o.id]){
+   if(s.face!==o.required){fail('数字が不一致！ この壁は「'+o.required+'」で通過しよう。');return;}
+   s.numberLocks[o.id]=true;
+  }
+ }
+ for(const o of objs){
+  if(o.switchId&&o.type!=='digitSwitch'){
+    if(o.type==='wall'&&switchEffectActive(o.switchId))continue;
+    if(o.type==='spike'&&switchEffectActive(o.switchId))continue;
+  }
+  if(o.type==='numberPlatform'&&rc.r>o.x&&rc.l<o.x+o.width){
+    // Only an above-top approach may be safe. Green top does not protect red rim/underside.
+    if(s.y<o.height-1&&rc.t>o.height-o.thickness){fail('数字足場の赤い側面・下面に接触！ 緑の上面へ上から着地しよう。');return;}
+  }
+  if(o.type==='switchPlatform'&&switchEffectActive(o.switchId)&&rc.r>o.x&&rc.l<o.x+o.width){
+    if(s.y<o.height-2&&rc.t>o.height-o.thickness){fail('出現した足場の側面・下面に衝突！ 上から着地しよう。');return;}
+  }
+  if(o.type==='gap'&&hitGapSideWall(o,centerX,s.y)){fail('穴の側壁に衝突！ 対岸の壁に届く前に地面より上へ復帰しよう。');return;}
+  if(o.type==='spike'&&hitSpike(o,rc)){fail('トゲに接触！ 高さとタイミングを調整しよう。');return;}
+  if(o.type==='ceiling'){
+   if(rc.r>o.x&&rc.l<o.x+o.width){
+    const spike={...o,type:'spike',count:Math.round(o.width/75),height:o.spikeH,down:true};
+    if(hitSpike(spike,rc)){fail('天井のトゲに接触！ 高く飛びすぎないように。');return;}
+   }
+  }
+  if(o.type==='airA'&&hitAirA(o,rc)){
+   fail('空中トゲAに接触！ 赤い部分は全面危険。');return;
+  }
+  if(o.type==='airB'&&hitAirB(o,rc,s)){
+   fail('空中トゲBの赤い側面・下面に接触！ 緑ラインに上から着地しよう。');return;
+  }
+  if(o.type==='wall'&&rc.r>o.x&&rc.l<o.x+o.width){
+   if(o.lethal){
+    // 赤枠：上面・側面とも接触不可。水平接触時に足元が天端以下なら衝突。
+    if(s.y<=o.height&&rc.t>(o.base||0)){fail('赤枠の危険壁に接触！ 上も側面も危険。');return;}
+   }else{
+    // 青枠：上面に着地すればセーフ、下から側面に進入したらアウト。
+    // 着地はこの判定より前に確定させているので、落下時のすり抜けが起きない。
+    if(s.y<o.height-2&&rc.t>(o.base||0)){fail('青枠の壁の側面に衝突！ 緑色の上面ラインに上から着地しよう。');return;}
+   }
+  }
+ }
+ if(centerX>=goal){
+   // Gameplay-wide rule: successful physical traversal is a clear.
+   // Switch activation, landing on floating spikes or platforms are optional,
+   // provided the player reached the goal without hazardous contact.
+   // Number gates remain physically screen-spanning, so require a legal pass.
+   if(entries[idx].type==='numberGate'&&s.numberPasses<1){fail('数字の壁の紫色の部分を通ってゴールしよう。');return;}
+   win();return;
+ }
+ if(s.turn<.20){s.turn=Math.min(.20,s.turn+dt);let e=1-Math.pow(1-s.turn/.20,3);s.angle=s.turnFrom+(s.turnTo-s.turnFrom)*e}else s.angle=s.turnTo;
+ s.lastLanding=Math.max(0,s.lastLanding-dt);if(!silent)ui();
 }
-function compute(who,start,desired,gap){
- const rest=chooseRest(desired);
- const selected=items.filter(x=>x.id!=="025"&&(x.id!=="027"||rest.needed));
- const candidates=permutations(selected).map(x=>scoreOrder(x,who,start,gap)).filter(Boolean);
- candidates.sort((a,b)=>b.total-a.total||a.order.map(x=>x.id).join().localeCompare(b.order.map(x=>x.id).join()));
- return {best:candidates[0]||null,candidateCount:candidates.length,rest};
+function round(x,y,w,h,r){r=Math.max(0,Math.min(r,w/2,h/2));ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function stroke(x1,y1,x2,y2,color,width=1){ctx.strokeStyle=color;ctx.lineWidth=width;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke()}
+const scrY=h=>FLOOR-h*ZOOM;const cameraPlayerX=()=>Math.min(400,Math.max(80,W*.27));const screenX=x=>x-state.distance+(cameraPlayerX()-240);
+function drawMeasureBand(){
+ const bandTop=FLOOR+6, bandBottom=Math.min(VH-8,FLOOR+62);
+ ctx.fillStyle='rgba(5,17,28,.72)';ctx.fillRect(0,bandTop,W,bandBottom-bandTop);
+ stroke(0,bandTop,W,bandTop,'#86bedc66',1.5);
+ const start=Math.floor((state.distance-(cameraPlayerX()-240))/GRID_UNIT)-1;
+ const end=Math.ceil((state.distance+W-(cameraPlayerX()-240))/GRID_UNIT)+1;
+ ctx.textAlign='center';ctx.textBaseline='middle';
+ for(let i=start;i<=end;i++){
+   const x=screenX(i*GRID_UNIT);
+   const major=i%5===0;
+   ctx.strokeStyle=major?'#9fdcff7a':'#7fb4d63b';
+   ctx.lineWidth=major?1.6:1;
+   ctx.beginPath();ctx.moveTo(x,bandTop);ctx.lineTo(x,bandBottom-22);ctx.stroke();
+   ctx.strokeStyle='#6ca6c83a';ctx.lineWidth=.8;ctx.beginPath();ctx.moveTo(x,FLOOR);ctx.lineTo(x,bandTop);ctx.stroke();
+   ctx.fillStyle=major?'#dff6ff':'#9ec3d8';
+   ctx.font=major?`800 ${Math.round(14/scale)}px system-ui`:`700 ${Math.round(12/scale)}px system-ui`;
+   ctx.fillText(String(i),x,bandBottom-10);
+ }
+ ctx.textAlign='start';ctx.textBaseline='alphabetic';
 }
-function calculate(){
- const who=document.getElementById("who").value,start=+document.getElementById("start").value*60,gap=+document.getElementById("gap").value;
- const desired=[+document.getElementById("load").value/10,+document.getElementById("recovery").value/10];
- const sims=items.map(x=>({...x,sim:cosine(desired,[x.load/10,x.rec/10])})).sort((a,b)=>b.sim-a.sim);
- document.getElementById("similarity").innerHTML='<table><thead><tr><th>順位</th><th>活動</th><th>コサイン類似度</th></tr></thead><tbody>'+sims.map((x,i)=>`<tr><td>${i+1}</td><td>${x.name}</td><td>${x.sim.toFixed(3)}</td></tr>`).join("")+'</tbody></table>';
- const result=compute(who,start,desired,gap),best=result.best;
- if(!best){document.getElementById("schedule").textContent="条件を満たす予定がありません。開始時刻または希望間隔を変更してください。";document.getElementById("summary").textContent="";return;}
- const all=[...best.steps];
- if(best.end<1380)all.push({name:"自由時間",start:best.end,end:1380,detail:"予定を割り当てていない時間"});
- all.push({name:"睡眠",start:1380,end:1860,detail:"23:00～翌07:00の固定予定"});
- document.getElementById("schedule").innerHTML=all.map(x=>`<div class="event"><strong>${fmt(x.start)}–${fmt(x.end)}　${x.name}</strong><div class="small muted">${x.detail}</div></div>`).join("");
- const r=result.rest;
- document.getElementById("explain").textContent=`ユーザー${who}・${fmt(start)}開始。休憩は${r.needed?"採用":"今回は不採用"}（類似度${r.similarity.toFixed(3)}、回復希望${(desired[1]*10).toFixed(0)}）。${result.candidateCount}候補を比較。夕食は17～21時、睡眠23時固定。`;
- const b=best.breakdown;
- document.getElementById("summary").innerHTML=`順番：${best.order.map(x=>x.name).join(" → ")} → 睡眠｜合計 ${best.total.toFixed(2)}点<br><span class="small muted">内訳：時間帯 ${b.time} ＋ 隣接相性 ${b.adjacency} ＋ 個人順序 ${b.personal} ＋ 疲労補正 ${b.fatigue}。コサイン類似度は順番得点に足していません。</span>`;
+function drawObjectMeasures(){
+ ctx.save();
+ ctx.font=`700 ${Math.round(12/scale)}px system-ui`;ctx.textAlign='center';ctx.textBaseline='alphabetic';
+ for(const o of objs){
+   if(o.type==='gap'){
+     const x1=screenX(o.x),x2=screenX(o.x+o.width),mid=(x1+x2)/2;
+     if(x2<0||x1>W) continue;
+     ctx.strokeStyle='#7dd2ff88';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x1,FLOOR+4);ctx.lineTo(x1,FLOOR+20);ctx.moveTo(x2,FLOOR+4);ctx.lineTo(x2,FLOOR+20);ctx.moveTo(x1,FLOOR+12);ctx.lineTo(x2,FLOOR+12);ctx.stroke();
+     ctx.fillStyle='#cfefff';const visibleMid=(Math.max(0,x1)+Math.min(W,x2))/2;ctx.fillText(`${(o.width/GRID_UNIT).toFixed(2)}マス`,Math.max(65,Math.min(W-65,visibleMid)),FLOOR+33);
+   }
+   if(o.type==='wall'){
+     if(o.moving)continue;
+     const x=screenX(o.x),mid=x+o.width/2; if(mid<-40||mid>W+40) continue;
+     const top=scrY(o.height)-6;
+     ctx.fillStyle=o.lethal?'#ff98aa':'#bfeaff';
+     ctx.fillText(`W ${(o.width/GRID_UNIT).toFixed(2)}`,mid,top-10);
+     ctx.save();ctx.translate(x-12,scrY(o.height/2));ctx.rotate(-Math.PI/2);ctx.fillText(`H ${(o.height/GRID_UNIT).toFixed(1)}`,0,0);ctx.restore();
+   }
+   if(o.type==='spike'){
+     const x1=screenX(o.x),x2=screenX(o.x+o.width),mid=(x1+x2)/2; if(x2<0||x1>W) continue;
+     ctx.fillStyle='#ffd1da';ctx.fillText(`${o.count}個 / ${(o.width/GRID_UNIT).toFixed(2)}マス`,mid,scrY(o.base+o.height)-10);
+   }
+ }
+ ctx.restore();
 }
-document.getElementById("items").innerHTML=items.map(x=>`<tr><td>${x.id}</td><td>${x.name}</td><td>${x.load}</td><td>${x.rec}</td><td>${x.d}</td></tr>`).join("");
-for(const k of ["load","recovery"]){document.getElementById(k).addEventListener("input",e=>document.getElementById(k+"Value").textContent=e.target.value)}
-document.getElementById("run").addEventListener("click",calculate);calculate();
-</script></body></html>
+function drawWallHeightReferences(){
+  if(entries[idx].type!=='wallCalibration')return;
+  const o=objs[0],n=entries[idx].target;
+  ctx.save();
+  for(const [h,label,cl] of [[(n-1)*JUMP*JUMP/(2*GRAVITY),'前の段数の限界','#ffb8c2'],[n*JUMP*JUMP/(2*GRAVITY),'目標の最高高度','#92e4bb']]){
+    if(h<=0)continue;
+    const y=scrY(h);
+    if(y<-30||y>FLOOR-6)continue;
+    ctx.strokeStyle=cl+'65';ctx.lineWidth=1;ctx.setLineDash([7,7]);
+    ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=cl;ctx.font='700 11px system-ui';ctx.textAlign='right';
+    ctx.fillText(label,W-13,y-8);
+  }
+  ctx.restore();
+}
+function background(){const g=ctx.createLinearGradient(0,0,0,VH);g.addColorStop(0,'#102239');g.addColorStop(.75,'#1a334d');g.addColorStop(1,'#0e2235');ctx.fillStyle=g;ctx.fillRect(0,0,W,VH);
+ const scroll=state.distance*.31;for(let x=-(scroll%69);x<W;x+=69)stroke(x,0,x,FLOOR,'#91bbd211');for(let y=45;y<FLOOR;y+=69)stroke(0,y,W,y,'#91bbd211');for(let x=-(state.distance*.15%210);x<W;x+=210){ctx.fillStyle='#75a8bf0d';ctx.fillRect(x+27,FLOOR-99,50,99)}
+ for(let k=0;k<5;k++){let x=W-((state.distance*(.30+k*.07)+k*W*.24)%(W+50));ctx.fillStyle='#92c7e326';ctx.fillRect(x,FLOOR-115-k*57,42+k*9,2)}
+}
+function drawBlock(o){if(o.switchId&&switchEffectActive(o.switchId)){drawEffectGhost(o,'消去中');return;}const x=screenX(o.x),y=scrY(o.height),w=o.width,h=(o.height-(o.base||0))*ZOOM;const lethal=!!o.lethal;ctx.save();ctx.shadowColor=lethal?'#ff7891':'#73c4ff';ctx.shadowBlur=13;round(x,y,w,h,4);ctx.fillStyle=lethal?'#3b1d2b':'#19334e';ctx.fill();ctx.strokeStyle=lethal?'#ff8fa4':'#a2e2ff';ctx.lineWidth=3;ctx.stroke();ctx.shadowBlur=0;ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();for(let k=-h;k<w+h;k+=25)stroke(x+k,y+h,x+k+h,y,lethal?'#ff7e9730':'#76a8d02f',5);ctx.restore();if(!lethal){ctx.shadowColor='#79ffd6';ctx.shadowBlur=6;stroke(x+3,y+1,x+w-3,y+1,'#74ffd0',4);ctx.shadowBlur=0;}if(lethal){ctx.strokeStyle='#ffd8df';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(x+6,y+h-6);ctx.lineTo(x+w-6,y+6);ctx.moveTo(x+6,y+h*.62);ctx.lineTo(x+w*.62,y+6);ctx.moveTo(x+w*.38,y+h-6);ctx.lineTo(x+w-6,y+h*.38);ctx.stroke();}ctx.restore()}
+function drawNumberGate(o){
+ const x=screenX(o.x),w=o.width,topLimit=-70,bottom=FLOOR;
+ const yLow=o.mode==='full'?0:o.lower*NUMBER_GATE_VERTICAL_UNIT;
+ const yHigh=o.mode==='full'?Infinity:(o.lower+o.opening)*NUMBER_GATE_VERTICAL_UNIT;
+ // Guard the entire vertical screen: only the purple window is traversable.
+ function part(worldLow,worldHigh,color,border){
+  const y1=worldHigh===Infinity?topLimit:scrY(worldHigh),y2=scrY(worldLow);
+  const yy=Math.max(topLimit,y1),hh=Math.max(0,Math.min(bottom,y2)-yy);
+  if(!hh)return;
+  ctx.save();ctx.fillStyle=color;ctx.fillRect(x,yy,w,hh);
+  ctx.strokeStyle=border;ctx.lineWidth=2.5;ctx.strokeRect(x,yy,w,hh);
+  ctx.beginPath();ctx.rect(x,yy,w,hh);ctx.clip();
+  for(let k=-hh;k<w+hh;k+=16)stroke(x+k,yy+hh,x+k+hh,yy,border+'45',3);
+  ctx.restore();
+ }
+ ctx.save();ctx.shadowColor='#ae94ff';ctx.shadowBlur=9;
+ if(o.mode!=='full'){
+  if(yLow>0)part(0,yLow,'#4b2036','#ff849b');
+  part(yLow,yHigh,'#34366f','#beb0ff');
+  part(yHigh,Infinity,'#4b2036','#ff849b');
+ }else part(0,Infinity,'#34366f','#beb0ff');
+ ctx.shadowBlur=0;
+ const minY=o.mode==='full'?0:scrY(yHigh),maxY=o.mode==='full'?FLOOR:scrY(yLow);
+ const centerY=Math.max(50,Math.min(FLOOR-45,(minY+maxY)/2));
+ ctx.font='900 24px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+ ctx.lineWidth=4;ctx.strokeStyle='#1c2253';ctx.strokeText(String(o.required),x+w/2,centerY);
+ ctx.fillStyle='#f1e8ff';ctx.fillText(String(o.required),x+w/2,centerY);
+ if(o.mode==='full'){ctx.font='bold 10px system-ui';ctx.fillStyle='#d0c6ff';ctx.fillText('FULL',x+w/2,centerY+27)}
+ ctx.restore();
+}
+function drawNumberPlatform(o){
+ const x=screenX(o.x),y=scrY(o.height),w=o.width,h=o.thickness*ZOOM;
+ ctx.save();ctx.shadowColor='#ff8499';ctx.shadowBlur=10;
+ round(x,y,w,h,5);ctx.fillStyle='#472339';ctx.fill();ctx.lineWidth=2.5;ctx.strokeStyle='#ff8399';ctx.stroke();
+ ctx.shadowBlur=0;for(let k=10;k<w;k+=25)stroke(x+k,y+h-3,x+k+12,y+5,'#ff89a452',2);
+ ctx.shadowColor='#86fcd1';ctx.shadowBlur=9;stroke(x+3,y+1,x+w-3,y+1,'#7affc8',5);ctx.shadowBlur=0;
+ ctx.font='900 25px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.strokeStyle='#2a143e';ctx.lineWidth=4;
+ ctx.strokeText(String(o.required),x+w/2,y+h/2+2);ctx.fillStyle='#f4e6ff';ctx.fillText(String(o.required),x+w/2,y+h/2+2);
+ ctx.font='bold 11px system-ui';ctx.fillStyle='#b6f8d3';ctx.fillText('LAND '+o.required,x+w/2,y-15);
+ ctx.restore();
+}
+function drawSpike(o){if(o.switchId&&switchEffectActive(o.switchId)){drawEffectGhost(o,'収納中');return;}const dw=o.width/o.count;ctx.save();ctx.shadowColor='#ff7794';ctx.shadowBlur=13;for(let k=0;k<o.count;k++){let x=screenX(o.x+k*dw),x2=x+dw,cy=scrY(o.base),tip=scrY(o.base+(o.down?-o.height:o.height));ctx.beginPath();ctx.moveTo(x,cy);ctx.lineTo(x+dw/2,tip);ctx.lineTo(x2,cy);ctx.closePath();ctx.fillStyle='#6b1d38';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#ff8da2';ctx.stroke();}ctx.restore()}
+// 実際にゴールできた入力タイミングの中央付近（start秒 / 追加ジャンプ間隔秒）。
+// 操作の個人差を吸収するため厳密な正解位置ではなく目安として表示。
+const JUMP_GUIDES={
+ 'B-01':[1.89,0], 'B-02':[1.25,.52], 'B-03':[.81,.52], 'B-04':[.49,.47],
+ 'R-01':[2.09,0], 'R-02':[1.69,.395], 'R-03':[1.29,.395], 'R-04':[.93,.395]
+};
+function drawJumpGuide(){
+  if(entries[idx].type!=='wallCalibration')return;
+  const data=JUMP_GUIDES[entries[idx].n];if(!data)return;
+  const n=entries[idx].target;
+  ctx.save();ctx.textAlign='center';
+  for(let i=0;i<n;i++){
+    const worldX=240+SPEED*(data[0]+i*data[1]);
+    const x=screenX(worldX);
+    if(x<-30||x>W+30)continue;
+    const last=i===n-1;
+    ctx.fillStyle=last?'#a8f8c9':'#78ddf7';ctx.strokeStyle=last?'#a8f8c9':'#78ddf7';ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.moveTo(x,FLOOR-5);ctx.lineTo(x-8,FLOOR-20);ctx.lineTo(x+8,FLOOR-20);ctx.closePath();ctx.fill();
+    ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(x,FLOOR-23);ctx.lineTo(x,FLOOR-42);ctx.stroke();ctx.setLineDash([]);
+    ctx.font='800 12px system-ui';ctx.fillText(String(i+1),x,FLOOR-50);
+  }
+  ctx.textAlign='left';ctx.font='800 10px system-ui';ctx.fillStyle='#abdef3';
+  ctx.fillText('▲ 目安位置：少しずれてもクリア可能',12,FLOOR-10);
+  ctx.restore();
+}
+// 穴練習ページでは、踏み切りのおおよその目安だけ表示する（正解の強制ではない）。
+// Initial-setting reference positions for number gates.
+const NUMBER_GATE_GUIDES={'N-01':[1.5], 'N-02':[1.0], 'N-03':[.9,1.35,2.0], 'N-04':[1.4,1.95]};
+function drawNumberGateGuide(){
+ const p=entries[idx];if(p.type!=='numberGate')return;
+ const times=NUMBER_GATE_GUIDES[p.n];if(!times)return;
+ ctx.save();ctx.textAlign='center';
+ times.forEach((t,i)=>{
+  const x=screenX(240+SPEED*t);if(x<-35||x>W+35)return;
+  ctx.fillStyle=i===times.length-1?'#c5b7ff':'#97e9ff';
+  ctx.beginPath();ctx.moveTo(x,FLOOR-5);ctx.lineTo(x-8,FLOOR-20);ctx.lineTo(x+8,FLOOR-20);ctx.closePath();ctx.fill();
+  ctx.font='800 12px system-ui';ctx.fillText(String(i+1),x,FLOOR-32);
+ });
+ ctx.fillStyle='#d6d2ff';ctx.font='800 11px system-ui';ctx.textAlign='left';ctx.fillText('▲ ジャンプ目安（参考）',10,FLOOR-12);ctx.restore();
+}
+// Tested sample jump positions for the unmodified platform presets.
+const NUMBER_PLATFORM_GUIDES={'P-01':[1.88],'P-02':[1.88],'P-03':[1.53,1.95],'P-04':[1.53,1.95]};
+function drawPlatformGuide(){
+ const p=entries[idx];if(p.type!=='numberPlatform')return;
+ const v=platformInfo(p);if(v.height!==p.initialHeight||v.width!==p.initialWidth)return;
+ const times=NUMBER_PLATFORM_GUIDES[p.n]||[];
+ ctx.save();ctx.textAlign='center';
+ times.forEach((t,i)=>{
+   const x=screenX(240+SPEED*t);if(x<-30||x>W+30)return;
+   ctx.fillStyle=i===times.length-1?'#9ef3c9':'#91e4f9';
+   ctx.beginPath();ctx.moveTo(x,FLOOR-5);ctx.lineTo(x-8,FLOOR-20);ctx.lineTo(x+8,FLOOR-20);ctx.closePath();ctx.fill();
+   ctx.font='800 12px system-ui';ctx.fillText(String(i+1),x,FLOOR-31);
+ });
+ ctx.font='800 11px system-ui';ctx.fillStyle='#a8edd6';ctx.textAlign='left';ctx.fillText('▲ ジャンプ目安（初期設定）',10,FLOOR-11);ctx.restore();
+}
+function drawGapGuide(){
+ const p=entries[idx];if(p.type!=='gapCalibration')return;
+ const o=objs[0],x=screenX(o.x),startX=x-57;
+ if(startX>-50&&startX<W+50){
+  ctx.save();ctx.strokeStyle='#7af3c1';ctx.fillStyle='#7af3c1';ctx.lineWidth=2;
+  ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(startX,FLOOR-5);ctx.lineTo(startX,FLOOR-47);ctx.stroke();ctx.setLineDash([]);
+  ctx.font='800 13px system-ui';ctx.textAlign='center';ctx.fillText('▲ 踏み切り目安',startX,FLOOR-56);ctx.restore();
+ }
+}
+function drawAirA(o){
+ const x=screenX(o.x),cx=x+o.width/2,top=scrY(o.base+o.height),bottom=scrY(o.base),mid=(top+bottom)/2;
+ ctx.save();ctx.fillStyle='#682037';ctx.strokeStyle='#ff8199';ctx.shadowColor='#ff718a';ctx.shadowBlur=13;ctx.lineWidth=3;
+ ctx.beginPath();ctx.moveTo(cx,top);ctx.lineTo(x+o.width,mid);ctx.lineTo(cx,bottom);ctx.lineTo(x,mid);ctx.closePath();ctx.fill();ctx.stroke();
+ ctx.shadowBlur=0;ctx.strokeStyle='#ffb1c0';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(cx,top+11);ctx.lineTo(cx,bottom-11);ctx.moveTo(x+15,mid);ctx.lineTo(x+o.width-15,mid);ctx.stroke();
+ ctx.font='900 12px system-ui';ctx.textAlign='center';ctx.fillStyle='#ffd1dc';ctx.fillText('A  ×',cx,top-13);ctx.restore();
+}
+function drawAirB(o){
+ const x=screenX(o.x),top=scrY(o.height),w=o.width,h=14*ZOOM,tip=o.spikeH*ZOOM;
+ ctx.save();ctx.shadowColor='#ff728b';ctx.shadowBlur=11;ctx.fillStyle='#482036';ctx.strokeStyle='#ff839a';ctx.lineWidth=2.5;
+ for(let i=0;i<3;i++){
+  const a=x+i*w/3,b=x+(i+1)*w/3;
+  ctx.beginPath();ctx.moveTo(a,top+h);ctx.lineTo((a+b)/2,top+h+tip);ctx.lineTo(b,top+h);ctx.closePath();ctx.fill();ctx.stroke();
+ }
+ ctx.fillStyle='#26354e';ctx.fillRect(x,top,w,h);ctx.strokeStyle='#ff839a';ctx.strokeRect(x,top,w,h);
+ ctx.shadowColor='#81ffd3';ctx.shadowBlur=8;stroke(x+3,top,x+w-3,top,'#81ffd3',4);
+ ctx.shadowBlur=0;ctx.font='900 11px system-ui';ctx.fillStyle='#a2ffd9';ctx.textAlign='center';ctx.fillText('B  ✓ LAND',x+w/2,top-12);ctx.restore();
+}
+function drawEffectGhost(o,label){
+ const x=screenX(o.x),w=o.width,y=o.type==='wall'?scrY(o.height):scrY(o.height||80),h=o.type==='wall'?o.height*ZOOM:Math.max(18,(o.height||80)*ZOOM);
+ ctx.save();ctx.fillStyle='#82e7be13';ctx.strokeStyle='#82ffd4';ctx.lineWidth=2;ctx.setLineDash([6,6]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);
+ ctx.fillStyle='#a8ffe0';ctx.font='900 12px system-ui';ctx.textAlign='center';ctx.fillText(label,x+w/2,y-12);ctx.restore();
+}
+function drawDigitSwitch(o){
+ const x=screenX(o.x),y=scrY(o.base+o.height),h=o.height*ZOOM,w=o.width,active=!!state.switchTriggered[o.id];
+ ctx.save();ctx.shadowColor=active?'#8cffc7':'#e7a6ff';ctx.shadowBlur=16;
+ ctx.fillStyle=active?'#164a43aa':'#54336988';ctx.strokeStyle=active?'#79ffca':'#d2a4ff';ctx.lineWidth=2.5;
+ round(x,y,w,h,7);ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+ ctx.fillStyle=active?'#a7ffdb':'#ffe9ff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 34px system-ui';ctx.fillText(String(o.required),x+w/2,y+h*.5);
+ ctx.font='bold 12px system-ui';ctx.fillText(active?'ON':'SWITCH',x+w/2,y-14);ctx.restore();
+}
+function drawSwitchPlatform(o){
+ if(!switchEffectActive(o.switchId)){
+  const x=screenX(o.x),y=scrY(o.height);ctx.save();ctx.setLineDash([7,7]);ctx.strokeStyle='#86c3e477';ctx.lineWidth=2;ctx.strokeRect(x,y,o.width,o.thickness*ZOOM);ctx.setLineDash([]);ctx.font='bold 11px system-ui';ctx.textAlign='center';ctx.fillStyle='#8baaba';ctx.fillText('待機中',x+o.width/2,y-9);ctx.restore();return;
+ }
+ const x=screenX(o.x),y=scrY(o.height),h=o.thickness*ZOOM;
+ ctx.save();ctx.shadowColor='#8effd1';ctx.shadowBlur=12;ctx.fillStyle='#1b4961';ctx.fillRect(x,y,o.width,h);
+ ctx.strokeStyle='#81dfff';ctx.lineWidth=2.5;ctx.strokeRect(x,y,o.width,h);
+ stroke(x+3,y,x+o.width-3,y,'#77ffcd',4);ctx.shadowBlur=0;
+ ctx.fillStyle='#bcffe7';ctx.font='bold 12px system-ui';ctx.textAlign='center';ctx.fillText('LAND / 回復',x+o.width/2,y-14);ctx.restore();
+}
+function drawSwitchGuide(){
+ if(entries[idx].type!=='digitSwitch'&&entries[idx].combo!=='switchSpike')return;
+ const p=entries[idx],sw=objs.find(o=>o.type==='digitSwitch');if(!sw)return;
+ const x=screenX(sw.x-105);if(x>=-30&&x<=W+30){
+  ctx.save();ctx.fillStyle='#efc3ff';ctx.strokeStyle='#efc3ff';ctx.textAlign='center';ctx.font='900 12px system-ui';ctx.fillText('▲ ジャンプ目安',x,FLOOR-34);
+  ctx.beginPath();ctx.moveTo(x,FLOOR-5);ctx.lineTo(x-8,FLOOR-21);ctx.lineTo(x+8,FLOOR-21);ctx.closePath();ctx.fill();ctx.restore();
+ }
+ const swcx=screenX(sw.x+sw.width/2),other=objs.find(o=>o.switchId===sw.id);
+ if(other){const dest=screenX(other.x+other.width/2);
+  if(swcx<W+30&&dest>-30){ctx.save();ctx.strokeStyle='#e1aeff88';ctx.lineWidth=2;ctx.setLineDash([5,5]);const arcY=Math.max(90,scrY(sw.height)-55);ctx.beginPath();ctx.moveTo(swcx,arcY+25);ctx.quadraticCurveTo((swcx+dest)/2,arcY-23,dest,arcY+25);ctx.stroke();ctx.setLineDash([]);ctx.restore();}
+ }
+}
+function drawGapWalls(){
+ // 赤い縦ライン＝穴の側壁は危険。地面を歩く方向にある対岸の壁に触れるとアウト。
+ ctx.save();ctx.lineWidth=3;ctx.shadowColor='#ff627d';ctx.shadowBlur=8;
+ for(const o of objs){
+  if(o.type!=='gap')continue;
+  for(const edge of [o.x,o.x+o.width]){
+   const x=screenX(edge);if(x<-8||x>W+8)continue;
+   stroke(x,FLOOR+2,x,VH,'#ff7990',3);
+   ctx.strokeStyle='#ffc2cf';ctx.lineWidth=1.5;
+   for(let y=FLOOR+10;y<VH-8;y+=21){ctx.beginPath();ctx.moveTo(x-3,y+9);ctx.lineTo(x+3,y);ctx.stroke()}
+  }
+ }
+ ctx.restore();
+}
+
+function drawMovingWallGuide(){
+ if(!objs.some(v=>v.moving))return;
+ const o=objs.find(v=>v.moving);if(!o)return;
+ const m=o.motion,a=m.amplitude,top=o.originHeight,base=o.originBase;
+ ctx.save();ctx.setLineDash([6,6]);ctx.lineWidth=1.8;
+ const dim='#bcd8ff76';
+ if(m.axis==='x'){
+  for(const dx of [-a,a]){
+   ctx.strokeStyle=dim;ctx.strokeRect(screenX(o.originX+dx),scrY(top),o.width,(top-base)*ZOOM);
+  }
+  const y=scrY(top)+Math.max(25,(top-base)*ZOOM/2);
+  const x1=screenX(o.originX-a),x2=screenX(o.originX+a+o.width);
+  ctx.setLineDash([]);stroke(x1,y,x2,y,'#d6b5ff85',2);
+  ctx.fillStyle='#d9c1ff';ctx.font='bold 13px system-ui';ctx.textAlign='center';
+  ctx.fillText('↔ 左右移動',screenX(o.originX+a/8+o.width/2),Math.max(40,scrY(top)-24));
+ }else{
+  for(const dy of [-a,a]){
+   ctx.strokeStyle=dim;ctx.strokeRect(screenX(o.originX),scrY(top+dy),o.width,(top-base)*ZOOM);
+  }
+  const x=screenX(o.originX+o.width+18),y1=scrY(top+a),y2=scrY(base-a);
+  ctx.setLineDash([]);stroke(x,y1,x,y2,'#d6b5ff85',2);
+  ctx.fillStyle='#d9c1ff';ctx.font='bold 13px system-ui';ctx.textAlign='left';
+  ctx.fillText('↕',x+8,(y1+y2)/2);
+ }
+ ctx.restore();
+}
+function drawGoal(){let x=screenX(goal);if(x< -100||x>W+120)return;ctx.save();ctx.shadowColor='#61e4b8';ctx.shadowBlur=15;ctx.strokeStyle='#78f0ce';ctx.lineWidth=4;ctx.strokeRect(x-5,170,8,FLOOR-170);ctx.shadowBlur=0;ctx.fillStyle='#a2fce8';ctx.font='900 21px system-ui';ctx.textAlign='center';ctx.fillText('GOAL',x+9,160);ctx.restore()}
+function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);background();if(uiMode!=='story')drawWallHeightReferences();
+ const gaps=objs.filter(o=>o.type==='gap');function floor(a,b){if(b<=a)return;ctx.fillStyle='#13283d';ctx.fillRect(a,FLOOR,b-a,VH-FLOOR);stroke(a,FLOOR,b,FLOOR,'#c1e7fa',3);}
+ if(!gaps.length)floor(0,W);else{let cursor=0;for(const o of gaps){let l=screenX(o.x),r=l+o.width;floor(cursor,Math.min(W,l));cursor=Math.max(cursor,r);stroke(l,FLOOR,l,VH,'#4d9fd577',2);stroke(r,FLOOR,r,VH,'#4d9fd577',2);}floor(cursor,W)}
+ let off=-(state.distance%51);for(let x=off;x<W;x+=51){if(gaps.some(o=>x>screenX(o.x)&&x<screenX(o.x)+o.width))continue;stroke(x,FLOOR+22,x+19,FLOOR+22,'#4b708b',3)}
+ if(uiMode!=='story')drawMovingWallGuide();
+ for(const o of objs){if(o.type==='digitSwitch')drawDigitSwitch(o);if(o.type==='switchPlatform')drawSwitchPlatform(o);if(o.type==='wall')drawBlock(o);if(o.type==='spike')drawSpike(o);if(o.type==='airA')drawAirA(o);if(o.type==='airB')drawAirB(o);if(o.type==='numberGate')drawNumberGate(o);if(o.type==='numberPlatform')drawNumberPlatform(o);if(o.type==='ceiling'){let roof={type:'wall',x:o.x,width:o.width,height:0};let x=screenX(o.x),y=scrY(o.base),top=y-32;ctx.fillStyle='#14273f';ctx.fillRect(x,top,o.width,32);stroke(x,top,x+o.width,top,'#7caac9',3);drawSpike({type:'spike',x:o.x,width:o.width,count:Math.round(o.width/75),height:o.spikeH,base:o.base,down:true})}}
+ drawGoal();
+ if(uiMode!=='story'){drawJumpGuide();drawGapGuide();drawNumberGateGuide();drawPlatformGuide();drawSwitchGuide();drawObjectMeasures();drawMeasureBand()}
+ drawGapWalls();
+ // light motion streaks and shadow
+ let sq=SIZE,px=cameraPlayerX(),py=scrY(state.y)-sq/2;
+ ctx.fillStyle='#071827a6';ctx.beginPath();ctx.ellipse(px,FLOOR+3,30*(1-Math.min(.6,state.y/650)),4,0,0,Math.PI*2);ctx.fill();
+ if(state.lastLanding>0){ctx.strokeStyle=`rgba(155,232,255,${state.lastLanding/.3})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(px,FLOOR,30+(1-state.lastLanding/.3)*25,6,0,0,Math.PI*2);ctx.stroke()}
+ const fill=COLORS[state.face][0],ink=COLORS[state.face][1];for(let k=0;k<5;k++)stroke(px-sq*.70-k*16,py+(k-2)*7,px-sq*.70-k*16+9,py+(k-2)*7,fill+'70',2);
+ ctx.save();ctx.translate(px,py);ctx.rotate(state.angle);ctx.shadowColor=fill;ctx.shadowBlur=17;round(-sq/2,-sq/2,sq,sq,8);ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle='#eefaff';ctx.lineWidth=3;ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle='#ffffff77';round(-sq*.38,-sq*.37,sq*.28,5,2);ctx.fill();ctx.fillStyle='#11354e50';round(sq*.26,sq*.25,9,9,2);ctx.fill();ctx.restore();
+ ctx.font='900 35px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=ink;ctx.fillText(String(state.face),px,py+2);ctx.textBaseline='alphabetic';ctx.font='800 13px system-ui';ctx.textAlign='center';ctx.fillStyle='#a7c9dd';ctx.fillText('AUTO →',px,FLOOR+90);
+}
+function resize(){const r=canvas.getBoundingClientRect();let width=Math.max(10,r.width),height=Math.max(10,r.height);W=VH*width/height;scale=height/VH;dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);draw()}
+function loop(t){if(!last)last=t;const dt=Math.min(.03,Math.max(0,(t-last)/1000));last=t;if(uiMode==='story'||uiMode==='practice'){update(dt);draw()}requestAnimationFrame(loop)}
+function catalog(mode){const o=$('overlay');$('catalog').style.display=mode==='rules'?'none':'grid';$('rules').style.display=mode==='rules'?'block':'none';$('overlayTitle').textContent=mode==='rules'?'遊び方・ルール':'障害物一覧';if(mode==='catalog'){$('catalog').innerHTML='';entries.forEach((p,i)=>{const b=document.createElement('button');b.className=i===idx?'active':'';b.innerHTML=`<span class="n">${p.n} / ${p.en}</span><span class="nm">${p.jp}</span>${cleared.includes(i)?'<span class="done">✓ CLEAR</span>':''}`;b.onclick=()=>{closeCatalog();setPage(i)};$('catalog').appendChild(b)})}o.classList.add('open');if(state.status==='running'){state.status='paused';showResult('paused');ui();}last=0}
+function closeCatalog(){$('overlay').classList.remove('open')}
+$('spikeMinus').onclick=()=>changeSpikeCount(-1);$('spikePlus').onclick=()=>changeSpikeCount(1);$('spikeDefault').onclick=()=>changeSpikeCount(entries[idx].initialCount-spikeCounts[idx]);
+$('wallHeightMinus').onclick=()=>changeWall('height',-1);
+$('wallHeightPlus').onclick=()=>changeWall('height',1);
+$('wallWidthMinus').onclick=()=>changeWall('width',-1);
+$('wallWidthPlus').onclick=()=>changeWall('width',1);
+$('wallDefault').onclick=restoreWall;
+$('gapWidthMinus').onclick=()=>changeGap(-1);$('gapWidthPlus').onclick=()=>changeGap(1);$('gapDefault').onclick=restoreGap;
+$('numberHeightMinus').onclick=()=>changeNumber('opening',-1);
+$('numberHeightPlus').onclick=()=>changeNumber('opening',1);
+$('numberPositionMinus').onclick=()=>changeNumber('lower',-1);
+$('numberPositionPlus').onclick=()=>changeNumber('lower',1);
+$('numberDefault').onclick=restoreNumber;
+$('platformHeightMinus').onclick=()=>changePlatform('height',-1);
+$('platformHeightPlus').onclick=()=>changePlatform('height',1);
+$('platformWidthMinus').onclick=()=>changePlatform('width',-1);
+$('platformWidthPlus').onclick=()=>changePlatform('width',1);
+$('platformDefault').onclick=restorePlatform;
+$('switchTimeMinus').onclick=()=>changeSwitchTime(-1);
+$('switchTimePlus').onclick=()=>changeSwitchTime(1);
+$('switchDefault').onclick=restoreSwitchTime;
+$('motionRangeMinus').onclick=()=>changeMotion('range',-1);
+$('motionRangePlus').onclick=()=>changeMotion('range',1);
+$('motionPeriodMinus').onclick=()=>changeMotion('period',-1);
+$('motionPeriodPlus').onclick=()=>changeMotion('period',1);
+$('motionDefault').onclick=restoreMotion;
+$('prev').onclick=()=>setPage(idx-1);$('next').onclick=()=>setPage(idx+1);$('catalogButton').onclick=()=>catalog('catalog');$('ruleButton').onclick=()=>catalog('rules');$('close').onclick=closeCatalog;$('retry').onclick=()=>state.status==='paused'?togglePause():retry();$('resultNext').onclick=()=>uiMode==='story'?playStory(Math.min(storyNumber+1,STORY_INDEX.length)):setPage(idx+1);$('reset').onclick=retry();$('pause').onclick=togglePause;
+$('storyHome').onclick=()=>showScreen('home');$('resultHome').onclick=()=>showScreen('home');$('jump').addEventListener('pointerdown',e=>{e.preventDefault();action()});$('jump').addEventListener('click',e=>{if(e.detail===0)action()});stage.addEventListener('pointerdown',e=>{if(e.target.closest('button')||e.target.closest('.result'))return;e.preventDefault();action()});
+window.addEventListener('keydown',e=>{if(uiMode!=='story'&&uiMode!=='practice')return;if($('overlay').classList.contains('open')){if(e.key==='Escape')closeCatalog();return;}if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();if(!e.repeat)action();}else if(e.code==='KeyR'){e.preventDefault();retry()}else if(e.code==='KeyP'){e.preventDefault();togglePause()}else if(e.code==='ArrowLeft'&&uiMode==='practice'){e.preventDefault();setPage(idx-1)}else if(e.code==='ArrowRight'&&uiMode==='practice'){e.preventDefault();setPage(idx+1)}});
+['contextmenu','dragstart','selectstart','gesturestart'].forEach(ev=>document.addEventListener(ev,e=>e.preventDefault(),{passive:false}));
+
+// First pass UI shell, storing settings and stage clear separately from the 51-page practice.
+const storyDescriptions=['小さな穴をジャンプで飛び越えよう','トゲを避けて進もう','少し長い穴に挑戦','青い壁は上面に着地できる','赤い壁には触れないように','指定数字で数字の壁を通過','数字足場は乗っても避けてもOK','数字スイッチを使うか、飛び越えよう'];
+const $front=$('front');
+const defaults={music:true,musicVolume:25,sfx:true,sfxVolume:40,vibration:false,reduce:false,lang:'ja'};
+let settings={...defaults};try{settings={...settings,...JSON.parse(localStorage.getItem('numberRollSettingsV20')||'{}')}}catch{}
+function settingsSave(){try{localStorage.setItem('numberRollSettingsV20',JSON.stringify(settings))}catch{}}
+let ac, musicTimer;
+function audioReady(){try{ac??=new (window.AudioContext||window.webkitAudioContext)();if(ac.state==='suspended')ac.resume()}catch{}}
+function beep(hz,delay,duration,volume,type='sine'){
+ if(!ac||!Number.isFinite(hz))return;
+ const t=ac.currentTime+delay,o=ac.createOscillator(),g=ac.createGain();o.type=type;o.frequency.value=hz;
+ const v=Math.max(.0001,Math.min(.1,volume));g.gain.setValueAtTime(.0001,t);g.gain.linearRampToValueAtTime(v,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+duration);o.connect(g);g.connect(ac.destination);o.start(t);o.stop(t+duration+.03);
+}
+function sfx(kind){if(!settings.sfx||!settings.sfxVolume)return;audioReady();const v=settings.sfxVolume/100*.08;if(kind==='jump')beep(470,0,.14,v);else if(kind==='clear'){beep(523,0,.22,v);beep(659,.16,.22,v);beep(784,.32,.32,v)}else if(kind==='fail')beep(190,0,.22,v*.8,'triangle')}
+function musicTick(){if(!settings.music||settings.musicVolume===0||!ac||uiMode==='practice')return;const v=settings.musicVolume/100*.017;beep(220,0,3.4,v);beep(329.6,.18,3.1,v*.68);beep(440,.42,2.8,v*.55)}
+function haptic(ms){try{if(settings.vibration&&navigator.vibrate)navigator.vibrate(ms)}catch{}}
+function updateSettingsUi(){
+ for(const [id,key] of [['musicToggle','music'],['sfxToggle','sfx'],['vibrationToggle','vibration'],['reduceToggle','reduce']])$(id).setAttribute('aria-checked',String(!!settings[key]));
+ $('musicVolume').value=settings.musicVolume;$('sfxVolume').value=settings.sfxVolume;$('languageSelect').value=settings.lang;
+ document.body.classList.toggle('motion-reduced',!!settings.reduce);
+}
+function unlockedStory(){return Math.min(STORY_INDEX.length,storyCleared.length+1)}
+function onStoryClear(){if(!storyCleared.includes(storyNumber)){storyCleared.push(storyNumber);storyCleared.sort((a,b)=>a-b);try{localStorage.setItem('numberRollStoryProgressV20',JSON.stringify(storyCleared))}catch{};}renderDoors()}
+function renderDoors(){
+ $('doorProgress').textContent=storyCleared.length+' / '+STORY_INDEX.length+' CLEAR';
+ const grid=$('doorGrid');grid.replaceChildren();
+ for(let n=1;n<=STORY_INDEX.length;n++){
+  const done=storyCleared.includes(n),allowed=done||n<=unlockedStory();
+  const b=document.createElement('button');b.type='button';b.className='door '+(done?'open':allowed?'current':'locked');b.disabled=!allowed;
+  b.setAttribute('aria-label',`ステージ${n} ${done?'クリア済み':allowed?'挑戦可能':'未解放'}`);
+  b.innerHTML=`<div class="arch"><div class="arch-symbol">${done?'✦':allowed?n:'🔒'}</div></div><span class="door-number">STAGE ${String(n).padStart(2,'0')} ${done?'✓':allowed?'▶':'🔒'}</span>`;
+  if(allowed)b.addEventListener('click',()=>playStory(n));grid.appendChild(b);
+ }
+ $('doorsPrev').disabled=true;$('doorsNext').disabled=true;$('pageIndicator').textContent='1 / 1';$('doorsPrev').parentElement.hidden=true;
+}
+function showScreen(name){
+ if(uiMode==='story'&&state?.status==='running'){state.status='paused';last=0;}
+ uiMode=name;
+ $front.hidden=name==='story'||name==='practice';
+ $('homeScreen').hidden=name!=='home';$('doorsScreen').hidden=name!=='doors';$('settingsScreen').hidden=name!=='settings';
+ document.body.classList.toggle('mode-story',name==='story');document.body.classList.toggle('mode-practice',name==='practice');
+ $('app').hidden=name!=='story'&&name!=='practice';
+ if(name==='doors')renderDoors();
+ if(name==='story'||name==='practice'){
+  last=0;requestAnimationFrame(()=>{resize();draw()});
+ }
+ if(name==='practice'){$('resultHome').style.display='none';$('overlay').classList.remove('open');setPage(idx);}
+}
+function playStory(n){
+ if(n>unlockedStory()&&!storyCleared.includes(n))return;
+ storyNumber=n;uiMode='story';$('storyHudStage').textContent=String(n).padStart(2,'0');setPage(STORY_INDEX[n-1]);showScreen('story');
+ storyResult('ready');requestAnimationFrame(resize);
+}
+function openSettings(from){screenBeforeSettings=from;showScreen('settings');updateSettingsUi()}
+$('homePlay').onclick=()=>{audioReady();playStory(Math.min(STORY_INDEX.length,unlockedStory()))};
+$('homeDoors').onclick=()=>{audioReady();showScreen('doors')};
+$('homeSettings').onclick=()=>openSettings('home');
+$('homePractice').onclick=()=>{audioReady();showScreen('practice')};
+$('doorsBack').onclick=()=>showScreen('home');
+$('settingsBack').onclick=()=>showScreen(screenBeforeSettings);
+$('doorsPrev').onclick=()=>{doorPage=Math.max(0,doorPage-1);renderDoors()};
+$('doorsNext').onclick=()=>{};
+for(const [id,key] of [['musicToggle','music'],['sfxToggle','sfx'],['vibrationToggle','vibration'],['reduceToggle','reduce']])$(id).onclick=()=>{settings[key]=!settings[key];settingsSave();updateSettingsUi();if(key==='music'&&settings.music){audioReady();musicTick()}};
+for(const [id,key] of [['musicVolume','musicVolume'],['sfxVolume','sfxVolume']])$(id).addEventListener('input',e=>{settings[key]=Number(e.target.value);settingsSave();if(key==='musicVolume'){audioReady()}});
+$('languageSelect').addEventListener('change',e=>{settings.lang=e.target.value;settingsSave();updateMenuLanguage()});
+function updateMenuLanguage(){
+ const en=settings.lang==='en';$('homeSubtitle').textContent=en?'Roll. Count. Reach the flag.':'数字で、道をひらく。';
+ $('homePractice').textContent=en?'◇  OBSTACLE PRACTICE (51)':'◇　障害物の練習（51種類）';
+ $('doorsScreen').querySelector('.doors-intro').textContent=en?'Open doors are cleared. The glowing door is next.':'開いた扉はクリア済み。光る扉から次に挑戦。';
+ $('settingsBack').textContent=en?'‹  BACK':'‹　戻る';
+}
+let swipeX=null;const doorSection=$('doorsScreen');
+doorSection.addEventListener('touchstart',e=>{swipeX=e.touches[0].clientX},{passive:true});
+doorSection.addEventListener('touchend',e=>{if(swipeX===null)return;const dx=e.changedTouches[0].clientX-swipeX;swipeX=null;if(Math.abs(dx)>90&&doorPage!==0){doorPage=0;renderDoors()}},{passive:true});
+updateSettingsUi();updateMenuLanguage();renderDoors();
+musicTimer=setInterval(()=>musicTick(),4300);
+// Extend automated inspection without changing the engine's mechanics.
+window.__NRUI={showScreen,playStory,get:()=>({mode:uiMode,storyNumber,unlocked:unlockedStory(),completed:[...storyCleared],settings:{...settings}})};
+
+// Exposed for automated smoke tests; the user-facing game never needs these hooks.
+window.__NRBook={version:'2.0-ui',page:n=>setPage(n),start,jump,step:update,get:()=>({...state,index:idx,goal,obstacles:objs,completed:[...cleared]}),setSilent:v=>silent=!!v,wallSettings:()=>wallSettings.map(v=>({...v})),spikeCount:()=>idx<4?spikeCounts[idx]:null,changeSpikeCount,changeWall,restoreWall,gapSettings:()=>gapSettings.slice(),changeGap,restoreGap,airCount:()=>airEntries.length,numberSettings:()=>numberSettings.map(v=>({...v})),changeNumber,restoreNumber,platformSettings:()=>platformSettings.map(v=>({...v})),changePlatform,restorePlatform,switchSettings:()=>switchSettings.map(v=>({...v})),changeSwitchTime,restoreSwitchTime,motionSettings:()=>motionSettings.map(v=>({...v})),changeMotion,restoreMotion};
+new ResizeObserver(resize).observe(stage);progress();setPage(window.location.hash==='#gap'?22:window.location.hash==='#air'?26:window.location.hash==='#number'?30:window.location.hash==='#platform'?34:window.location.hash==='#switch'?38:window.location.hash==='#motion'?41:window.location.hash==='#combo'?45:0);requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
