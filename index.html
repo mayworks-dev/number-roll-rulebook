@@ -313,7 +313,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <button id="dbOld" type="button" class="db-tool" aria-pressed="false">□ 旧デザイン風</button>
         <button id="dbBackground" type="button" class="db-tool">背景：遺跡</button>
       </div>
-      <div class="db-extras"><label>表示する数字</label><div class="db-digits" id="dbDigits"></div><button type="button" id="dbRotate" class="db-tool">↻ 90°回転</button><span class="db-hint">※ ここは見た目の確認用。ゲームの動作には影響しません。</span></div>
+      <div class="db-extras"><label>表示する数字</label><div class="db-digits" id="dbDigits"></div><button type="button" id="dbRotate" class="db-tool">↻ 90°回転</button><button type="button" id="dbView" class="db-tool" aria-label="キューブを見る角度を変える">視点：斜め</button><span class="db-hint">※ 仮設プレビュー専用。ゲームの動き・当たり判定は変更しません。</span></div>
       <div class="db-notes"><label for="dbMemo">改善メモ（このパーツだけに保存）</label><textarea id="dbMemo" placeholder="例：光を弱く、角を少し丸く、数字を大きく…" rows="2"></textarea><small>メモはこのブラウザ内に仮保存。公開版のゲームには影響しません。</small></div>
       <div class="db-footer"><button type="button" id="dbPrevious" class="db-tool">◀ 前のパーツ</button><span>完成デザインではなく比較・調整用の仮置き</span><button type="button" id="dbNext" class="db-tool">次のパーツ ▶</button></div>
     </div>
@@ -1349,6 +1349,7 @@ const items=[
  ['moving','移動する壁','MOVING WALLS','青と赤の区別を維持したまま、移動方向がわかる。']
 ];
 let pos=0,face=1,improved=true,ruins=true;
+let cubeSpin=0, cubeTurns=0, cubeRoll=null, cameraView=1;
 const cn=document.getElementById('designCanvas'),g=cn.getContext('2d');
 const $=id=>document.getElementById(id);
 const memoKey=i=>'nr_preview_notes_21_'+items[i][0];
@@ -1389,14 +1390,124 @@ function facetSpike(x,bottom,w,h,old=false,down=false){
 }
 function spikeBase(x,y,w,old=false){stoneTile(x,y,w,26,old);if(!old){for(let a=0;a<w-12;a+=16)line(x+a+5,y+21,x+a+10,y+21,'#ffb69b78',1)}}
 function drawSpikes(){floor(120,333,780,107,!improved);const y=333;spikeBase(331,y-18,338,!improved);for(let n=0;n<4;n++)facetSpike(341+n*82,y-19,73,n===1?146:106,!improved)}
-function cube(x,y,s,n=face,old=false){
+/* Rounded solid cube renderer: one continuous parametric rounded-box surface.
+   Temporary design-book preview only; the actual game physics and render path stay unchanged. */
+const dbRGB=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+const dbMix=(a,b,t)=>a.map((v,i)=>Math.round(v*(1-t)+b[i]*t));
+const dbColor=v=>'rgb('+v.map(x=>Math.max(0,Math.min(255,Math.round(x)))).join(',')+')';
+const dbPal={
+ 1:{main:'#d2ecff',rim:'#e9f9ff',side:'#72a8d2',ink:'#234779',accent:'#55b5ed'},
+ 2:{main:'#c9f7e7',rim:'#e6fff4',side:'#66b9a8',ink:'#155c56',accent:'#62c9ae'},
+ 3:{main:'#e8dcff',rim:'#f7f0ff',side:'#a28acb',ink:'#59418a',accent:'#b19beb'},
+ 4:{main:'#ffdfd8',rim:'#fff1e9',side:'#d79e9d',ink:'#834a54',accent:'#efab9f'}
+};
+const dbSamp=[-1,-.98,-.95,-.92,-.87,-.825,0,.825,.87,.92,.95,.98,1];
+const dbUnitMesh=[];
+function dbClamp(a,low,high){return Math.max(low,Math.min(high,a))}
+function dbRoundedPoint(q){
+ const radius=.175,inner=1-radius;
+ const core=q.map(v=>dbClamp(v,-inner,inner));let delta=q.map((v,i)=>v-core[i]);
+ const length=Math.hypot(...delta)||1;
+ return core.map((v,i)=>v+radius*delta[i]/length);
+}
+for(let axis=0;axis<3;axis++)for(const side of [-1,1]){
+ function point(u,v){const q=[0,0,0];q[axis]=side;q[(axis+1)%3]=u;q[(axis+2)%3]=v;return dbRoundedPoint(q)}
+ for(let i=0;i<dbSamp.length-1;i++)for(let j=0;j<dbSamp.length-1;j++){
+  const pts=[point(dbSamp[i],dbSamp[j]),point(dbSamp[i+1],dbSamp[j]),point(dbSamp[i+1],dbSamp[j+1]),point(dbSamp[i],dbSamp[j+1])];
+  const mid=pts.reduce((acc,p)=>acc.map((v,k)=>v+p[k]/4),[0,0,0]);
+  const inner=1-.175,clamped=mid.map(v=>dbClamp(v,-inner,inner));const normal=mid.map((v,k)=>v-clamped[k]);const len=Math.hypot(...normal)||1;
+  dbUnitMesh.push({pts,normal:normal.map(v=>v/len),mid});
+ }
+}
+function dbProjector(cx,cy,size,spin=0){
+ const yaw=[-.12,-.43,-.68][cameraView]; const pitch=.30;
+ const ya=Math.cos(yaw),yb=Math.sin(yaw),pa=Math.cos(pitch),pb=Math.sin(pitch);
+ const ca=Math.cos(spin),sa=Math.sin(spin);
+ function rotate(q){
+  // Physical perspective then roll on the screen-plane axis.
+  const x=q[0]*ya+q[2]*yb,zz=-q[0]*yb+q[2]*ya;
+  const y=q[1]*pa-zz*pb,z=q[1]*pb+zz*pa;
+  return [x*ca-y*sa,x*sa+y*ca,z];
+ }
+ const scale=size*.45;
+ function project(q){const [x,y,z]=rotate(q),r=6.8/(6.8-z);return {x:cx+x*scale*r,y:cy-y*scale*r,z}}
+ return {project,rotate,scale};
+}
+function dbRoundPath(cx,cy,r,s,mapping){ // rounded rectangle built on a face in 3-D
+ const p=[],steps=7;
+ for(const [ox,oy,a] of [[s-r,s-r,0],[-s+r,s-r,90],[-s+r,-s+r,180],[s-r,-s+r,270]]){
+  for(let k=0;k<=steps;k++){
+   const ang=(a+k*90/steps)*Math.PI/180;
+   p.push(mapping(ox+r*Math.cos(ang),oy+r*Math.sin(ang)));
+  }
+ }
+ return p;
+}
+function dbPolygon3d(points,projection,fill,stroke=null,lineWidth=1){
+ g.beginPath();points.forEach((p,i)=>{let v=projection.project(p);i?g.lineTo(v.x,v.y):g.moveTo(v.x,v.y)});g.closePath();
+ if(fill){g.fillStyle=fill;g.fill()}
+ if(stroke){g.strokeStyle=stroke;g.lineWidth=lineWidth;g.stroke()}
+}
+function dbRoundedCube(cx,cy,size,n,spin=0,small=false){
+ const pal=dbPal[n]||dbPal[1],p=dbProjector(cx,cy,size,spin),base=dbRGB(pal.main),light=[-.37,.62,.70];
+ // Surface is a single rounded volume, including smooth edges and spherical corners.
+ const list=[];
+ for(const tile of dbUnitMesh){
+  const normal=p.rotate(tile.normal),center=p.rotate(tile.mid);
+  if(normal[2]<-.13)continue;
+  let lit=dbClamp(.79+.23*(normal[0]*light[0]+normal[1]*light[1]+normal[2]*light[2]),.58,1.08);
+  const color=dbColor(base.map((v,k)=>{
+    let tinted=v;
+    if(k===2)tinted-=3;
+    const sideMix=dbClamp((normal[0]-.02)/.9,0,1)*.53; tinted=(1-sideMix)*v+sideMix*dbRGB(pal.side)[k];
+    return tinted*lit;
+  }));
+  const points=tile.pts.map(q=>p.project(q));
+  list.push({points,z:center[2],color});
+ }
+ list.sort((a,b)=>a.z-b.z);
+ g.save();g.shadowColor='#03172c85';g.shadowBlur=small?4:12;g.shadowOffsetY=small?1:6;
+ for(const tile of list){
+  g.beginPath();tile.points.forEach((v,i)=>i?g.lineTo(v.x,v.y):g.moveTo(v.x,v.y));g.closePath();g.fillStyle=tile.color;g.fill();
+  // The tiny same-color stroke prevents antialias seams without creating visible grid lines.
+  g.strokeStyle=tile.color;g.lineWidth=.65;g.stroke();
+  g.shadowBlur=0;g.shadowOffsetY=0;
+ }
+ g.restore();
+ // Face decoration is projected onto the actual flat +Z face, not a floating rounded plate.
+ const facing=p.rotate([0,0,1])[2];
+ if(facing>.15){
+  const onFace=(u,v,z=1.008)=>[u,v,z];
+  const outer=dbRoundPath(0,0,.115,.79,(u,v)=>onFace(u,v,1.008));
+  const inner=dbRoundPath(0,0,.10,.745,(u,v)=>onFace(u,v,1.013));
+  const fc=p.project(onFace(-.5,.7)),ft=p.project(onFace(.56,-.76));
+  const fill=g.createLinearGradient(fc.x,fc.y,ft.x,ft.y);fill.addColorStop(0,pal.rim);fill.addColorStop(.52,pal.main);fill.addColorStop(1,dbColor(dbMix(dbRGB(pal.main),dbRGB(pal.side),.22)));
+  dbPolygon3d(outer,p,fill,small?'#f9ffff91':'#f9ffffaf',small?.55:Math.max(.9,size*.007));
+  dbPolygon3d(inner,p,null,pal.accent+'54',small?.6:.85);
+  // Subtle corner jewel kept inside flat face plane.
+  if(!small){const mark=dbRoundPath(0,0,.035,.096,(u,v)=>onFace(.51+u,.51+v,1.015));dbPolygon3d(mark,p,pal.accent,'#ffffff72',.6)}
+  const center=p.project(onFace(0,-.015,1.02));
+  const ink=pal.ink;
+  const labelSize=Math.max(10,size*.55);
+  g.save();g.textAlign='center';g.textBaseline='middle';g.font=`900 ${labelSize}px system-ui,Arial,sans-serif`;
+  g.fillStyle='#ffffff58';g.fillText(String(n),center.x+.65,center.y+1.6);
+  g.fillStyle=ink;g.fillText(String(n),center.x,center.y);
+  g.restore();
+ }
+ // Gentle broad glint follows the surface rather than creating an independent frame.
+ if(!small){const gl=p.project([-.66,.66,1.015]);ellipse(gl.x,gl.y,3.3,2.2,'#ffffff7a')}
+}
+function oldCube(x,y,s,n=face){
  const palette={1:['#d6edff','#55b6f3','#274f9a'],2:['#d9fff3','#74cfb6','#155b5b'],3:['#fff2df','#eabb80','#96602e'],4:['#f1e8ff','#b49bec','#654e9e']};const p=palette[n];
  const skew=s*.17,top=s*.12;g.save();g.shadowColor='#030e2f92';g.shadowBlur=20;g.shadowOffsetY=15;
- shape([[x,y+top],[x+skew,y],[x+s+skew,y+top*.58],[x+s,y+top*1.6]],old?'#7fc5e1':gradient(x,y,0,s,[[0,p[0]],[1,p[1]]]),'#f7ffffb3',2);
- shape([[x+s,y+top*1.6],[x+s+skew,y+top*.58],[x+s+skew,y+s+top*.58],[x+s,y+s+top*1.6]],old?'#3b80b2':p[2],'#c2e7ff7d',2);
- rr(x,y+top*1.55,s,s,old?4:Math.max(12,s*.09));g.fillStyle=old?'#69c2f0':gradient(x,y+top*1.5,s,s,[[0,p[0]],[.66,p[0]],[1,p[1]]]);g.fill();g.strokeStyle=old?'#9eeaff':'#f6fcff';g.lineWidth=old?2.5:Math.max(3,s*.038);g.stroke();g.restore();
- if(!old){rr(x+s*.095,y+top*1.5+s*.095,s*.81,s*.81,s*.08);g.strokeStyle=p[1]+'95';g.lineWidth=Math.max(2,s*.016);g.stroke();rr(x+s*.71,y+top*1.5+s*.075,s*.17,s*.17,s*.06);g.fillStyle=p[1];g.fill();ellipse(x+s*.17,y+top*1.5+s*.13,s*.055,s*.027,'#ffffffbd')}
- text(String(n),x+s*.5,y+top*1.55+s*.57,s*.58,old?'#14344d':p[2],900);
+ shape([[x,y+top],[x+skew,y],[x+s+skew,y+top*.58],[x+s,y+top*1.6]],'#7fc5e1','#f7ffffb3',2);
+ shape([[x+s,y+top*1.6],[x+s+skew,y+top*.58],[x+s+skew,y+s+top*.58],[x+s,y+s+top*1.6]],'#3b80b2','#c2e7ff7d',2);
+ rr(x,y+top*1.55,s,s,4);g.fillStyle='#69c2f0';g.fill();g.strokeStyle='#9eeaff';g.lineWidth=2.5;g.stroke();g.restore();
+ text(String(n),x+s*.5,y+top*1.55+s*.57,s*.58,'#14344d',900)
+}
+function cube(x,y,s,n=face,old=false){
+ if(old)oldCube(x,y,s,n);
+ else dbRoundedCube(x+s*.5,y+s*.56,s,n,0,s<110);
 }
 function wall(x,y,w,h,safe,old=false){
  g.save();g.shadowBlur=20;g.shadowColor='#03081f90';g.shadowOffsetY=9;
@@ -1436,7 +1547,25 @@ function drawSwitch(){floor(88,353,842,87,!improved);const x=282,y=220,w=237,h=7
 function drawMoving(){floor(72,360,877,80,!improved);g.setLineDash([15,10]);line(200,144,822,144,improved?'#9fe9d7b0':'#7faaff9c',4);g.setLineDash([]);text('↔',515,107,70,'#b4f2df',600);wall(266,206,215,154,true,!improved);wall(580,186,160,174,false,!improved)}
 function draw(){
  backdrop();const id=items[pos][0];
- if(id==='player'){floor(195,345,626,95,!improved);shadow(515,331,140);cube(411,75,198,face,!improved)}
+ if(id==='player'){
+    floor(130,345,770,95,!improved);
+    if(improved){
+      const portrait=window.matchMedia&&window.matchMedia('(max-width:710px) and (orientation:portrait)').matches;
+      if(portrait){
+        shadow(425,331,140);dbRoundedCube(425,195,280,face,cubeSpin);
+        shadow(845,323,42);dbRoundedCube(844,263,83,face,cubeSpin,true);
+        text('ゲームサイズ',845,350,19,'#b8d9e9',740);
+      }else{
+        shadow(381,331,122);dbRoundedCube(381,210,196,face,cubeSpin);
+        g.save();g.fillStyle='#071d33aa';rr(642,72,326,261,14);g.fill();g.strokeStyle='#83aecb61';g.lineWidth=1.5;g.stroke();g.restore();
+        text('GAME SIZE / 小さくした場合',804,100,17,'#d0ebf2',750);
+        shadow(753,271,41);dbRoundedCube(752,208,92,face,cubeSpin,true);
+        shadow(890,270,32);dbRoundedCube(889,224,63,face,cubeSpin,true);
+        text('92 px',752,294,16,'#a9d4e2',750);text('63 px',890,294,16,'#a9d4e2',750);
+        text('角・数字・シルエットを比較',806,317,13,'#95c0d1',600);
+      }
+    }else {shadow(515,331,140);oldCube(411,75,198,face)}
+   }
  else if(id==='spike')drawSpikes();else if(id==='ground')drawGround();else if(id==='gap')drawGap();
  else if(id==='safe'||id==='danger'){floor(135,358,761,82,!improved);shadow(520,346);wall(id==='safe'?381:414,id==='safe'?101:79,id==='safe'?277:210,id==='safe'?260:280,id==='safe',!improved)}
  else if(id==='airA'||id==='airB')drawAir(id==='airB');else if(id==='gate')drawGate();else if(id==='platform')drawPlatform();else if(id==='switch')drawSwitch();else if(id==='moving')drawMoving();
@@ -1448,15 +1577,33 @@ function refresh(){const i=items[pos];$('dbName').textContent=i[1];$('dbEnglish'
  $('dbBackground').textContent=ruins?'背景：遺跡':'背景：単色';$('dbModeLabel').textContent=improved?'改良デザイン案（仮）':'旧デザイン風（比較用）';
  try{$('dbMemo').value=localStorage.getItem(memoKey(pos))||''}catch{$('dbMemo').value=''};
  for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
- $('dbRotate').disabled=false;draw();}
+ $('dbRotate').disabled=!!cubeRoll;const viewText=['正面寄り','斜め','側面寄り'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!(items[pos][0]==='player'&&improved);draw();}
 function select(n){pos=(n+items.length)%items.length;refresh()}
 for(let i=0;i<items.length;i++){const b=document.createElement('button');b.type='button';b.className='db-cat';b.innerHTML=`<small>${String(i+1).padStart(2,'0')}</small><span>${items[i][1]}</span>`;b.onclick=()=>select(i);$('dbCategories').appendChild(b)}
-for(let d=1;d<=4;d++){const b=document.createElement('button');b.type='button';b.className='db-digit';b.dataset.digit=String(d);b.textContent=d;b.onclick=()=>{face=d;refresh()};$('dbDigits').appendChild(b)}
-$('dbNew').onclick=()=>{improved=true;refresh()};$('dbOld').onclick=()=>{improved=false;refresh()};$('dbBackground').onclick=()=>{ruins=!ruins;refresh()};$('dbRotate').onclick=()=>{face=face%4+1;refresh()};
+for(let d=1;d<=4;d++){const b=document.createElement('button');b.type='button';b.className='db-digit';b.dataset.digit=String(d);b.textContent=d;b.onclick=()=>{cubeRoll=null;cubeSpin=0;cubeTurns=0;face=d;refresh()};$('dbDigits').appendChild(b)}
+$('dbNew').onclick=()=>{improved=true;refresh()};$('dbOld').onclick=()=>{improved=false;refresh()};$('dbBackground').onclick=()=>{ruins=!ruins;refresh()};
+$('dbView').onclick=()=>{cameraView=(cameraView+1)%3;refresh()};
+$('dbRotate').onclick=()=>{
+ if(cubeRoll)return;
+ if(items[pos][0]!=='player'||!improved){face=face%4+1;refresh();return}
+ const next=face%4+1,starting=cubeSpin,duration=650;
+ cubeRoll={start:performance.now(),from:face,to:next};$('dbRotate').disabled=true;
+ function tick(now){
+  if(!cubeRoll)return;
+  const t=Math.min(1,(now-cubeRoll.start)/duration);const eased=t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2;
+  cubeSpin=starting+eased*Math.PI/2;
+  if(t>=.53)face=next;
+  for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
+  draw();
+  if(t<1)requestAnimationFrame(tick);
+  else{face=next;cubeRoll=null;cubeTurns++;cubeSpin=(cubeTurns%4)*Math.PI/2;refresh()}
+ }
+ requestAnimationFrame(tick);
+};
 $('dbPrevious').onclick=()=>select(pos-1);$('dbNext').onclick=()=>select(pos+1);$('dbMemo').addEventListener('input',()=>{try{localStorage.setItem(memoKey(pos),$('dbMemo').value)}catch{}});
 $('dbBack').onclick=()=>window.__NRUI.showScreen('home');
 refresh();
-window.__NRDesign={select,rotate:()=>$('dbRotate').click(),get:()=>({id:items[pos][0],face,improved,ruins,count:items.length})};
+window.__NRDesign={select,rotate:()=>$('dbRotate').click(),get:()=>({id:items[pos][0],face,improved,ruins,cameraView,spin:cubeSpin,animating:!!cubeRoll,count:items.length})};
 })();
 /* === TEMP DESIGN PREVIEW BOOK END === */
 
