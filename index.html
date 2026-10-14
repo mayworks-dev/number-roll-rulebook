@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — UI Alpha Ver.2.0</title>
+<title>NUMBER ROLL — UI Alpha Ver.2.1 · Design Preview Book</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -169,7 +169,31 @@ body.motion-reduced .front-button,body.motion-reduced .door,body.motion-reduced 
  .door-page-controls .front-button{min-height:26px;padding:2px 10px}
  .door-footnote{font-size:9px;line-height:1.25}
 }
-body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidden]{display:none!important} .mode-story #app .result-actions #resultHome{display:inline-flex!important}</style>
+body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidden]{display:none!important} .mode-story #app .result-actions #resultHome{display:inline-flex!important}/* === TEMP DESIGN PREVIEW BOOK START: removable as one feature === */
+#designBookScreen{max-width:1180px;justify-content:flex-start;gap:10px;padding-top:max(12px,env(safe-area-inset-top));padding-bottom:max(12px,env(safe-area-inset-bottom))}
+.db-titlebar{display:flex;justify-content:space-between;align-items:center;gap:10px}
+.db-back{min-width:105px}.db-head{text-align:center;flex:1;min-width:0}.db-kicker{font-size:10px;letter-spacing:.2em;color:#a4c6df}.db-head h2{font-size:clamp(18px,3vw,28px);margin:2px 0;font-weight:900;letter-spacing:.075em}.db-temporary{border:1px solid #a6d8c573;color:#bbefdf;padding:6px 10px;font-size:10px;border-radius:999px;background:#1539509c;white-space:nowrap}
+.db-shell{display:grid;grid-template-columns:185px minmax(0,1fr);gap:12px;min-height:0;flex:1}
+.db-categories{border-radius:16px;padding:10px;display:flex;flex-direction:column;gap:6px;min-height:0;overflow:auto;overscroll-behavior:contain;touch-action:pan-y;scrollbar-width:thin}
+.db-categories-title{font-size:10px;color:#b5d2e6;letter-spacing:.13em;font-weight:850;padding:3px 5px 6px}.db-cat{border:1px solid #52718d78;border-radius:10px;background:#102944b5;color:#d6e8f5;text-align:left;padding:9px 9px;display:flex;align-items:center;gap:10px;min-height:40px;font-size:12px;font-weight:750;line-height:1.2}
+.db-cat small{display:inline-grid;place-items:center;width:25px;min-width:25px;height:24px;background:#23425c;color:#a8cadb;border-radius:6px;font-weight:900;font-size:10px}.db-cat.active{color:#d9fff4;border-color:#7cdbc2;background:#2d716b7a;box-shadow:inset 0 0 0 1px #82dfbb45}.db-cat.active small{background:#87e2c7;color:#174b58}.db-cat:active{transform:scale(.99)}
+.db-content{min-width:0;display:flex;flex-direction:column;gap:9px}
+.db-preview{position:relative;border:1px solid #7aabcf70;border-radius:18px;background:#122740;overflow:hidden;box-shadow:inset 0 1px #ffffff15,0 10px 30px #06142680}
+#designCanvas{display:block;width:100%;height:auto;aspect-ratio:1024/440;touch-action:pan-y}
+.db-preview-label{position:absolute;top:12px;left:14px;pointer-events:none;display:flex;gap:5px;align-items:center;font-size:10px;letter-spacing:.15em;font-weight:900;color:#d5eaf5;text-shadow:0 1px 8px #061225}
+.db-preview-label span{width:7px;height:7px;background:#80dec8;border-radius:50%;box-shadow:0 0 10px #80dec8}
+.db-preview-pill{position:absolute;right:12px;top:11px;border:1px solid #90b9dd60;border-radius:999px;background:#091d34bb;color:#d0e2ef;padding:5px 9px;font-size:10px;pointer-events:none}
+.db-toolbar{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+.db-tool{background:#203b5b;border:1px solid #6b90ab94;border-radius:9px;color:#e1f3fb;padding:9px 12px;min-height:36px;font-size:12px;font-weight:740}.db-tool.active{background:#397972a6;border-color:#8fe8cb;color:#dffff1}.db-tool:active{transform:translateY(1px)}
+.db-titles{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.db-nameline h3{font-size:clamp(17px,2.5vw,24px);margin:0}.db-nameline small{font-size:10px;color:#9cbcd3;font-weight:750;letter-spacing:.11em}.db-description{color:#d0e1eb;font-size:12px;line-height:1.6;margin:4px 0 0}.db-status{border:1px solid #7bd2c680;background:#123e45b3;color:#aef4da;border-radius:10px;padding:7px 9px;white-space:nowrap;font-size:10px;font-weight:850}
+.db-extras{display:flex;gap:12px;flex-wrap:wrap;align-items:center;background:#0c1c31ae;border:1px solid #507b9c5e;border-radius:12px;padding:10px 12px}.db-extras label{font-size:11px;font-weight:750;color:#bdd7e6}.db-digits{display:flex;gap:6px}.db-digit{width:36px;height:34px;border-radius:8px;border:1px solid #66859f;background:#1b3554;color:#deeffb;font-weight:900}.db-digit[aria-pressed=true]{background:#8de3cb;color:#173f51;border-color:#cefff2}.db-hint{font-size:10px;color:#a7c2d3}
+.db-notes{border-top:1px solid #6686a145;padding-top:8px;display:flex;flex-direction:column;gap:5px}.db-notes label{font-size:11px;font-weight:800;color:#c1d9ec}.db-notes textarea{display:block;width:100%;min-height:48px;resize:vertical;border:1px solid #658aaa82;border-radius:10px;background:#07172ab0;color:#eef8ff;font:12px system-ui,sans-serif;padding:9px 11px;user-select:text;-webkit-user-select:text;touch-action:pan-y}.db-notes small{color:#8db4c8;font-size:10px}
+.db-footer{display:flex;justify-content:space-between;gap:9px;align-items:center;color:#a4c2d5;font-size:11px}.db-footer .db-tool{min-width:120px}
+@media(max-width:710px){#designBookScreen{gap:7px;padding-left:9px;padding-right:9px}.db-shell{grid-template-columns:1fr;gap:7px;flex:none}.db-categories{display:flex;flex-direction:row;gap:5px;padding:7px;overflow-x:auto;overflow-y:hidden;min-height:52px}.db-categories-title{display:none}.db-cat{min-height:35px;flex:0 0 auto;padding:6px 9px;white-space:nowrap;font-size:11px}.db-cat small{width:19px;min-width:19px;height:20px;font-size:9px}.db-preview{border-radius:12px}.db-preview-label{top:8px;left:9px;font-size:8px}.db-preview-pill{font-size:8px;top:6px;right:7px}.db-description{font-size:11px}.db-nameline h3{font-size:18px}.db-tool{font-size:11px;padding:7px 10px;min-height:32px}.db-head h2{font-size:18px}.db-temporary{font-size:9px;padding:5px 7px}.db-back{min-width:64px;padding:6px 9px;font-size:11px}.db-status{font-size:9px;white-space:normal}}
+@media(max-height:520px) and (orientation:landscape){#designBookScreen{gap:5px;min-height:100dvh;justify-content:flex-start}.db-shell{grid-template-columns:153px minmax(0,1fr);flex:1;gap:7px}.db-categories{display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;padding:5px}.db-cat{white-space:normal;font-size:10px;min-height:31px;padding:4px 6px}.db-content{gap:5px}.db-preview{max-width:590px;align-self:center;width:100%}#designCanvas{aspect-ratio:1024/440}.db-titles{align-items:center}.db-description{font-size:10px;margin:1px 0}.db-extras{padding:4px 7px}.db-notes{padding-top:4px}.db-notes textarea{min-height:36px}.db-footer .db-tool{min-width:80px}.db-footer{font-size:9px}.db-titlebar .db-head h2{font-size:17px}}
+/* === TEMP DESIGN PREVIEW BOOK END === */
+
+</style>
 </head>
 <body>
 <main id="app">
@@ -247,7 +271,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
     <div class="front-title">NUMBER <span>ROLL</span></div>
     <p class="front-sub" id="homeSubtitle">数字で、道をひらく。</p>
     <div class="home-cube" aria-hidden="true"><div class="cube-face">3</div></div>
-    <div class="home-actions"><button type="button" id="homePlay" class="front-button main">▶　PLAY</button><div class="home-actions-row"><button type="button" id="homeDoors" class="front-button">▤　STAGES</button><button type="button" id="homeSettings" class="front-button">⚙　SETTINGS</button></div><button type="button" id="homePractice" class="front-button">◇　障害物の練習（51種類）</button></div>
+    <div class="home-actions"><button type="button" id="homePlay" class="front-button main">▶　PLAY</button><div class="home-actions-row"><button type="button" id="homeDoors" class="front-button">▤　STAGES</button><button type="button" id="homeSettings" class="front-button">⚙　SETTINGS</button></div><button type="button" id="homePractice" class="front-button">◇　障害物の練習（51種類）</button><button type="button" id="homeDesign" class="front-button" style="border-color:#82ccb592;background:#1c4b52a6">✧　デザイン確認ブック（仮設）</button></div>
     <div class="home-trial">UI試作版 · 体験ステージ8個 · ステージ内容は仮構成</div>
   </section>
   <section id="doorsScreen" class="front-screen doors-screen" hidden>
@@ -268,6 +292,34 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
     </div>
     <div class="setting-note" style="max-width:630px">※ 音楽・効果音は試作用の簡易音です。正式な楽曲や各画面の翻訳は今後追加します。音の再生には最初のタップが必要です。</div>
   </section>
+<!-- === TEMP DESIGN PREVIEW BOOK START. Remove this section and its CSS/JS when final game is ready. === -->
+<section id="designBookScreen" class="front-screen db-screen" hidden aria-label="仮設デザイン確認ブック">
+  <div class="db-titlebar">
+    <button type="button" id="dbBack" class="front-button db-back">‹ HOME</button>
+    <div class="db-head"><div class="db-kicker">NUMBER ROLL · WORK IN PROGRESS</div><h2>デザイン確認ブック</h2></div>
+    <div class="db-temporary">仮設 / 後で削除</div>
+  </div>
+  <div class="db-shell">
+    <nav class="db-categories glass" id="dbCategories" aria-label="デザイン確認対象"></nav>
+    <div class="db-content">
+      <div class="db-titles"><div class="db-nameline"><h3 id="dbName">プレイヤー</h3><small id="dbEnglish">PLAYER CUBE</small><p class="db-description" id="dbDescription">見た目の比較と確認ができます。</p></div><div class="db-status" id="dbCounter">01 / 12</div></div>
+      <div class="db-preview">
+        <canvas id="designCanvas" width="1024" height="440" aria-label="選択したパーツのプレビュー"></canvas>
+        <div class="db-preview-label"><span></span> VISUAL TEST / NOT GAMEPLAY</div>
+        <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
+      </div>
+      <div class="db-toolbar">
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ 改良デザイン案</button>
+        <button id="dbOld" type="button" class="db-tool" aria-pressed="false">□ 旧デザイン風</button>
+        <button id="dbBackground" type="button" class="db-tool">背景：遺跡</button>
+      </div>
+      <div class="db-extras"><label>表示する数字</label><div class="db-digits" id="dbDigits"></div><button type="button" id="dbRotate" class="db-tool">↻ 90°回転</button><span class="db-hint">※ ここは見た目の確認用。ゲームの動作には影響しません。</span></div>
+      <div class="db-notes"><label for="dbMemo">改善メモ（このパーツだけに保存）</label><textarea id="dbMemo" placeholder="例：光を弱く、角を少し丸く、数字を大きく…" rows="2"></textarea><small>メモはこのブラウザ内に仮保存。公開版のゲームには影響しません。</small></div>
+      <div class="db-footer"><button type="button" id="dbPrevious" class="db-tool">◀ 前のパーツ</button><span>完成デザインではなく比較・調整用の仮置き</span><button type="button" id="dbNext" class="db-tool">次のパーツ ▶</button></div>
+    </div>
+  </div>
+</section>
+<!-- === TEMP DESIGN PREVIEW BOOK END === -->
 </div>
 
 <script>
@@ -1231,7 +1283,7 @@ function showScreen(name){
  if(uiMode==='story'&&state?.status==='running'){state.status='paused';last=0;}
  uiMode=name;
  $front.hidden=name==='story'||name==='practice';
- $('homeScreen').hidden=name!=='home';$('doorsScreen').hidden=name!=='doors';$('settingsScreen').hidden=name!=='settings';
+ $('homeScreen').hidden=name!=='home';$('doorsScreen').hidden=name!=='doors';$('settingsScreen').hidden=name!=='settings';$('designBookScreen').hidden=name!=='design';
  document.body.classList.toggle('mode-story',name==='story');document.body.classList.toggle('mode-practice',name==='practice');
  $('app').hidden=name!=='story'&&name!=='practice';
  if(name==='doors')renderDoors();
@@ -1250,6 +1302,7 @@ $('homePlay').onclick=()=>{audioReady();playStory(Math.min(STORY_INDEX.length,un
 $('homeDoors').onclick=()=>{audioReady();showScreen('doors')};
 $('homeSettings').onclick=()=>openSettings('home');
 $('homePractice').onclick=()=>{audioReady();showScreen('practice')};
+$('homeDesign').onclick=()=>showScreen('design');
 $('doorsBack').onclick=()=>showScreen('home');
 $('settingsBack').onclick=()=>showScreen(screenBeforeSettings);
 $('doorsPrev').onclick=()=>{doorPage=Math.max(0,doorPage-1);renderDoors()};
@@ -1260,6 +1313,7 @@ $('languageSelect').addEventListener('change',e=>{settings.lang=e.target.value;s
 function updateMenuLanguage(){
  const en=settings.lang==='en';$('homeSubtitle').textContent=en?'Roll. Count. Reach the flag.':'数字で、道をひらく。';
  $('homePractice').textContent=en?'◇  OBSTACLE PRACTICE (51)':'◇　障害物の練習（51種類）';
+ $('homeDesign').textContent=en?'✧  DESIGN PREVIEW BOOK (TEMP)':'✧　デザイン確認ブック（仮設）';
  $('doorsScreen').querySelector('.doors-intro').textContent=en?'Open doors are cleared. The glowing door is next.':'開いた扉はクリア済み。光る扉から次に挑戦。';
  $('settingsBack').textContent=en?'‹  BACK':'‹　戻る';
 }
@@ -1275,6 +1329,137 @@ window.__NRUI={showScreen,playStory,get:()=>({mode:uiMode,storyNumber,unlocked:u
 window.__NRBook={version:'2.0-ui',page:n=>setPage(n),start,jump,step:update,get:()=>({...state,index:idx,goal,obstacles:objs,completed:[...cleared]}),setSilent:v=>silent=!!v,wallSettings:()=>wallSettings.map(v=>({...v})),spikeCount:()=>idx<4?spikeCounts[idx]:null,changeSpikeCount,changeWall,restoreWall,gapSettings:()=>gapSettings.slice(),changeGap,restoreGap,airCount:()=>airEntries.length,numberSettings:()=>numberSettings.map(v=>({...v})),changeNumber,restoreNumber,platformSettings:()=>platformSettings.map(v=>({...v})),changePlatform,restorePlatform,switchSettings:()=>switchSettings.map(v=>({...v})),changeSwitchTime,restoreSwitchTime,motionSettings:()=>motionSettings.map(v=>({...v})),changeMotion,restoreMotion};
 new ResizeObserver(resize).observe(stage);progress();setPage(window.location.hash==='#gap'?22:window.location.hash==='#air'?26:window.location.hash==='#number'?30:window.location.hash==='#platform'?34:window.location.hash==='#switch'?38:window.location.hash==='#motion'?41:window.location.hash==='#combo'?45:0);requestAnimationFrame(loop);
 })();
+</script>
+<script>
+/* === TEMP DESIGN PREVIEW BOOK START; remove together with matching CSS/HTML markers. === */
+(()=>{
+'use strict';
+const items=[
+ ['player','プレイヤー','PLAYER CUBE','丸角・大きな数字・面色の違い・軽い立体感を確認。'],
+ ['spike','地上トゲ','CRYSTAL SPIKES','危険を一目で判断できる結晶形のトゲ。先端はシャープに。'],
+ ['ground','地面・石床','RUIN STONE FLOOR','床の高さが読み取りやすい石積みと、控えめな苔のライン。'],
+ ['gap','穴・側壁','GAP / SIDE WALL','穴の位置と危険な側壁を、装飾に埋もれず判別できるように。'],
+ ['safe','青壁・安全','LANDABLE WALL','上面だけ安全。ミントの着地ラインと石の装飾を確認。'],
+ ['danger','赤壁・危険','HAZARDOUS WALL','全方向危険。赤い縁・警告模様・本体の質感。'],
+ ['airA','空中トゲA','AIR SPIKES / DANGER','上・横・下のすべてが危険な浮遊結晶。'],
+ ['airB','空中トゲB','AIR SPIKES / LANDABLE TOP','緑色の上面に着地OK。横と下は危険と分かる見た目。'],
+ ['gate','数字の壁','NUMBER GATE','数字一致で通過。赤い部分は常に危険な認証ゲート。'],
+ ['platform','数字足場','NUMBER PLATFORM','指定の数字で上から着地。側面・下面は危険。下抜け可能。'],
+ ['switch','数字スイッチ','NUMBER SWITCH','指定数字で触れると対応する仕掛けが作動する。'],
+ ['moving','移動する壁','MOVING WALLS','青と赤の区別を維持したまま、移動方向がわかる。']
+];
+let pos=0,face=1,improved=true,ruins=true;
+const cn=document.getElementById('designCanvas'),g=cn.getContext('2d');
+const $=id=>document.getElementById(id);
+const memoKey=i=>'nr_preview_notes_21_'+items[i][0];
+function rr(x,y,w,h,r){const q=Math.min(r,w/2,h/2);g.beginPath();g.moveTo(x+q,y);g.lineTo(x+w-q,y);g.quadraticCurveTo(x+w,y,x+w,y+q);g.lineTo(x+w,y+h-q);g.quadraticCurveTo(x+w,y+h,x+w-q,y+h);g.lineTo(x+q,y+h);g.quadraticCurveTo(x,y+h,x,y+h-q);g.lineTo(x,y+q);g.quadraticCurveTo(x,y,x+q,y);g.closePath()}
+function gradient(x,y,w,h,colors){let a=g.createLinearGradient(x,y,x+w,y+h);colors.forEach(([v,c])=>a.addColorStop(v,c));return a}
+function shape(points,fill,stroke=null,lw=1){g.beginPath();points.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]));g.closePath();if(fill){g.fillStyle=fill;g.fill()}if(stroke){g.strokeStyle=stroke;g.lineWidth=lw;g.stroke()}}
+function ellipse(x,y,rx,ry,color){g.fillStyle=color;g.beginPath();g.ellipse(x,y,rx,ry,0,0,Math.PI*2);g.fill()}
+function line(x1,y1,x2,y2,color,width=2){g.beginPath();g.moveTo(x1,y1);g.lineTo(x2,y2);g.strokeStyle=color;g.lineWidth=width;g.stroke()}
+function text(v,x,y,size=20,color='#ebf6ff',weight=700){g.font=`${weight} ${size}px system-ui,Arial,sans-serif`;g.fillStyle=color;g.textAlign='center';g.textBaseline='middle';g.fillText(v,x,y)}
+function backdrop(){
+ const w=1024,h=440;g.clearRect(0,0,w,h);
+ g.fillStyle=ruins?gradient(0,0,0,h,[[0,'#152946'],[.47,'#344f76'],[1,'#6a7798']]):gradient(0,0,0,h,[[0,'#11283f'],[1,'#264863']]);g.fillRect(0,0,w,h);
+ if(ruins){
+  ellipse(790,111,78,78,'#b3c1ef26');
+  for(let j=0;j<18;j++){const x=(j*173+83)%1024,y=26+(j*89)%183;ellipse(x,y,(j%3===0?2:1.2),(j%3===0?2:1.2),'#bde8f45b')}
+  function island(x,y,s){g.save();g.translate(x,y);g.scale(s,s);shape([[0,0],[154,0],[143,37],[112,62],[104,78],[85,43],[55,66],[36,25],[11,30]],'#182c4bc9');g.fillStyle='#486687bd';g.fillRect(10,-5,137,9);for(let i=0;i<4;i++){g.fillStyle='#273f5e';g.fillRect(15+i*30,-35-((i%2)*15),22,32+(i%2)*15)}g.restore()}
+  island(85,209,.95);island(816,218,1.3);island(410,144,.42);
+  for(const [x,y] of [[171,182],[905,216]]){line(x,y,x-10,440,'#b5dcff20',8);line(x+3,y,x-8,440,'#b3ecf822',2)}
+  for(let i=0;i<7;i++)ellipse(75+i*151,422+(i%2)*10,130,39,'#98b3d51c');
+ }
+ g.fillStyle='#08162924';g.fillRect(0,0,w,h);
+}
+function shadow(x,y,rx=120){ellipse(x,y,rx,16,'#02152579');ellipse(x,y+3,rx*.71,6,'#66dbd021')}
+function stoneTile(x,y,w,h,old=false){
+ g.fillStyle=old?'#243c57':gradient(x,y,w,h,[[0,'#486687'],[.40,'#293f60'],[1,'#182d49']]);rr(x,y,w,h,7);g.fill();g.strokeStyle=old?'#708ca6':'#7891aa91';g.lineWidth=2;g.stroke();
+ if(!old){line(x+7,y+5,x+w-7,y+5,'#95a8c045',2);line(x+6,y+h-5,x+w-7,y+h-5,'#0d233e87',3);g.strokeStyle='#94a9c22b';g.lineWidth=1;g.beginPath();g.moveTo(x+w*.43,y+4);g.lineTo(x+w*.35,y+h*.24);g.lineTo(x+w*.53,y+h*.43);g.stroke()}
+}
+function floor(x,y,w,h=100,old=false){
+ g.fillStyle='#14243e';g.fillRect(x,y,w,h);
+ for(let layer=0;layer<Math.ceil(h/45);layer++){const yy=y+layer*45;for(let xx=x-(layer%2)*38;xx<x+w;xx+=78){stoneTile(xx+2,yy+2,74,41,old)}}
+ if(!old){g.fillStyle=gradient(x,y,0,12,[[0,'#b4f8dd'],[.45,'#86dab8'],[1,'#386b72']]);rr(x,y-4,w,12,5);g.fill();line(x+9,y+2,x+w-10,y+2,'#d4ffef9c',2);for(let k=0;k<Math.min(9,Math.round(w/74));k++){const cx=x+(k*81+31)%Math.max(w,1);ellipse(cx,y+3,7+(k%3)*2,3,'#397b6e')}}else{g.fillStyle='#57c4ed';g.fillRect(x,y-3,w,4)}
+}
+function facetSpike(x,bottom,w,h,old=false,down=false){
+ const tipY=down?bottom+h:bottom-h,rootY=bottom;
+ if(old){shape([[x,rootY],[x+w/2,tipY],[x+w,rootY]],'#f15c72','#ff91aa',3);return}
+ g.save();g.shadowColor='#ff657e80';g.shadowBlur=12;shape([[x,rootY],[x+w*.18,rootY-h*(down?-1:1)*.28],[x+w*.48,tipY],[x+w*.83,rootY-h*(down?-1:1)*.18],[x+w,rootY]],gradient(x,tipY,w,bottom-tipY,[[0,'#ffb5b2'],[1,'#b83c61']]),'#ffabb9',2.5);g.restore();
+ shape([[x+w*.48,tipY],[x+w*.47,rootY],[x+w*.16,rootY]],'#ffd5cd72');shape([[x+w*.48,tipY],[x+w*.85,rootY],[x+w*.47,rootY]],'#963159a9');line(x+w*.48,tipY+Math.sign(rootY-tipY)*8,x+w*.47,rootY-6,'#ffdae0a0',1.5)
+}
+function spikeBase(x,y,w,old=false){stoneTile(x,y,w,26,old);if(!old){for(let a=0;a<w-12;a+=16)line(x+a+5,y+21,x+a+10,y+21,'#ffb69b78',1)}}
+function drawSpikes(){floor(120,333,780,107,!improved);const y=333;spikeBase(331,y-18,338,!improved);for(let n=0;n<4;n++)facetSpike(341+n*82,y-19,73,n===1?146:106,!improved)}
+function cube(x,y,s,n=face,old=false){
+ const palette={1:['#d6edff','#55b6f3','#274f9a'],2:['#d9fff3','#74cfb6','#155b5b'],3:['#fff2df','#eabb80','#96602e'],4:['#f1e8ff','#b49bec','#654e9e']};const p=palette[n];
+ const skew=s*.17,top=s*.12;g.save();g.shadowColor='#030e2f92';g.shadowBlur=20;g.shadowOffsetY=15;
+ shape([[x,y+top],[x+skew,y],[x+s+skew,y+top*.58],[x+s,y+top*1.6]],old?'#7fc5e1':gradient(x,y,0,s,[[0,p[0]],[1,p[1]]]),'#f7ffffb3',2);
+ shape([[x+s,y+top*1.6],[x+s+skew,y+top*.58],[x+s+skew,y+s+top*.58],[x+s,y+s+top*1.6]],old?'#3b80b2':p[2],'#c2e7ff7d',2);
+ rr(x,y+top*1.55,s,s,old?4:Math.max(12,s*.09));g.fillStyle=old?'#69c2f0':gradient(x,y+top*1.5,s,s,[[0,p[0]],[.66,p[0]],[1,p[1]]]);g.fill();g.strokeStyle=old?'#9eeaff':'#f6fcff';g.lineWidth=old?2.5:Math.max(3,s*.038);g.stroke();g.restore();
+ if(!old){rr(x+s*.095,y+top*1.5+s*.095,s*.81,s*.81,s*.08);g.strokeStyle=p[1]+'95';g.lineWidth=Math.max(2,s*.016);g.stroke();rr(x+s*.71,y+top*1.5+s*.075,s*.17,s*.17,s*.06);g.fillStyle=p[1];g.fill();ellipse(x+s*.17,y+top*1.5+s*.13,s*.055,s*.027,'#ffffffbd')}
+ text(String(n),x+s*.5,y+top*1.55+s*.57,s*.58,old?'#14344d':p[2],900);
+}
+function wall(x,y,w,h,safe,old=false){
+ g.save();g.shadowBlur=20;g.shadowColor='#03081f90';g.shadowOffsetY=9;
+ if(old){g.fillStyle=safe?'#28546a':'#6b3044';g.fillRect(x,y,w,h);g.lineWidth=4;g.strokeStyle=safe?'#70cef4':'#ff6883';g.strokeRect(x,y,w,h);if(safe){g.fillStyle='#94e5b3';g.fillRect(x,y,w,7)}g.restore();return}
+ const back=safe?'#2d4668':'#632e49',edge=safe?'#b4f7e0':'#ff9aa4';
+ g.fillStyle=gradient(x,y,w,h,[[0,safe?'#516e8b':'#91425b'],[.38,back],[1,safe?'#1d3152':'#351e3c']]);rr(x,y,w,h,8);g.fill();g.strokeStyle=edge+'a8';g.lineWidth=3;g.stroke();g.restore();
+ for(let row=1;row<4;row++)line(x+12,y+(h-8)/4*row,x+w-12,y+(h-8)/4*row,safe?'#748da54b':'#cf698454',2);
+ for(let row=0;row<4;row++){const xx=x+(row%2?0:w*.5);line(xx,y+row*h/4+4,xx,y+(row+1)*h/4-4,safe?'#89a4b24a':'#e7819b38',2)}
+ if(safe){g.save();g.shadowBlur=9;g.shadowColor='#69e3c8';g.fillStyle=gradient(x,y,0,12,[[0,'#d2fff0'],[.9,'#69ccb6']]);rr(x-1,y-4,w+2,12,5);g.fill();g.restore();for(let k=0;k<4;k++){line(x+w*.15+k*(w*.2),y+38,x+w*.15+k*(w*.2),y+52,'#a6d3e052',3)}
+ }else{
+  g.save();g.shadowBlur=12;g.shadowColor='#ff7185';g.strokeStyle='#fe858f';g.lineWidth=4;rr(x+8,y+8,w-16,h-16,5);g.stroke();g.restore();
+  for(let i=0;i<Math.floor(w/33);i++){const xx=x+i*33+4;shape([[xx,y+8],[xx+13,y+8],[xx+24,y+23],[xx+11,y+23]],'#ff9c9b8a')}
+  for(let i=0;i<Math.floor(w/33);i++){const xx=x+i*33+4;shape([[xx,y+h-23],[xx+13,y+h-23],[xx+24,y+h-8],[xx+11,y+h-8]],'#ff9c9b75')}
+  g.strokeStyle='#ffb9b5';g.lineWidth=7;line(x+w*.35,y+h*.44,x+w*.65,y+h*.65,'#ffadac',7);line(x+w*.65,y+h*.44,x+w*.35,y+h*.65,'#ffadac',7)
+ }
+}
+function drawGround(){floor(150,265,728,175,!improved);if(!improved)return;for(let i=0;i<4;i++){line(220+i*150,304,239+i*150,303,'#83a6b867',3)}text('安全な着地点が分かる、薄いミントの縁',505,220,18,'#c5e9e7',650)}
+function drawGap(){floor(66,255,350,185,!improved);floor(672,255,285,185,!improved);if(improved){line(415,260,415,430,'#ff9ba685',5);line(671,260,671,430,'#ff9ba685',5);for(let y=275;y<425;y+=21){line(413,y,421,y+8,'#ffd0bf83',2);line(668,y,660,y+8,'#ffd0bf83',2)}}else{line(417,255,417,440,'#ff7085',3);line(671,255,671,440,'#ff7085',3)}ellipse(544,416,90,13,'#121a37ac');cube(252,137,74,face,!improved);g.setLineDash([9,12]);g.beginPath();g.moveTo(340,180);g.quadraticCurveTo(515,38,733,202);g.strokeStyle='#b6ffe4ad';g.lineWidth=3;g.stroke();g.setLineDash([])}
+function drawAir(safe){floor(105,359,815,81,!improved);shadow(533,325,120);if(!safe){spikeBase(348,132,326,!improved);for(let i=0;i<3;i++){facetSpike(354+i*106,158,100,107,!improved,true);facetSpike(354+i*106,132,100,50,!improved,false)}}else{
+  wall(356,132,312,40,true,!improved);if(improved){for(let i=0;i<3;i++){facetSpike(367+i*102,176,94,112,false,true)}line(374,126,646,126,'#bbffe6',3)}else{for(let i=0;i<3;i++)facetSpike(365+i*104,174,94,110,true,true)}
+ }}
+function drawGate(){floor(190,361,655,79,!improved);
+ const x=454,y=28,w=135,h=335;g.save();g.shadowBlur=20;g.shadowColor='#a67cff6b';g.fillStyle=improved?'#6e56a78a':'#595fa6a0';rr(x,y,w,h,12);g.fill();g.shadowBlur=0;g.strokeStyle='#bda5fe';g.lineWidth=4;g.stroke();g.restore();
+ if(improved){g.strokeStyle='#dbc0ff80';g.lineWidth=2;rr(x+18,y+24,w-36,h-48,7);g.stroke();for(let yy=75;yy<335;yy+=37){g.save();g.translate(x+23,yy);g.rotate(Math.PI/4);g.strokeStyle='#c6b1f4b0';g.lineWidth=2;g.strokeRect(0,0,9,9);g.restore()}}
+ text(String(face),x+w/2,y+174,114,'#f8ebff',950);
+ wall(x,y,w,93,false,!improved);wall(x,y+277,w,59,false,!improved);cube(265,273,78,face,!improved);
+}
+function drawPlatform(){floor(105,359,815,81,!improved);shadow(524,315,205);
+ const x=367,y=172,w=291,h=112;g.save();g.shadowColor='#101c39b6';g.shadowBlur=17;g.shadowOffsetY=14;
+ if(improved){g.fillStyle=gradient(x,y,w,h,[[0,'#8f76cf'],[1,'#3d315f']]);rr(x,y,w,h,12);g.fill();g.strokeStyle='#c6b9ef';g.lineWidth=3;g.stroke()}else{g.fillStyle='#303d71';g.fillRect(x,y,w,h);g.strokeStyle='#a680e1';g.lineWidth=3;g.strokeRect(x,y,w,h)}g.restore();
+ if(improved){for(let i=0;i<6;i++)facetSpike(x+i*47+5,y+h+3,41,19,false,true);rr(x+11,y+6,w-22,24,9);g.fillStyle='#aff8da';g.fill();line(x+22,y+14,x+w-24,y+14,'#e8fff9',3);line(x+14,y+h-15,x+w-14,y+h-15,'#f48d9a',3)}else{line(x,y,x+w,y,'#8beac5',8)}
+ text(String(face),x+w/2,y+72,73,'#e8e3ff',950);}
+function drawSwitch(){floor(88,353,842,87,!improved);const x=282,y=220,w=237,h=75;
+ if(improved){g.save();g.shadowColor='#ad98ff80';g.shadowBlur=22;g.fillStyle=gradient(x,y,w,h,[[0,'#7388b2'],[1,'#35436c']]);rr(x,y,w,h,19);g.fill();g.strokeStyle='#a3b9de';g.lineWidth=3;g.stroke();g.restore();g.strokeStyle='#bea1fc';g.lineWidth=10;g.beginPath();g.ellipse(x+w/2,y+20,89,31,0,0,2*Math.PI);g.stroke();g.strokeStyle='#f2dfff';g.lineWidth=2;g.stroke()}else{wall(x,y,w,h,true,true)}
+ text(String(face),x+w/2,y+21,42,'#ece1ff',950);
+ const xx=722;wall(xx,153,90,200,false,!improved);g.setLineDash([10,10]);line(518,245,703,245,'#c4a3ffb3',4);g.setLineDash([]);text('→',612,221,32,'#b6e5ef',800);}
+function drawMoving(){floor(72,360,877,80,!improved);g.setLineDash([15,10]);line(200,144,822,144,improved?'#9fe9d7b0':'#7faaff9c',4);g.setLineDash([]);text('↔',515,107,70,'#b4f2df',600);wall(266,206,215,154,true,!improved);wall(580,186,160,174,false,!improved)}
+function draw(){
+ backdrop();const id=items[pos][0];
+ if(id==='player'){floor(195,345,626,95,!improved);shadow(515,331,140);cube(411,75,198,face,!improved)}
+ else if(id==='spike')drawSpikes();else if(id==='ground')drawGround();else if(id==='gap')drawGap();
+ else if(id==='safe'||id==='danger'){floor(135,358,761,82,!improved);shadow(520,346);wall(id==='safe'?381:414,id==='safe'?101:79,id==='safe'?277:210,id==='safe'?260:280,id==='safe',!improved)}
+ else if(id==='airA'||id==='airB')drawAir(id==='airB');else if(id==='gate')drawGate();else if(id==='platform')drawPlatform();else if(id==='switch')drawSwitch();else if(id==='moving')drawMoving();
+ // Neutral rule-of-thumb object preview: side figures keep strong central visibility.
+}
+function refresh(){const i=items[pos];$('dbName').textContent=i[1];$('dbEnglish').textContent=i[2];$('dbDescription').textContent=i[3];$('dbCounter').textContent=String(pos+1).padStart(2,'0')+' / '+items.length;
+ for(const [k,b] of [...$('dbCategories').children].entries()){b.classList.toggle('active',k===pos);b.setAttribute('aria-current',String(k===pos))}
+ $('dbNew').classList.toggle('active',improved);$('dbOld').classList.toggle('active',!improved);$('dbNew').setAttribute('aria-pressed',String(improved));$('dbOld').setAttribute('aria-pressed',String(!improved));
+ $('dbBackground').textContent=ruins?'背景：遺跡':'背景：単色';$('dbModeLabel').textContent=improved?'改良デザイン案（仮）':'旧デザイン風（比較用）';
+ try{$('dbMemo').value=localStorage.getItem(memoKey(pos))||''}catch{$('dbMemo').value=''};
+ for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
+ $('dbRotate').disabled=false;draw();}
+function select(n){pos=(n+items.length)%items.length;refresh()}
+for(let i=0;i<items.length;i++){const b=document.createElement('button');b.type='button';b.className='db-cat';b.innerHTML=`<small>${String(i+1).padStart(2,'0')}</small><span>${items[i][1]}</span>`;b.onclick=()=>select(i);$('dbCategories').appendChild(b)}
+for(let d=1;d<=4;d++){const b=document.createElement('button');b.type='button';b.className='db-digit';b.dataset.digit=String(d);b.textContent=d;b.onclick=()=>{face=d;refresh()};$('dbDigits').appendChild(b)}
+$('dbNew').onclick=()=>{improved=true;refresh()};$('dbOld').onclick=()=>{improved=false;refresh()};$('dbBackground').onclick=()=>{ruins=!ruins;refresh()};$('dbRotate').onclick=()=>{face=face%4+1;refresh()};
+$('dbPrevious').onclick=()=>select(pos-1);$('dbNext').onclick=()=>select(pos+1);$('dbMemo').addEventListener('input',()=>{try{localStorage.setItem(memoKey(pos),$('dbMemo').value)}catch{}});
+$('dbBack').onclick=()=>window.__NRUI.showScreen('home');
+refresh();
+window.__NRDesign={select,rotate:()=>$('dbRotate').click(),get:()=>({id:items[pos][0],face,improved,ruins,count:items.length})};
+})();
+/* === TEMP DESIGN PREVIEW BOOK END === */
+
 </script>
 </body>
 </html>
