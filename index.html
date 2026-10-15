@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — UI Alpha Ver.2.1 · Design Preview Book</title>
+<title>NUMBER ROLL — UI Alpha Ver.2.3 · Player Refinement</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -310,6 +310,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
       </div>
       <div class="db-toolbar">
         <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ 改良デザイン案</button>
+        <button id="dbV22" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.2 と比較</button>
         <button id="dbOld" type="button" class="db-tool" aria-pressed="false">□ 旧デザイン風</button>
         <button id="dbBackground" type="button" class="db-tool">背景：遺跡</button>
       </div>
@@ -1335,7 +1336,7 @@ new ResizeObserver(resize).observe(stage);progress();setPage(window.location.has
 (()=>{
 'use strict';
 const items=[
- ['player','プレイヤー','PLAYER CUBE','丸角・大きな数字・面色の違い・軽い立体感を確認。'],
+ ['player','プレイヤー','PLAYER CUBE','角のつながり・平らな上面・細い枠・数字の見やすさ・90°回転を確認。'],
  ['spike','地上トゲ','CRYSTAL SPIKES','危険を一目で判断できる結晶形のトゲ。先端はシャープに。'],
  ['ground','地面・石床','RUIN STONE FLOOR','床の高さが読み取りやすい石積みと、控えめな苔のライン。'],
  ['gap','穴・側壁','GAP / SIDE WALL','穴の位置と危険な側壁を、装飾に埋もれず判別できるように。'],
@@ -1348,7 +1349,7 @@ const items=[
  ['switch','数字スイッチ','NUMBER SWITCH','指定数字で触れると対応する仕掛けが作動する。'],
  ['moving','移動する壁','MOVING WALLS','青と赤の区別を維持したまま、移動方向がわかる。']
 ];
-let pos=0,face=1,improved=true,ruins=true;
+let pos=0,face=1,improved=true,ruins=true,legacy22=false;
 let cubeSpin=0, cubeTurns=0, cubeRoll=null, cameraView=1;
 const cn=document.getElementById('designCanvas'),g=cn.getContext('2d');
 const $=id=>document.getElementById(id);
@@ -1372,7 +1373,7 @@ function backdrop(){
  }
  g.fillStyle='#08162924';g.fillRect(0,0,w,h);
 }
-function shadow(x,y,rx=120){ellipse(x,y,rx,16,'#02152579');ellipse(x,y+3,rx*.71,6,'#66dbd021')}
+function shadow(x,y,rx=120){ellipse(x,y,rx,16,'#02152579');ellipse(x,y+3,rx*.71,6,'#66dbd017')}
 function stoneTile(x,y,w,h,old=false){
  g.fillStyle=old?'#243c57':gradient(x,y,w,h,[[0,'#486687'],[.40,'#293f60'],[1,'#182d49']]);rr(x,y,w,h,7);g.fill();g.strokeStyle=old?'#708ca6':'#7891aa91';g.lineWidth=2;g.stroke();
  if(!old){line(x+7,y+5,x+w-7,y+5,'#95a8c045',2);line(x+6,y+h-5,x+w-7,y+h-5,'#0d233e87',3);g.strokeStyle='#94a9c22b';g.lineWidth=1;g.beginPath();g.moveTo(x+w*.43,y+4);g.lineTo(x+w*.35,y+h*.24);g.lineTo(x+w*.53,y+h*.43);g.stroke()}
@@ -1401,26 +1402,35 @@ const dbPal={
  3:{main:'#e8dcff',rim:'#f7f0ff',side:'#a28acb',ink:'#59418a',accent:'#b19beb'},
  4:{main:'#ffdfd8',rim:'#fff1e9',side:'#d79e9d',ink:'#834a54',accent:'#efab9f'}
 };
-const dbSamp=[-1,-.98,-.95,-.92,-.87,-.825,0,.825,.87,.92,.95,.98,1];
-const dbUnitMesh=[];
+/* Ver.2.3: identical rounded-solid geometry at two different bevel radii.
+   The previous Ver.2.2 mesh is retained only for visual A/B comparison. */
+const dbRadius23=.142; // Ver.2.2 = .175; reduces corner rounding by about 19%.
+const dbSample22=[-1,-.98,-.95,-.92,-.87,-.825,0,.825,.87,.92,.95,.98,1];
+const dbSample23=[-1,-.985,-.956,-.92,-.885,-.858,0,.858,.885,.92,.956,.985,1];
 function dbClamp(a,low,high){return Math.max(low,Math.min(high,a))}
-function dbRoundedPoint(q){
- const radius=.175,inner=1-radius;
- const core=q.map(v=>dbClamp(v,-inner,inner));let delta=q.map((v,i)=>v-core[i]);
- const length=Math.hypot(...delta)||1;
- return core.map((v,i)=>v+radius*delta[i]/length);
-}
-for(let axis=0;axis<3;axis++)for(const side of [-1,1]){
- function point(u,v){const q=[0,0,0];q[axis]=side;q[(axis+1)%3]=u;q[(axis+2)%3]=v;return dbRoundedPoint(q)}
- for(let i=0;i<dbSamp.length-1;i++)for(let j=0;j<dbSamp.length-1;j++){
-  const pts=[point(dbSamp[i],dbSamp[j]),point(dbSamp[i+1],dbSamp[j]),point(dbSamp[i+1],dbSamp[j+1]),point(dbSamp[i],dbSamp[j+1])];
-  const mid=pts.reduce((acc,p)=>acc.map((v,k)=>v+p[k]/4),[0,0,0]);
-  const inner=1-.175,clamped=mid.map(v=>dbClamp(v,-inner,inner));const normal=mid.map((v,k)=>v-clamped[k]);const len=Math.hypot(...normal)||1;
-  dbUnitMesh.push({pts,normal:normal.map(v=>v/len),mid});
+function dbBuildMesh(radius,samples){
+ const mesh=[],inner=1-radius;
+ function roundedPoint(q){
+  const core=q.map(v=>dbClamp(v,-inner,inner));const delta=q.map((v,i)=>v-core[i]);
+  const length=Math.hypot(...delta)||1;
+  return core.map((v,i)=>v+radius*delta[i]/length);
  }
+ for(let axis=0;axis<3;axis++)for(const side of [-1,1]){
+  function point(u,v){const q=[0,0,0];q[axis]=side;q[(axis+1)%3]=u;q[(axis+2)%3]=v;return roundedPoint(q)}
+  for(let i=0;i<samples.length-1;i++)for(let j=0;j<samples.length-1;j++){
+   const pts=[point(samples[i],samples[j]),point(samples[i+1],samples[j]),point(samples[i+1],samples[j+1]),point(samples[i],samples[j+1])];
+   const mid=pts.reduce((acc,p)=>acc.map((v,k)=>v+p[k]/4),[0,0,0]);
+   const clamped=mid.map(v=>dbClamp(v,-inner,inner));const normal=mid.map((v,k)=>v-clamped[k]);
+   const len=Math.hypot(...normal)||1;
+   mesh.push({pts,normal:normal.map(v=>v/len),mid});
+  }
+ }
+ return mesh;
 }
+const dbMesh22=dbBuildMesh(.175,dbSample22);
+const dbMesh23=dbBuildMesh(dbRadius23,dbSample23);
 function dbProjector(cx,cy,size,spin=0){
- const yaw=[-.12,-.43,-.68][cameraView]; const pitch=.30;
+ const yaw=[-.12,-.43,-.68][cameraView]; const pitch=legacy22?.30:.255;
  const ya=Math.cos(yaw),yb=Math.sin(yaw),pa=Math.cos(pitch),pb=Math.sin(pitch);
  const ca=Math.cos(spin),sa=Math.sin(spin);
  function rotate(q){
@@ -1449,53 +1459,61 @@ function dbPolygon3d(points,projection,fill,stroke=null,lineWidth=1){
  if(stroke){g.strokeStyle=stroke;g.lineWidth=lineWidth;g.stroke()}
 }
 function dbRoundedCube(cx,cy,size,n,spin=0,small=false){
- const pal=dbPal[n]||dbPal[1],p=dbProjector(cx,cy,size,spin),base=dbRGB(pal.main),light=[-.37,.62,.70];
- // Surface is a single rounded volume, including smooth edges and spherical corners.
+ const previous=legacy22,mesh=previous?dbMesh22:dbMesh23;
+ const pal=dbPal[n]||dbPal[1],p=dbProjector(cx,cy,size,spin),base=dbRGB(pal.main);
+ const sideRGB=dbRGB(pal.side),light=previous?[-.37,.62,.70]:[-.35,.44,.79];
+ // Draw the single solid cube from rear to front; top, side and front share vertices.
  const list=[];
- for(const tile of dbUnitMesh){
+ for(const tile of mesh){
   const normal=p.rotate(tile.normal),center=p.rotate(tile.mid);
   if(normal[2]<-.13)continue;
-  let lit=dbClamp(.79+.23*(normal[0]*light[0]+normal[1]*light[1]+normal[2]*light[2]),.58,1.08);
+  const lit=dbClamp((previous?.79:.815)+(previous?.23:.185)*(normal[0]*light[0]+normal[1]*light[1]+normal[2]*light[2]),.64,1.04);
   const color=dbColor(base.map((v,k)=>{
-    let tinted=v;
-    if(k===2)tinted-=3;
-    const sideMix=dbClamp((normal[0]-.02)/.9,0,1)*.53; tinted=(1-sideMix)*v+sideMix*dbRGB(pal.side)[k];
-    return tinted*lit;
+   let tinted=v;if(k===2)tinted-=3;
+   const sideMix=dbClamp((normal[0]-.02)/.9,0,1)*(previous?.53:.49);
+   return ((1-sideMix)*v+sideMix*sideRGB[k])*lit;
   }));
-  const points=tile.pts.map(q=>p.project(q));
-  list.push({points,z:center[2],color});
+  list.push({points:tile.pts.map(q=>p.project(q)),z:center[2],color});
  }
  list.sort((a,b)=>a.z-b.z);
- g.save();g.shadowColor='#03172c85';g.shadowBlur=small?4:12;g.shadowOffsetY=small?1:6;
+ g.save();g.shadowColor='#03172c70';g.shadowBlur=small?3:9;g.shadowOffsetY=small?1:4;
  for(const tile of list){
   g.beginPath();tile.points.forEach((v,i)=>i?g.lineTo(v.x,v.y):g.moveTo(v.x,v.y));g.closePath();g.fillStyle=tile.color;g.fill();
-  // The tiny same-color stroke prevents antialias seams without creating visible grid lines.
-  g.strokeStyle=tile.color;g.lineWidth=.65;g.stroke();
+  // Same-color very thin edge is an antialias seam guard, not a mesh grid.
+  g.strokeStyle=tile.color;g.lineWidth=small?.65:.55;g.stroke();
   g.shadowBlur=0;g.shadowOffsetY=0;
  }
  g.restore();
- // Face decoration is projected onto the actual flat +Z face, not a floating rounded plate.
  const facing=p.rotate([0,0,1])[2];
  if(facing>.15){
-  const onFace=(u,v,z=1.008)=>[u,v,z];
-  const outer=dbRoundPath(0,0,.115,.79,(u,v)=>onFace(u,v,1.008));
-  const inner=dbRoundPath(0,0,.10,.745,(u,v)=>onFace(u,v,1.013));
+  const onFace=(u,v,z=1.006)=>[u,v,z];
+  const outer=dbRoundPath(0,0,previous?.115:.097,previous?.79:.827,(u,v)=>onFace(u,v,previous?1.008:1.004));
+  const inner=dbRoundPath(0,0,previous?.10:.092,previous?.745:.803,(u,v)=>onFace(u,v,previous?1.013:1.006));
   const fc=p.project(onFace(-.5,.7)),ft=p.project(onFace(.56,-.76));
-  const fill=g.createLinearGradient(fc.x,fc.y,ft.x,ft.y);fill.addColorStop(0,pal.rim);fill.addColorStop(.52,pal.main);fill.addColorStop(1,dbColor(dbMix(dbRGB(pal.main),dbRGB(pal.side),.22)));
-  dbPolygon3d(outer,p,fill,small?'#f9ffff91':'#f9ffffaf',small?.55:Math.max(.9,size*.007));
-  dbPolygon3d(inner,p,null,pal.accent+'54',small?.6:.85);
-  // Subtle corner jewel kept inside flat face plane.
-  if(!small){const mark=dbRoundPath(0,0,.035,.096,(u,v)=>onFace(.51+u,.51+v,1.015));dbPolygon3d(mark,p,pal.accent,'#ffffff72',.6)}
-  const center=p.project(onFace(0,-.015,1.02));
-  const ink=pal.ink;
-  const labelSize=Math.max(10,size*.55);
-  g.save();g.textAlign='center';g.textBaseline='middle';g.font=`900 ${labelSize}px system-ui,Arial,sans-serif`;
-  g.fillStyle='#ffffff58';g.fillText(String(n),center.x+.65,center.y+1.6);
-  g.fillStyle=ink;g.fillText(String(n),center.x,center.y);
+  const fill=g.createLinearGradient(fc.x,fc.y,ft.x,ft.y);
+  fill.addColorStop(0,previous?pal.rim:dbColor(dbMix(dbRGB(pal.rim),dbRGB(pal.main),.38)));
+  fill.addColorStop(.52,pal.main);fill.addColorStop(1,dbColor(dbMix(dbRGB(pal.main),sideRGB,previous?.22:.14)));
+  dbPolygon3d(outer,p,fill,previous?(small?'#f9ffff91':'#f9ffffaf'):'#f9ffff7b',previous?(small?.55:Math.max(.9,size*.007)):(small?.45:Math.max(.65,size*.0049)));
+  dbPolygon3d(inner,p,null,pal.accent+(previous?'54':'38'),small?.4:(previous?.85:.54));
+  if(!small){
+   const markSize=previous?.096:.067;
+   const mark=dbRoundPath(0,0,previous?.035:.025,markSize,(u,v)=>onFace((previous?.51:.575)+u,(previous?.51:.575)+v,1.012));
+   dbPolygon3d(mark,p,pal.accent,previous?'#ffffff72':'#ffffff40',.5);
+  }
+  const center=p.project(onFace(0,previous?-.015:-.02,1.016));
+  const labelSize=Math.max(10,size*(previous?.55:.592));
+  const labelTilt=previous?0:(()=>{
+   // Numeric face readout rotates with the cube; its orientation changes at mid-roll.
+   const quarter=Math.PI/2;
+   return -(spin-Math.round(spin/quarter)*quarter);
+  })();
+  g.save();g.translate(center.x,center.y);g.rotate(labelTilt);
+  g.textAlign='center';g.textBaseline='middle';g.font=`900 ${labelSize}px system-ui,Arial,sans-serif`;
+  g.fillStyle='#ffffff40';g.fillText(String(n),.6,1.2);
+  g.fillStyle=pal.ink;g.fillText(String(n),0,0);
   g.restore();
  }
- // Gentle broad glint follows the surface rather than creating an independent frame.
- if(!small){const gl=p.project([-.66,.66,1.015]);ellipse(gl.x,gl.y,3.3,2.2,'#ffffff7a')}
+ if(!small){const gl=p.project([-.68,.65,1.008]);ellipse(gl.x,gl.y,previous?3.3:2.6,previous?2.2:1.9,'#ffffff65')}
 }
 function oldCube(x,y,s,n=face){
  const palette={1:['#d6edff','#55b6f3','#274f9a'],2:['#d9fff3','#74cfb6','#155b5b'],3:['#fff2df','#eabb80','#96602e'],4:['#f1e8ff','#b49bec','#654e9e']};const p=palette[n];
@@ -1573,15 +1591,15 @@ function draw(){
 }
 function refresh(){const i=items[pos];$('dbName').textContent=i[1];$('dbEnglish').textContent=i[2];$('dbDescription').textContent=i[3];$('dbCounter').textContent=String(pos+1).padStart(2,'0')+' / '+items.length;
  for(const [k,b] of [...$('dbCategories').children].entries()){b.classList.toggle('active',k===pos);b.setAttribute('aria-current',String(k===pos))}
- $('dbNew').classList.toggle('active',improved);$('dbOld').classList.toggle('active',!improved);$('dbNew').setAttribute('aria-pressed',String(improved));$('dbOld').setAttribute('aria-pressed',String(!improved));
- $('dbBackground').textContent=ruins?'背景：遺跡':'背景：単色';$('dbModeLabel').textContent=improved?'改良デザイン案（仮）':'旧デザイン風（比較用）';
+ $('dbNew').classList.toggle('active',improved&&!legacy22);$('dbV22').classList.toggle('active',improved&&legacy22);$('dbOld').classList.toggle('active',!improved);$('dbNew').setAttribute('aria-pressed',String(improved&&!legacy22));$('dbV22').setAttribute('aria-pressed',String(improved&&legacy22));$('dbOld').setAttribute('aria-pressed',String(!improved));$('dbV22').hidden=items[pos][0]!=='player';
+ $('dbBackground').textContent=ruins?'背景：遺跡':'背景：単色';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':'Ver.2.3 / 形状改善版'):'旧デザイン風（比較用）';
  try{$('dbMemo').value=localStorage.getItem(memoKey(pos))||''}catch{$('dbMemo').value=''};
  for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
  $('dbRotate').disabled=!!cubeRoll;const viewText=['正面寄り','斜め','側面寄り'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!(items[pos][0]==='player'&&improved);draw();}
 function select(n){pos=(n+items.length)%items.length;refresh()}
 for(let i=0;i<items.length;i++){const b=document.createElement('button');b.type='button';b.className='db-cat';b.innerHTML=`<small>${String(i+1).padStart(2,'0')}</small><span>${items[i][1]}</span>`;b.onclick=()=>select(i);$('dbCategories').appendChild(b)}
 for(let d=1;d<=4;d++){const b=document.createElement('button');b.type='button';b.className='db-digit';b.dataset.digit=String(d);b.textContent=d;b.onclick=()=>{cubeRoll=null;cubeSpin=0;cubeTurns=0;face=d;refresh()};$('dbDigits').appendChild(b)}
-$('dbNew').onclick=()=>{improved=true;refresh()};$('dbOld').onclick=()=>{improved=false;refresh()};$('dbBackground').onclick=()=>{ruins=!ruins;refresh()};
+$('dbNew').onclick=()=>{improved=true;legacy22=false;refresh()};$('dbV22').onclick=()=>{improved=true;legacy22=true;refresh()};$('dbOld').onclick=()=>{improved=false;legacy22=false;refresh()};$('dbBackground').onclick=()=>{ruins=!ruins;refresh()};
 $('dbView').onclick=()=>{cameraView=(cameraView+1)%3;refresh()};
 $('dbRotate').onclick=()=>{
  if(cubeRoll)return;
@@ -1603,7 +1621,7 @@ $('dbRotate').onclick=()=>{
 $('dbPrevious').onclick=()=>select(pos-1);$('dbNext').onclick=()=>select(pos+1);$('dbMemo').addEventListener('input',()=>{try{localStorage.setItem(memoKey(pos),$('dbMemo').value)}catch{}});
 $('dbBack').onclick=()=>window.__NRUI.showScreen('home');
 refresh();
-window.__NRDesign={select,rotate:()=>$('dbRotate').click(),get:()=>({id:items[pos][0],face,improved,ruins,cameraView,spin:cubeSpin,animating:!!cubeRoll,count:items.length})};
+window.__NRDesign={select,rotate:()=>$('dbRotate').click(),get:()=>({id:items[pos][0],face,improved,ruins,cameraView,spin:cubeSpin,legacy22,animating:!!cubeRoll,count:items.length})};
 })();
 /* === TEMP DESIGN PREVIEW BOOK END === */
 
