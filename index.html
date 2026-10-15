@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.2.8 · Rotation / Contact / Floor Pass</title>
+<title>NUMBER ROLL — Ver.2.9 · Upright Numerals</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -1478,7 +1478,7 @@ function dbProjector(cx,cy,size,spin=0){
   // Keep one stable camera. The cube rotates in its own local space first,
   // then the whole object is projected. This prevents the view from looking
   // like it jumps to unrelated angles after every 90° turn.
-  const lx=q[0]*ca-q[1]*sa,ly=q[0]*sa+q[1]*ca,lz=q[2];
+  const lx=q[0]*ca+q[1]*sa,ly=-q[0]*sa+q[1]*ca,lz=q[2];
   const x=lx*ya+lz*yb,zz=-lx*yb+lz*ya;
   const y=ly*pa-zz*pb,z=ly*pb+zz*pa;
   return [x,y,z];
@@ -1548,14 +1548,26 @@ function dbFaceNumber(p,n,angle,opacity,size,small,pal){
 // The former 1.35px font was magnified by ~100× in the 3-D transform: at tiny
 // CSS font sizes browsers can quantize glyph metrics, making numerals drift.
 // Work instead in a 100× local glyph coordinate system, using a real 135px font.
+// Ver.2.9: the digit is anchored at the projected centre of the physical
+// number plate, but its *screen-space* baseline is straight at zero rotation.
+// The old code used the projected surface shear, then applied a second roll;
+// that double-rotation was why numerals could lean / turn sideways.
+// The number now rolls exactly once and settles to zero degrees at each stop.
 function dbFaceNumber25(p,n,angle,opacity,size,small,pal){
  if(opacity<=.001)return;
- const c=p.project([0,0,1.022]),right=p.project([.4,0,1.022]),up=p.project([0,.385,1.022]);
- const a=(right.x-c.x)/.4,b=(right.y-c.y)/.4;
- const cc=-(up.x-c.x)/.385,d=-(up.y-c.y)/.385;
+ const c=p.project([0,0,1.022]);
+ const right=p.project([.4,0,1.022]),up=p.project([0,.385,1.022]);
+ // Preserve the natural face's apparent dimensions, but not its skew. This
+ // produces a clean horizontal baseline and upright vertical axis at rest.
+ const faceWidth=Math.hypot(right.x-c.x,right.y-c.y)/.4;
+ const faceHeight=Math.hypot(up.x-c.x,up.y-c.y)/.385;
+ const unitX=faceWidth/100,unitY=faceHeight/100;
  g.save();g.globalAlpha=opacity;
- g.transform(a/100,b/100,cc/100,d/100,c.x,c.y);
+ g.translate(c.x,c.y);
+ // Rotation is clockwise in Canvas screen coordinates, consistent with the
+ // clockwise quarter turns in dbProjector. At t=0/1 the angle is 0 exactly.
  g.rotate(angle);
+ g.scale(unitX,unitY);
  g.font=`900 ${small?141:135}px system-ui,Arial,sans-serif`;
  g.textAlign='left';g.textBaseline='alphabetic';
  const glyph=String(n),m=g.measureText(glyph);
@@ -1563,10 +1575,7 @@ function dbFaceNumber25(p,n,angle,opacity,size,small,pal){
  const inkRight=Number.isFinite(m.actualBoundingBoxRight)?m.actualBoundingBoxRight:m.width;
  const ascent=Number.isFinite(m.actualBoundingBoxAscent)?m.actualBoundingBoxAscent:100;
  const descent=Number.isFinite(m.actualBoundingBoxDescent)?m.actualBoundingBoxDescent:0;
- // Metrics are measured from the anchor, with y positive down. Align the
- // glyph's actual painted bounding box to the physical center of the front face.
- const x=(left-inkRight)/2;
- const y=(ascent-descent)/2;
+ const x=(left-inkRight)/2,y=(ascent-descent)/2;
  g.fillStyle='#ffffff24';g.fillText(glyph,x+.75,y+1.25);
  g.fillStyle=pal.ink;g.fillText(glyph,x,y);
  g.restore();
@@ -1580,12 +1589,9 @@ function dbRoundedCube(cx,cy,size,n,spin=0,small=false){
  const pal=(!legacy22&&!legacy23&&cubeRoll&&cubeRoll.progress!==undefined)?(()=>{
   let t=dbClamp((cubeRoll.progress-.18)/.64,0,1);t=t*t*(3-2*t);
   const from=dbPal[cubeRoll.from],to=dbPal[cubeRoll.to],mixed={};
-  // Keep the cube body mostly stable and move more of the color identity into
-  // the ink/accent/side tones. That reduces the feeling that a different toy
-  // pops in every time the digit changes.
-  mixed.main='#'+dbMix(dbRGB(from.main),dbRGB(to.main),t*.32).map(v=>v.toString(16).padStart(2,'0')).join('');
-  mixed.rim ='#'+dbMix(dbRGB(from.rim), dbRGB(to.rim), t*.25).map(v=>v.toString(16).padStart(2,'0')).join('');
-  for(const key of ['side','ink','accent']){
+  // The body palette stays almost neutral. Transition every material
+  // property continuously so there is no sudden color pop at the end.
+  for(const key of ['main','rim','side','ink','accent']){
    mixed[key]='#'+dbMix(dbRGB(from[key]),dbRGB(to[key]),t).map(v=>v.toString(16).padStart(2,'0')).join('');
   }
   return mixed;
@@ -1797,10 +1803,10 @@ function draw(){
 function refresh(){const i=items[pos];const player=i[0]==='player';$('dbName').textContent=i[1];$('dbEnglish').textContent=i[2];$('dbDescription').textContent=i[3];$('dbCounter').textContent=String(pos+1).padStart(2,'0')+' / '+items.length;
  for(const [k,b] of [...$('dbCategories').children].entries()){b.classList.toggle('active',k===pos);b.setAttribute('aria-current',String(k===pos))}
  $('dbNew').classList.toggle('active',improved&&!legacy22&&!legacy23&&!legacy24);$('dbV24').classList.toggle('active',improved&&legacy24);$('dbV23').classList.toggle('active',improved&&legacy23);$('dbV22').classList.toggle('active',improved&&legacy22);$('dbOld').classList.toggle('active',!improved);$('dbNew').setAttribute('aria-pressed',String(improved&&!legacy22&&!legacy23&&!legacy24));$('dbV24').setAttribute('aria-pressed',String(improved&&legacy24));$('dbV23').setAttribute('aria-pressed',String(improved&&legacy23));$('dbV22').setAttribute('aria-pressed',String(improved&&legacy22));$('dbOld').setAttribute('aria-pressed',String(!improved));$('dbV22').hidden=items[pos][0]!=='player';$('dbV23').hidden=items[pos][0]!=='player';$('dbV24').hidden=items[pos][0]!=='player';
- $('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=!player;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbBackground').textContent=ruins?'背景：遺跡':'背景：単色';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':'Ver.2.8 / 回転・接地・影 改善'):'旧デザイン風（比較用）';
+ $('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=!player;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbBackground').textContent=ruins?'背景：遺跡':'背景：単色';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':'Ver.2.9 / 数字の向き補正'):'旧デザイン風（比較用）';
  try{$('dbMemo').value=localStorage.getItem(memoKey(pos))||''}catch{$('dbMemo').value=''};
  for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
- $('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=!player||!runActive;$('dbRun').textContent=runActive?'■ 停止して戻る':'▶ 走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'平らな床 / 回転・接地・影を確認':'障害物なし・平らな床';$('dbInstruction').textContent=runActive?'画面タップ / ジャンプボタンで回転・ジャンプ。着地後は姿勢をそろえて表示します。':player?'数字切替・90°回転を確認できます。走行テストは本編と別です。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['正面寄り','斜め','側面寄り'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
+ $('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=!player||!runActive;$('dbRun').textContent=runActive?'■ 停止して戻る':'▶ 走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'平らな床 / 数字・回転・接地を確認':'障害物なし・平らな床';$('dbInstruction').textContent=runActive?'画面タップでジャンプ。数字が回転後にまっすぐ戻るか確認できます。':player?'数字切替・90°回転を確認できます。走行テストは本編と別です。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['正面寄り','斜め','側面寄り'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
 function select(n){stopRun(false);pos=(n+items.length)%items.length;refresh()}
 function stopRun(redraw=true){
  if(!runActive)return;
