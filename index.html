@@ -1378,9 +1378,14 @@ const items=[
 let pos=0,face=1,improved=true,ruins=true,legacy22=false,legacy23=false,legacy24=false;
 let cubeSpin=0, cubeTurns=0, cubeRoll=null, cameraView=1;
 // Temporary running-preview state. It does not interact with the playable engine.
-const RUN_SPEED=285,RUN_JUMP_V=700,RUN_GRAVITY=1850;
+// Use the SAME world-space constants as the real game. Height in the playable
+// engine is rendered at ZOOM=.49, not at one screen pixel per world unit.
+const RUN_SPEED=285,RUN_JUMP_V=700,RUN_GRAVITY=1850,RUN_PLAYER_WORLD_SIZE=64,RUN_GAME_ZOOM=.49;
+const RUN_PLAYER_SIZE=84,RUN_VISUAL_SCALE=RUN_GAME_ZOOM*RUN_PLAYER_SIZE/RUN_PLAYER_WORLD_SIZE;
+const RUN_TURN_SPEED=(Math.PI/2)/.20; // same ~0.20s rotation duration as the original game
 let runActive=false,runLast=0,runDistance=0,runHeight=0,runVelocity=0,runUsed=0,runLimit=1,runFrame=0,runStamp=0;
-let runRoll=null,runRollStart=0,runRollFromTurn=0;
+let runStartFace=1,runTurnTarget=0,runLandFx=0,runLaunchFx=0,runCameraLift=0,runElapsed=0;
+// Only this removable preview code owns these globals; live-game physics is unchanged.
 const cn=document.getElementById('designCanvas'),g=cn.getContext('2d');
 const $=id=>document.getElementById(id);
 const memoKey=i=>'nr_preview_notes_21_'+items[i][0];
@@ -1461,8 +1466,11 @@ const dbMesh22=dbBuildMesh(.175,dbSample22);
 const dbMesh23=dbBuildMesh(dbRadius23,dbSample23);
 // Ver.2.4: preserve the corrected proportions; refine highlights, shading and label motion.
 const dbMesh24=dbBuildMesh(.137,[-1,-.986,-.958,-.92,-.863,0,.863,.92,.958,.986,1]);
+// The player is only 84px in this preview. Use a low-density mesh while
+// running: much less work for mobile GPUs with no meaningful lost detail.
+const dbMeshRun=dbBuildMesh(.137,[-1,-.966,-.916,-.863,0,.863,.916,.966,1]);
 function dbProjector(cx,cy,size,spin=0){
- const yaw=[-.12,-.43,-.68][cameraView]; const pitch=legacy22?.30:.255;
+ const yaw=runActive?-.24:[-.12,-.43,-.68][cameraView]; const pitch=runActive?.17:(legacy22?.30:.255);
  const ya=Math.cos(yaw),yb=Math.sin(yaw),pa=Math.cos(pitch),pb=Math.sin(pitch);
  const ca=Math.cos(spin),sa=Math.sin(spin);
  function rotate(q){
@@ -1534,7 +1542,7 @@ function dbFaceNumber25(p,n,angle,opacity,size,small,pal){
  g.restore();
 }
 function dbRoundedCube(cx,cy,size,n,spin=0,small=false){
- const previous=legacy22,prior=legacy22||legacy23,mesh=legacy22?dbMesh22:legacy23?dbMesh23:dbMesh24;
+ const previous=legacy22,prior=legacy22||legacy23,mesh=runActive&&small?dbMeshRun:legacy22?dbMesh22:legacy23?dbMesh23:dbMesh24;
  // Smoothly blend the material hue during each quarter-turn (v2.4 only).
  const basePal=dbPal[n]||dbPal[1];
  const pal=(!legacy22&&!legacy23&&cubeRoll&&cubeRoll.progress!==undefined)?(()=>{
@@ -1658,8 +1666,8 @@ function drawSwitch(){floor(88,353,842,87,!improved);const x=282,y=220,w=237,h=7
  text(String(face),x+w/2,y+21,42,'#ece1ff',950);
  const xx=722;wall(xx,153,90,200,false,!improved);g.setLineDash([10,10]);line(518,245,703,245,'#c4a3ffb3',4);g.setLineDash([]);text('→',612,221,32,'#b6e5ef',800);}
 function drawMoving(){floor(72,360,877,80,!improved);g.setLineDash([15,10]);line(200,144,822,144,improved?'#9fe9d7b0':'#7faaff9c',4);g.setLineDash([]);text('↔',515,107,70,'#b4f2df',600);wall(266,206,215,154,true,!improved);wall(580,186,160,174,false,!improved)}
-function runFloor(offset){
- const y=341, tileW=78, shift=((offset%tileW)+tileW)%tileW;
+function runFloor(offset,cameraLift=0){
+ const y=341+cameraLift, tileW=78, shift=((offset%tileW)+tileW)%tileW;
  g.fillStyle='#11243a';g.fillRect(0,y,1024,99);
  // Repeating masonry. The scrolling texture makes automatic advance visible.
  for(let row=0;row<3;row++){
@@ -1675,20 +1683,40 @@ function runFloor(offset){
 }
 function drawRunning(){
  backdrop();
- // Subtle parallax markers on the horizon; floor moves at full speed.
- const slide=(runDistance*.13)%400;
+ // The character remains in the normal auto-run position; only the floor and
+ // the DISTANT ruins scroll. Avoid fake walking/bobbing (the cube is not a runner).
+ const slide=(runDistance*.075)%400;
  for(let i=-1;i<5;i++){
   const x=i*400-slide;
-  g.fillStyle='#7892bd15';g.fillRect(x+93,196,53,145);g.fillRect(x+158,237,13,104);
+  g.fillStyle='#7892bd13';g.fillRect(x+93,196,53,145);g.fillRect(x+158,237,13,104);
  }
- runFloor(runDistance);
- const px=252,py=305-runHeight, playerSize=72;
- // The shadow stays on the floor when the cube jumps.
- ellipse(px,343,Math.max(18,37-runHeight*.035),Math.max(2,7-runHeight*.011),'#051b2d8a');
+ const px=252,groundY=341+runCameraLift,playerSize=RUN_PLAYER_SIZE;
+ const visualJump=runHeight*RUN_VISUAL_SCALE;
+ // Floor motion is world-speed relative to the rendered cube's width.
+ runFloor(runDistance*playerSize/RUN_PLAYER_WORLD_SIZE,runCameraLift);
+ // Anchor the shadow to the surface and fade as the cube rises.
+ const flight=dbClamp(visualJump/160,0,1);
+ ellipse(px,groundY-1,Math.max(16,38-flight*15),Math.max(2,6-flight*2),`rgba(3,21,32,${.49-flight*.31})`);
+ ellipse(px,groundY-2,22,2,`rgba(120,217,199,${.20-flight*.16})`);
+ if(runHeight<.01){
+  // Tiny contact flecks behind the cube signal forward movement without
+  // making the cube roll along the floor (it rotates only during jumps).
+  for(let i=0;i<3;i++){
+   const dx=((runDistance*.19+i*22)%77);
+   ellipse(px-42-dx,groundY-3-(i%2)*2,1.7,1,'#9bd9c044');
+  }
+ }
+ if(runLandFx>0){
+  const t=1-runLandFx/.19;
+  g.beginPath();g.ellipse(px,groundY-2,23+t*36,4+t*1.3,0,0,Math.PI*2);
+  g.strokeStyle=`rgba(169,247,219,${(1-t)*.40})`;g.lineWidth=2;g.stroke();
+ }
+ const py=groundY-playerSize*.53-visualJump;
  dbRoundedCube(px,py,playerSize,face,cubeSpin,true);
- g.save();g.fillStyle='#091e34c6';rr(18,59,241,57,12);g.fill();g.strokeStyle='#6a96ab75';g.lineWidth=1.5;g.stroke();g.restore();
- text('AUTO RUN  ·  FLAT FLOOR',139,77,15,'#b6e9d8',850);
- text(`DISTANCE  ${Math.floor(runDistance/64)} マス`,139,100,17,'#edf8ff',850);
+ // Keep the run HUD away from the cube's entire jump path.
+ g.save();g.fillStyle='#091e34c6';rr(413,59,252,57,12);g.fill();g.strokeStyle='#6a96ab75';g.lineWidth=1.5;g.stroke();g.restore();
+ text('AUTO RUN  ·  FLAT FLOOR',539,77,15,'#b6e9d8',850);
+ text(`DISTANCE  ${Math.floor(runDistance/64)} マス`,539,100,17,'#edf8ff',850);
  g.save();g.fillStyle='#091e34bd';rr(754,60,250,57,12);g.fill();g.restore();
  text(`数字  ${face}`,815,88,20,'#d7f6ed',900);
  text(`ジャンプ  ${Math.max(0,runLimit-runUsed)} / ${runLimit}`,924,88,16,'#d6edff',800);
@@ -1726,51 +1754,68 @@ function refresh(){const i=items[pos];const player=i[0]==='player';$('dbName').t
  $('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=!player;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbBackground').textContent=ruins?'背景：遺跡':'背景：単色';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':'Ver.2.5 / 数字の中心位置改善'):'旧デザイン風（比較用）';
  try{$('dbMemo').value=localStorage.getItem(memoKey(pos))||''}catch{$('dbMemo').value=''};
  for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
- $('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=!player||!runActive;$('dbRun').textContent=runActive?'■ 停止して戻る':'▶ 走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'自動前進中・タップでジャンプ':'障害物なし・平らな床';$('dbInstruction').textContent=runActive?'画面タップ / ジャンプボタンで回転・ジャンプ。停止すると元の表示に戻ります。':player?'数字切替・90°回転を確認できます。走行テストは本編と別です。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / NO OBSTACLES':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['正面寄り','斜め','側面寄り'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
+ $('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=!player||!runActive;$('dbRun').textContent=runActive?'■ 停止して戻る':'▶ 走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'本編に近いジャンプ高さ・90°回転':'障害物なし・平らな床';$('dbInstruction').textContent=runActive?'画面タップ / ジャンプボタンで回転・ジャンプ。停止すると元の表示に戻ります。':player?'数字切替・90°回転を確認できます。走行テストは本編と別です。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['正面寄り','斜め','側面寄り'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
 function select(n){stopRun(false);pos=(n+items.length)%items.length;refresh()}
 function stopRun(redraw=true){
  if(!runActive)return;
- runActive=false;runLast=0;runRoll=null;runHeight=0;runVelocity=0;cubeRoll=null;cubeSpin=0;cubeTurns=0;
+ runActive=false;runLast=0;runHeight=0;runVelocity=0;cubeRoll=null;cubeSpin=0;cubeTurns=0;runTurnTarget=0;runCameraLift=0;runLandFx=0;runLaunchFx=0;
  cancelAnimationFrame(runFrame);
  if(redraw)refresh();
 }
 function startRun(){
  if(runActive)return;
- runActive=true;runDistance=0;runHeight=0;runVelocity=0;runUsed=0;runLimit=face;
- cubeRoll=null;cubeSpin=0;cubeTurns=0;runRoll=null;runLast=0;runStamp=0;
+ runActive=true;runDistance=0;runHeight=0;runVelocity=0;runUsed=0;runLimit=face;runStartFace=face;
+ cubeRoll=null;cubeSpin=0;cubeTurns=0;runTurnTarget=0;runLast=0;runStamp=0;runCameraLift=0;runLandFx=0;runLaunchFx=0;runElapsed=0;
  refresh();runFrame=requestAnimationFrame(runTick);
 }
 function runJump(){
  if(!runActive)return;
  if(runUsed>=runLimit)return;
  if(runHeight<.05&&runUsed===0)runLimit=face;
- const oldFace=face,newFace=face%4+1;
- runUsed++;runVelocity=RUN_JUMP_V;
- runRollStart=performance.now();runRollFromTurn=cubeTurns;
- runRoll={from:oldFace,to:newFace,progress:0,fromTurn:runRollFromTurn};
- cubeRoll=runRoll;
- // Face value changes when the rotation passes its midpoint.
+ runUsed++;
+ runVelocity=RUN_JUMP_V;
+ runLaunchFx=.13;
+ face=face%4+1; // The real game also advances the face immediately on jumping.
+ runTurnTarget+=Math.PI/2; // Queue a full turn; never snap backwards on repeated taps.
 }
 function runTick(now){
  if(!runActive)return;
  if($('designBookScreen').hidden||document.hidden){runLast=now;runFrame=requestAnimationFrame(runTick);return}
  if(!runLast)runLast=now;
- const dt=Math.min(.045,Math.max(0,(now-runLast)/1000));runLast=now;
- runDistance+=RUN_SPEED*dt;
+ const dt=Math.min(.033,Math.max(0,(now-runLast)/1000));runLast=now;
+ runElapsed+=dt;runDistance+=RUN_SPEED*dt;
+ runLandFx=Math.max(0,runLandFx-dt);runLaunchFx=Math.max(0,runLaunchFx-dt);
  if(runHeight>0||runVelocity>0){
+  const oldHeight=runHeight;
   runHeight=Math.max(0,runHeight+runVelocity*dt-RUN_GRAVITY*dt*dt/2);
   runVelocity-=RUN_GRAVITY*dt;
-  if(runHeight<=0){runHeight=0;runVelocity=0;runUsed=0;runLimit=face}
+  if(runHeight<=0&&oldHeight>0){
+   runHeight=0;runVelocity=0;runUsed=0;runLimit=face;runLandFx=.19;
+  }
  }
- if(runRoll){
-  const t=Math.min(1,(now-runRollStart)/260),smooth=t*t*(3-2*t);
-  cubeSpin=(runRollFromTurn+smooth)*Math.PI/2;
-  runRoll.progress=smooth;
-  if(t>=.5)face=runRoll.to;
-  if(t>=1){face=runRoll.to;cubeTurns++;cubeSpin=cubeTurns*Math.PI/2;runRoll=null;cubeRoll=null}
+ // Match the playable game's 0.20s quarter turns. Consecutive air jumps
+ // add targets instead of resetting animation: no angle discontinuities.
+ const step=RUN_TURN_SPEED*dt;
+ cubeSpin=Math.min(runTurnTarget,cubeSpin+step);
+ const quarter=Math.PI/2;
+ const segment=Math.floor((cubeSpin+1e-6)/quarter);
+ const frac=dbClamp((cubeSpin-segment*quarter)/quarter,0,1);
+ if(cubeSpin<runTurnTarget-1e-5){
+  cubeTurns=segment;
+  const from=(runStartFace-1+segment)%4+1;
+  cubeRoll={from,to:from%4+1,fromTurn:segment,progress:frac};
+ }else{
+  cubeTurns=Math.round(runTurnTarget/quarter);
+  cubeRoll=null;
  }
- // Limit preview to approximately 30 FPS to keep mobile drawing responsive.
- if(now-runStamp>=30){runStamp=now;draw()}
+ // Follow unusually high multi-jumps rather than clipping the player at the
+ // top of the preview. Camera shifts only when the second/third jump needs it.
+ const desiredLift=Math.max(0,runHeight*RUN_VISUAL_SCALE-204);
+ runCameraLift+=(desiredLift-runCameraLift)*Math.min(1,dt*9);
+ // Never let rapid chained jumps push the top of the cube out of frame.
+ runCameraLift=Math.max(runCameraLift,runHeight*RUN_VISUAL_SCALE-194,0);
+ // 60fps target; the running mesh is lower density for responsive mobile UI.
+ if(now-runStamp>=16){runStamp=now;draw()}
  runFrame=requestAnimationFrame(runTick);
 }
 $('dbRun').onclick=()=>{if(runActive)stopRun();else startRun()};
