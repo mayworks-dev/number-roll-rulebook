@@ -1225,22 +1225,110 @@ function drawMovingWallGuide(){
  ctx.restore();
 }
 function drawGoal(){let x=screenX(goal);if(x< -100||x>W+120)return;ctx.save();ctx.shadowColor='#61e4b8';ctx.shadowBlur=15;ctx.strokeStyle='#78f0ce';ctx.lineWidth=4;ctx.strokeRect(x-5,170,8,FLOOR-170);ctx.shadowBlur=0;ctx.fillStyle='#a2fce8';ctx.font='900 21px system-ui';ctx.textAlign='center';ctx.fillText('GOAL',x+9,160);ctx.restore()}
+function nrGameHash37(i){let n=(i|0)^0x6d2b79f5;n=Math.imul(n^(n>>>15),1|n);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967295}
+function nrGameCubePal37(n){return ({
+ 1:{front:'#9aadb7',light:'#bcc9cf',shadow:'#708590',edge:'#4a6170',ink:'#203948',trail:'#7e9bab'},
+ 2:{front:'#9caeab',light:'#becbc8',shadow:'#748884',edge:'#4c6260',ink:'#26423f',trail:'#87a29e'},
+ 3:{front:'#aaa8b7',light:'#c9c7d1',shadow:'#807e92',edge:'#5c5f73',ink:'#3b3950',trail:'#9693a7'},
+ 4:{front:'#b4aaa4',light:'#d0c6c0',shadow:'#8c7f79',edge:'#6b5e59',ink:'#4b3d3a',trail:'#a2948e'}
+ })[n]||({front:'#9aadb7',light:'#bcc9cf',shadow:'#708590',edge:'#4a6170',ink:'#203948',trail:'#7e9bab'})}
+function nrDrawGameStoneFloor37(a,b,offset=0){
+ if(b<=a)return;
+ const depth=VH-FLOOR;if(depth<=0)return;
+ const slabH=Math.min(56,Math.max(42,depth*.44)),cap=10,tile=58;
+ ctx.save();ctx.beginPath();ctx.rect(a,FLOOR,b-a,depth);ctx.clip();
+ ctx.fillStyle='#122131';ctx.fillRect(a,FLOOR,b-a,depth);
+ // Main top slabs: same collision plane, but quieter value shifts and joints.
+ const base=a-((offset%tile)+tile)%tile-tile;
+ for(let x=base;x<b+tile;x+=tile){
+  const seed=Math.floor((x+offset)/tile),v=nrGameHash37(seed*13+7),vv=nrGameHash37(seed*29+5);
+  const bright=v>.53;
+  const topGrad=ctx.createLinearGradient(x,FLOOR,x+8,FLOOR+cap);
+  topGrad.addColorStop(0,bright?'#8ba0aa':'#8398a3');
+  topGrad.addColorStop(.6,bright?'#758b97':'#6f8591');
+  topGrad.addColorStop(1,'#556b7d');
+  ctx.fillStyle=topGrad;ctx.fillRect(x+1,FLOOR,x+tile-(x+1),cap);
+  const faceGrad=ctx.createLinearGradient(x,FLOOR+cap,x+7,FLOOR+slabH);
+  faceGrad.addColorStop(0,bright?'#526877':'#4b6273');
+  faceGrad.addColorStop(.42,bright?'#3d5262':'#394e5f');
+  faceGrad.addColorStop(1,'#223646');
+  ctx.fillStyle=faceGrad;ctx.fillRect(x+1,FLOOR+cap,tile-2,slabH-cap);
+  ctx.fillStyle='rgba(190,204,210,.08)';ctx.fillRect(x+6,FLOOR+cap+5,tile-12,1);
+  ctx.fillStyle='rgba(8,24,38,.35)';ctx.fillRect(x+4,FLOOR+slabH-3,tile-8,2);
+  // Slight per-block tonal drift to break uniformity without becoming noisy.
+  if(vv>.58){ctx.fillStyle=vv>.82?'rgba(157,172,179,.06)':'rgba(31,47,58,.09)';ctx.fillRect(x+8,FLOOR+cap+8+Math.floor(v*8),tile-18,6+Math.floor(vv*7));}
+  if(v>.76){
+    const q=x+tile*(.24+nrGameHash37(seed*17+2)*.44);
+    ctx.beginPath();ctx.moveTo(q,FLOOR+cap+7);ctx.lineTo(q-4,FLOOR+cap+17);ctx.lineTo(q+1,FLOOR+cap+29);ctx.strokeStyle='rgba(17,38,53,.55)';ctx.lineWidth=.9;ctx.stroke();
+    ctx.beginPath();ctx.moveTo(q+1,FLOOR+cap+7);ctx.lineTo(q-3,FLOOR+cap+17);ctx.strokeStyle='rgba(168,181,188,.18)';ctx.lineWidth=.45;ctx.stroke();
+  }
+  const jointW=1+Math.floor(nrGameHash37(seed*31+11)*2);
+  ctx.fillStyle='rgba(11,27,41,.55)';ctx.fillRect(x+tile-jointW,FLOOR+cap+1,jointW,slabH-cap-2);
+  ctx.fillStyle='rgba(136,152,160,.12)';ctx.fillRect(x+1,FLOOR+cap+2,1,slabH-cap-6);
+ }
+ // Recessed lower courses: simpler bricks with soft brightness changes.
+ const rows=[{y:FLOOR+slabH,h:24,w:38,shift:0},{y:FLOOR+slabH+24,h:28,w:46,shift:18}];
+ for(let r=0;r<rows.length;r++){
+  const row=rows[r];if(row.y>=VH)continue;
+  const start=a-(((offset*.57+row.shift)%row.w)+row.w)%row.w-row.w;
+  for(let x=start;x<b+row.w;x+=row.w){
+   const seed=Math.floor((x+offset*.57)/row.w)+r*211,v=nrGameHash37(seed*19+3);
+   const gr=ctx.createLinearGradient(x,row.y,x+5,row.y+row.h);
+   gr.addColorStop(0,v>.5?'#324657':'#2d4052');gr.addColorStop(.55,v>.5?'#273a4b':'#253848');gr.addColorStop(1,'#1b2d3c');
+   ctx.fillStyle=gr;ctx.fillRect(x+1,row.y,row.w-2,Math.min(row.h,VH-row.y));
+   ctx.fillStyle='rgba(147,164,172,.06)';ctx.fillRect(x+5,row.y+4,row.w-10,1);
+   ctx.fillStyle='rgba(9,24,37,.28)';ctx.fillRect(x+4,row.y+row.h-3,row.w-8,2);
+   ctx.fillStyle='rgba(10,24,37,.38)';ctx.fillRect(x+row.w-1,row.y+2,1,Math.min(row.h-3,VH-row.y));
+  }
+ }
+ ctx.beginPath();ctx.moveTo(a,FLOOR+.65);ctx.lineTo(b,FLOOR+.65);ctx.strokeStyle='rgba(185,200,207,.34)';ctx.lineWidth=1;ctx.stroke();
+ ctx.restore();
+}
+function nrDrawGameStoneCube37(px,py,sq,n,angle=0){
+ const pal=nrGameCubePal37(n),h=sq/2,inset=Math.round(sq*.11);
+ ctx.save();ctx.translate(px,py);ctx.rotate(angle);
+ const outer=ctx.createLinearGradient(-h,-h,h,h);
+ outer.addColorStop(0,pal.light);outer.addColorStop(.52,pal.front);outer.addColorStop(1,pal.shadow);
+ ctx.shadowColor='rgba(3,12,20,.26)';ctx.shadowBlur=5;
+ round(-h,-h,sq,sq,8);ctx.fillStyle=outer;ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='rgba(220,231,234,.22)';ctx.lineWidth=1.2;ctx.stroke();
+ round(-h+inset,-h+inset,sq-inset*2,sq-inset*2,6);ctx.clip();
+ const face=ctx.createLinearGradient(-h+inset,-h+inset,h-inset,h-inset);
+ face.addColorStop(0,pal.light);face.addColorStop(.45,pal.front);face.addColorStop(1,pal.shadow);ctx.fillStyle=face;ctx.fillRect(-h,-h,sq,sq);
+ // Low-contrast stone tone variation.
+ ctx.fillStyle='rgba(255,255,255,.05)';ctx.fillRect(-h+inset+5,-h+inset+6,sq*.42,6);
+ ctx.fillStyle='rgba(0,0,0,.05)';ctx.fillRect(-h+inset+6,h-inset-12,sq*.46,7);
+ // Slight asymmetry and restrained wear to keep the cube from looking synthetic.
+ ctx.beginPath();ctx.moveTo(-h+inset+3,-h+inset+4);ctx.lineTo(-h+inset+10,-h+inset+7);ctx.lineTo(-h+inset+7,-h+inset+12);ctx.closePath();ctx.fillStyle='rgba(66,88,101,.42)';ctx.fill();
+ if(n%2===0){ctx.beginPath();ctx.moveTo(h-inset-11,h-inset-6);ctx.lineTo(h-inset-5,h-inset-9);ctx.lineTo(h-inset-8,h-inset-14);ctx.closePath();ctx.fillStyle='rgba(209,216,218,.22)';ctx.fill();}
+ // One short stone fissure and a few chips only.
+ const cx=h*.18;ctx.beginPath();ctx.moveTo(cx,-h*.08);ctx.lineTo(cx-4,h*.06);ctx.lineTo(cx+2,h*.19);ctx.strokeStyle='rgba(17,38,53,.45)';ctx.lineWidth=1;ctx.stroke();
+ ctx.beginPath();ctx.moveTo(cx+1,-h*.08);ctx.lineTo(cx-3,h*.06);ctx.strokeStyle='rgba(210,219,221,.16)';ctx.lineWidth=.45;ctx.stroke();
+ ctx.restore();
+}
+function nrDrawGameDigit37(px,py,n,pal){
+ const glyph=String(n);
+ ctx.save();ctx.font='900 35px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+ // Stronger carved impression: upper interior is darker, lower lip is lighter.
+ ctx.fillStyle='rgba(9,23,36,.34)';ctx.fillText(glyph,px-.6,py-1.1);
+ ctx.fillStyle='rgba(233,239,239,.36)';ctx.fillText(glyph,px+.55,py+1.55);
+ ctx.fillStyle=pal.ink;ctx.fillText(glyph,px,py+.15);
+ ctx.restore();
+}
 function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);background();if(uiMode!=='story')drawWallHeightReferences();
- const gaps=objs.filter(o=>o.type==='gap');function floor(a,b){if(b<=a)return;ctx.fillStyle='#13283d';ctx.fillRect(a,FLOOR,b-a,VH-FLOOR);stroke(a,FLOOR,b,FLOOR,'#c1e7fa',3);}
- if(!gaps.length)floor(0,W);else{let cursor=0;for(const o of gaps){let l=screenX(o.x),r=l+o.width;floor(cursor,Math.min(W,l));cursor=Math.max(cursor,r);stroke(l,FLOOR,l,VH,'#4d9fd577',2);stroke(r,FLOOR,r,VH,'#4d9fd577',2);}floor(cursor,W)}
- let off=-(state.distance%51);for(let x=off;x<W;x+=51){if(gaps.some(o=>x>screenX(o.x)&&x<screenX(o.x)+o.width))continue;stroke(x,FLOOR+22,x+19,FLOOR+22,'#4b708b',3)}
+ const gaps=objs.filter(o=>o.type==='gap');function floor(a,b){nrDrawGameStoneFloor37(a,b,state.distance*.72)}
+ if(!gaps.length)floor(0,W);else{let cursor=0;for(const o of gaps){let l=screenX(o.x),r=l+o.width;floor(cursor,Math.min(W,l));cursor=Math.max(cursor,r);stroke(l,FLOOR,l,VH,'#49687b6e',2);stroke(r,FLOOR,r,VH,'#49687b6e',2);}floor(cursor,W)}
  if(uiMode!=='story')drawMovingWallGuide();
  for(const o of objs){if(o.type==='digitSwitch')drawDigitSwitch(o);if(o.type==='switchPlatform')drawSwitchPlatform(o);if(o.type==='wall')drawBlock(o);if(o.type==='spike')drawSpike(o);if(o.type==='airA')drawAirA(o);if(o.type==='airB')drawAirB(o);if(o.type==='numberGate')drawNumberGate(o);if(o.type==='numberPlatform')drawNumberPlatform(o);if(o.type==='ceiling'){let roof={type:'wall',x:o.x,width:o.width,height:0};let x=screenX(o.x),y=scrY(o.base),top=y-32;ctx.fillStyle='#14273f';ctx.fillRect(x,top,o.width,32);stroke(x,top,x+o.width,top,'#7caac9',3);drawSpike({type:'spike',x:o.x,width:o.width,count:Math.round(o.width/75),height:o.spikeH,base:o.base,down:true})}}
  drawGoal();
  if(uiMode!=='story'){drawJumpGuide();drawGapGuide();drawNumberGateGuide();drawPlatformGuide();drawSwitchGuide();drawObjectMeasures();drawMeasureBand()}
  drawGapWalls();
- // light motion streaks and shadow
- let sq=SIZE,px=cameraPlayerX(),py=scrY(state.y)-sq/2;
+ let sq=SIZE,px=cameraPlayerX(),py=scrY(state.y)-sq/2,pal=nrGameCubePal37(state.face);
  ctx.fillStyle='#071827a6';ctx.beginPath();ctx.ellipse(px,FLOOR+3,30*(1-Math.min(.6,state.y/650)),4,0,0,Math.PI*2);ctx.fill();
  if(state.lastLanding>0){ctx.strokeStyle=`rgba(155,232,255,${state.lastLanding/.3})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(px,FLOOR,30+(1-state.lastLanding/.3)*25,6,0,0,Math.PI*2);ctx.stroke()}
- const fill=COLORS[state.face][0],ink=COLORS[state.face][1];for(let k=0;k<5;k++)stroke(px-sq*.70-k*16,py+(k-2)*7,px-sq*.70-k*16+9,py+(k-2)*7,fill+'70',2);
- ctx.save();ctx.translate(px,py);ctx.rotate(state.angle);ctx.shadowColor=fill;ctx.shadowBlur=17;round(-sq/2,-sq/2,sq,sq,8);ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle='#eefaff';ctx.lineWidth=3;ctx.stroke();ctx.shadowBlur=0;ctx.fillStyle='#ffffff77';round(-sq*.38,-sq*.37,sq*.28,5,2);ctx.fill();ctx.fillStyle='#11354e50';round(sq*.26,sq*.25,9,9,2);ctx.fill();ctx.restore();
- ctx.font='900 35px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle=ink;ctx.fillText(String(state.face),px,py+2);ctx.textBaseline='alphabetic';ctx.font='800 13px system-ui';ctx.textAlign='center';ctx.fillStyle='#a7c9dd';ctx.fillText('AUTO →',px,FLOOR+90);
+ for(let k=0;k<4;k++)stroke(px-sq*.68-k*15,py+(k-1.5)*7,px-sq*.68-k*15+8,py+(k-1.5)*7,pal.trail+'55',1.8);
+ nrDrawGameStoneCube37(px,py,sq,state.face,state.angle);
+ nrDrawGameDigit37(px,py,state.face,pal);
+ ctx.textBaseline='alphabetic';ctx.font='800 13px system-ui';ctx.textAlign='center';ctx.fillStyle='#a7c9dd';ctx.fillText('AUTO →',px,FLOOR+90);
 }
 function resize(){const r=canvas.getBoundingClientRect();let width=Math.max(10,r.width),height=Math.max(10,r.height);W=VH*width/height;scale=height/VH;dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);draw()}
 function loop(t){if(!last)last=t;const dt=Math.min(.03,Math.max(0,(t-last)/1000));last=t;if(uiMode==='story'||uiMode==='practice'){update(dt);draw()}requestAnimationFrame(loop)}
@@ -1727,6 +1815,10 @@ function nrSlab35(x,y,w,seed,cap=17,slabH=90){
   const qx=x+12+nrHash(seed*5+17)*(w-28),qy=topY+16+nrHash(seed+27)*28;
   nrStoneMark35(qx,qy,seed,.42);
  }
+ if(nrHash(seed*23+14)>.57){
+  g.fillStyle=nrHash(seed*41+2)>.62?'rgba(173,187,193,.06)':'rgba(27,44,58,.08)';
+  g.fillRect(x+10,topY+10+nrHash(seed+5)*18,w*(.22+nrHash(seed+6)*.22),7+nrHash(seed+7)*9);
+ }
  g.restore();
  // The pale upper plane is part of the same stone, not a separate glowing panel.
  const top=g.createLinearGradient(x,y,x+8,y+cap);
@@ -1990,11 +2082,11 @@ function nrFaceGlyph35(p,n,angle,opacity,small,pal){
  const left=m.actualBoundingBoxLeft??0,right=m.actualBoundingBoxRight??m.width;
  const top=m.actualBoundingBoxAscent??78,bottom=m.actualBoundingBoxDescent??0;
  const px=(left-right)/2,py=(top-bottom)/2;
- // Shallow cut-stone digits. A soft lower lip and a dark upper interior
- // suggest depth, without a white outline, extruded sticker or glow.
+ // Slightly deeper stone carving: stronger interior shade, restrained lower lip.
  g.lineJoin='round';
- g.fillStyle='#e3e8e247';g.fillText(char,px+.5,py+1.8);
- g.fillStyle='#0b203750';g.fillText(char,px-.7,py-.9);
+ g.fillStyle='#eef2ee42';g.fillText(char,px+.55,py+2.05);
+ g.fillStyle='#091d315a';g.fillText(char,px-.8,py-1.15);
+ g.fillStyle='rgba(255,255,255,.07)';g.fillText(char,px+.1,py+.3);
  g.fillStyle=pal.ink;g.fillText(char,px,py);
  g.restore();
 }
