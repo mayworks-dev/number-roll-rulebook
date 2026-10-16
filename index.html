@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.4.1 · Stone Motion Feedback</title>
+<title>NUMBER ROLL — Ver.4.2 · Stronger Motion & Slightly Smaller Cube</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -335,7 +335,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
       </div>
       <div class="db-toolbar" id="dbToolbar">
-        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.1 動きの手応え</button>
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.2 動きとサイズ</button>
         <button id="dbV24" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.4 と比較</button>
         <button id="dbV23" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.3 と比較</button>
         <button id="dbV22" type="button" class="db-tool" aria-pressed="false">Ver.2.2</button>
@@ -1463,7 +1463,7 @@ new ResizeObserver(resize).observe(stage);progress();setPage(window.location.has
 (()=>{
 'use strict';
 const items=[
- ['player','プレイヤー','PLAYER CUBE','Ver.4.1：石の質感と接地位置は維持し、走行中のごく小さな粉じん、ジャンプと着地の反応を追加。'],
+ ['player','プレイヤー','PLAYER CUBE','Ver.4.2：石の質感と接地位置は維持しつつ、走行粉じんを見やすくし、プレイヤーを少しだけ小さく調整。'],
  ['spike','地上トゲ','CRYSTAL SPIKES','危険を一目で判断できる結晶形のトゲ。先端はシャープに。'],
  ['ground','地面・石床','RUIN STONE FLOOR','Ver.4.0：明るい床上面と青暗い石壁の区別、床の角度と奥行きはVer.3.9を維持。'],
  ['gap','穴・側壁','GAP / SIDE WALL','穴の位置と危険な側壁を、装飾に埋もれず判別できるように。'],
@@ -1483,7 +1483,7 @@ let cubeSpin=0, cubeTurns=0, cubeRoll=null, cameraView=0;
 // engine is rendered at ZOOM=.49, not at one screen pixel per world unit.
 const RUN_SPEED=285,RUN_JUMP_V=700,RUN_GRAVITY=1850,RUN_PLAYER_WORLD_SIZE=64,RUN_GAME_ZOOM=.49;
 const NR_FRONT_OFFSET40=3.5; // canvas px toward the near edge of the top slab; rendering only
-const RUN_PLAYER_SIZE=77,RUN_VISUAL_SCALE=RUN_GAME_ZOOM*RUN_PLAYER_SIZE/RUN_PLAYER_WORLD_SIZE; // Ver.3.8: visual scale only, physics units unchanged
+const RUN_PLAYER_SIZE=74,RUN_VISUAL_SCALE=RUN_GAME_ZOOM*RUN_PLAYER_SIZE/RUN_PLAYER_WORLD_SIZE; // Ver.4.2: slightly smaller visual size only; physics unchanged
 const RUN_TURN_SPEED=(Math.PI/2)/.20; // same ~0.20s rotation duration as the original game
 let runActive=false,runLast=0,runDistance=0,runHeight=0,runVelocity=0,runUsed=0,runLimit=1,runFrame=0,runStamp=0;
 let runStartFace=1,runTurnTarget=0,runLandFx=0,runLaunchFx=0,runCameraLift=0,runElapsed=0;
@@ -2340,25 +2340,25 @@ function runFloor(offset,cameraLift=0){
 // Deterministic muted grit. No glow, no particles while airborne except jump/landing bursts.
 function nrEmitRunDust41(kind){
  if(!runActive||!nrModernStone35())return;
- const count=kind==='jump'?6:kind==='land'?8:2;
+ const count=kind==='jump'?9:kind==='land'?11:4;
  const groundY=341+runCameraLift+8.1+NR_FRONT_OFFSET40;
  for(let k=0;k<count;k++){
   const seed=++runDustSerial41;
   const a=nrHash(seed*79+3),b=nrHash(seed*113+11),c=nrHash(seed*37+8);
   const behind=kind==='trail';
-  const dustX=behind?252-RUN_PLAYER_SIZE*.54-a*12:kind==='jump'?252-RUN_PLAYER_SIZE*.40+a*11:252+(k%2===0?-1:1)*(RUN_PLAYER_SIZE*.36+a*8);
+  const dustX=behind?252-RUN_PLAYER_SIZE*.50-a*18:kind==='jump'?252-RUN_PLAYER_SIZE*.34+a*15:252+(k%2===0?-1:1)*(RUN_PLAYER_SIZE*.32+a*11);
   runDust41.push({
    x:dustX,
-   y:groundY-(behind?0:1)-b*3.2,
-   vx:behind?-(30+a*68):(-54+a*85),
-   vy:behind?-(3+b*11):kind==='jump'?-(20+b*30):-(7+b*25),
-   gravity:behind?56:92,
-   life:behind?.18+b*.11:kind==='jump'?.23+b*.17:.2+b*.16,
-   age:0,r:behind?1.0+c*1.05:1.2+c*1.45,
-   light:seed%4===0
+   y:groundY-(behind?.6:1.2)-b*(behind?3.6:4.6),
+   vx:behind?-(42+a*96):(-58+a*92),
+   vy:behind?-(8+b*16):kind==='jump'?-(24+b*34):-(10+b*28),
+   gravity:behind?58:96,
+   life:behind?.24+b*.13:kind==='jump'?.26+b*.18:.23+b*.17,
+   age:0,r:behind?1.45+c*1.25:1.5+c*1.75,
+   light:seed%3===0
   });
  }
- if(runDust41.length>70)runDust41.splice(0,runDust41.length-70);
+ if(runDust41.length>120)runDust41.splice(0,runDust41.length-120);
 }
 function nrUpdateRunDust41(dt){
  for(const p of runDust41){p.age+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=p.gravity*dt;}
@@ -2368,9 +2368,9 @@ function nrDrawRunDust41(){
  if(!runDust41.length)return;
  g.save();g.beginPath();g.rect(0,0,1024,440);g.clip();
  for(const p of runDust41){
-  const fade=Math.max(0,1-p.age/p.life);
-  g.fillStyle=p.light?`rgba(189,201,202,${.40*fade})`:`rgba(121,142,150,${.40*fade})`;
-  g.beginPath();g.ellipse(p.x,p.y,p.r*(1+.18*p.age/p.life),p.r*.67,0,0,Math.PI*2);g.fill();
+  const fade=Math.max(0,1-p.age/p.life),stretch=1+.85*(p.age/p.life);
+  g.fillStyle=p.light?`rgba(202,212,214,${.56*fade})`:`rgba(128,150,160,${.52*fade})`;
+  g.beginPath();g.ellipse(p.x,p.y,p.r*stretch,p.r*.72,0,0,Math.PI*2);g.fill();
  }
  g.restore();
 }
@@ -2403,7 +2403,7 @@ function draw(){
     const mainGround=341;
     const mainX=512;
     if(improved){
-      const previewSize=180; // Ver.4.0: keep approved scale and floor geometry.
+      const previewSize=172; // Ver.4.2: slightly smaller preview cube; floor geometry unchanged.
       nrPlayerContactShadow38(playerShadowX(mainX,previewSize,phase),mainGround,previewSize,0,20);
       dbRoundedCube(mainX,playerCenterYForGround(mainGround+10.2+NR_FRONT_OFFSET40,previewSize,phase),previewSize,face,phase);
     }else {
@@ -2418,10 +2418,10 @@ function draw(){
 function refresh(){const i=items[pos];const player=i[0]==='player';$('dbName').textContent=i[1];$('dbEnglish').textContent=i[2];$('dbDescription').textContent=i[3];$('dbCounter').textContent=String(pos+1).padStart(2,'0')+' / '+items.length;
  for(const [k,b] of [...$('dbCategories').children].entries()){b.classList.toggle('active',k===pos);b.setAttribute('aria-current',String(k===pos))}
  $('dbNew').classList.toggle('active',improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31));$('dbV24').classList.toggle('active',improved&&legacy24);$('dbV23').classList.toggle('active',improved&&legacy23);$('dbV22').classList.toggle('active',improved&&legacy22);$('dbOld').classList.toggle('active',!improved);$('dbNew').setAttribute('aria-pressed',String(improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31)));$('dbV24').setAttribute('aria-pressed',String(improved&&legacy24));$('dbV23').setAttribute('aria-pressed',String(improved&&legacy23));$('dbV22').setAttribute('aria-pressed',String(improved&&legacy22));$('dbOld').setAttribute('aria-pressed',String(!improved));$('dbV22').hidden=items[pos][0]!=='player';$('dbV23').hidden=items[pos][0]!=='player';$('dbV24').hidden=items[pos][0]!=='player';$('dbGroundBefore').hidden=items[pos][0]!=='ground'||!improved;$('dbGroundBefore').classList.toggle('active',nrFloorCompare31);$('dbGroundBefore').setAttribute('aria-pressed',String(nrFloorCompare31));$('dbGroundBefore').textContent=nrFloorCompare31?'✓ Ver.3.1 石床':'◈ Ver.3.1と比較';
- $('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=!player;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.4.1 / 石材と接地面は維持'):'Ver.4.1 / 動きの手応えを調整'):'旧デザイン風（比較用）';
+ $('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=!player;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.4.2 / 石材と接地面は維持'):'Ver.4.2 / 動きとサイズを調整'):'旧デザイン風（比較用）';
  try{$('dbMemo').value=localStorage.getItem(memoKey(pos))||''}catch{$('dbMemo').value=''};
  for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
- $('dbExtras').hidden=items[pos][0]==='ground';$('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=!player||!runActive;$('dbRun').textContent=runActive?'■ 停止して戻る':'▶ 走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'黒背景 / 石粉の走行・着地演出を確認':'黒背景 / プレイヤーと床だけ';$('dbInstruction').textContent=runActive?'画面タップでジャンプ。回転後の向き・接地・横滑りを確認。':player?'背景を消した状態で、数字・回転・接地の見た目を確認できます。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['真正面','正面＋少し奥行き','正面＋奥行き'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
+ $('dbExtras').hidden=items[pos][0]==='ground';$('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=!player||!runActive;$('dbRun').textContent=runActive?'■ 停止して戻る':'▶ 走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'黒背景 / 石粉の疾走感と着地演出を確認':'黒背景 / プレイヤーと床だけ';$('dbInstruction').textContent=runActive?'画面タップでジャンプ。回転後の向き・接地・横滑りを確認。':player?'背景を消した状態で、数字・回転・接地の見た目を確認できます。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['真正面','正面＋少し奥行き','正面＋奥行き'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
 function select(n){stopRun(false);pos=(n+items.length)%items.length;if(items[pos][0]!=='ground')nrFloorCompare31=false;refresh()}
 function stopRun(redraw=true){
  if(!runActive)return;
@@ -2454,10 +2454,10 @@ function runTick(now){
  const dt=Math.min(.033,Math.max(0,(now-runLast)/1000));runLast=now;
  runElapsed+=dt;runDistance+=RUN_SPEED*dt;
  runLandFx=Math.max(0,runLandFx-dt);runLaunchFx=Math.max(0,runLaunchFx-dt);
- // Slow, tiny trail anchored to the moving stone surface. No continuous smoke cloud.
+ // Ver.4.2: clearer trail of muted stone dust for more perceived speed.
  if(runHeight<.25&&runVelocity<=0){
   runDustTimer41+=dt;
-  while(runDustTimer41>=.085){nrEmitRunDust41('trail');runDustTimer41-=.085;}
+  while(runDustTimer41>=.05){nrEmitRunDust41('trail');runDustTimer41-=.05;}
  }else runDustTimer41=0;
  nrUpdateRunDust41(dt);
  if(runHeight>0||runVelocity>0){
