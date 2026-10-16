@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.3.6 · Ruin Stone Material</title>
+<title>NUMBER ROLL — Ver.3.9 · Floor Plane & Contact</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -335,7 +335,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
       </div>
       <div class="db-toolbar" id="dbToolbar">
-        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.3.6 落ち着いた石材</button>
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.3.9 接地・奥行き調整</button>
         <button id="dbV24" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.4 と比較</button>
         <button id="dbV23" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.3 と比較</button>
         <button id="dbV22" type="button" class="db-tool" aria-pressed="false">Ver.2.2</button>
@@ -1235,53 +1235,59 @@ function nrGameCubePal37(n){return ({
 function nrDrawGameStoneFloor37(a,b,offset=0){
  if(b<=a)return;
  const depth=VH-FLOOR;if(depth<=0)return;
- const slabH=Math.min(56,Math.max(42,depth*.44)),cap=10,tile=58;
+ const topDepth=9,slabH=Math.min(54,Math.max(41,depth*.42)),tile=60;
  ctx.save();ctx.beginPath();ctx.rect(a,FLOOR,b-a,depth);ctx.clip();
- ctx.fillStyle='#122131';ctx.fillRect(a,FLOOR,b-a,depth);
- // Main top slabs: same collision plane, but quieter value shifts and joints.
+ // Dark base behind everything so the upper running plane reads clearly.
+ ctx.fillStyle='#102030';ctx.fillRect(a,FLOOR,b-a,depth);
  const base=a-((offset%tile)+tile)%tile-tile;
  for(let x=base;x<b+tile;x+=tile){
   const seed=Math.floor((x+offset)/tile),v=nrGameHash37(seed*13+7),vv=nrGameHash37(seed*29+5);
-  const bright=v>.53;
-  const topGrad=ctx.createLinearGradient(x,FLOOR,x+8,FLOOR+cap);
-  topGrad.addColorStop(0,bright?'#8ba0aa':'#8398a3');
-  topGrad.addColorStop(.6,bright?'#758b97':'#6f8591');
-  topGrad.addColorStop(1,'#556b7d');
-  ctx.fillStyle=topGrad;ctx.fillRect(x+1,FLOOR,x+tile-(x+1),cap);
-  const faceGrad=ctx.createLinearGradient(x,FLOOR+cap,x+7,FLOOR+slabH);
-  faceGrad.addColorStop(0,bright?'#526877':'#4b6273');
-  faceGrad.addColorStop(.42,bright?'#3d5262':'#394e5f');
-  faceGrad.addColorStop(1,'#223646');
-  ctx.fillStyle=faceGrad;ctx.fillRect(x+1,FLOOR+cap,tile-2,slabH-cap);
-  ctx.fillStyle='rgba(190,204,210,.08)';ctx.fillRect(x+6,FLOOR+cap+5,tile-12,1);
-  ctx.fillStyle='rgba(8,24,38,.35)';ctx.fillRect(x+4,FLOOR+slabH-3,tile-8,2);
-  // Slight per-block tonal drift to break uniformity without becoming noisy.
-  if(vv>.58){ctx.fillStyle=vv>.82?'rgba(157,172,179,.06)':'rgba(31,47,58,.09)';ctx.fillRect(x+8,FLOOR+cap+8+Math.floor(v*8),tile-18,6+Math.floor(vv*7));}
-  if(v>.76){
+  const bright=v>.52;
+  // Top running plane: lighter and slightly greyer so it separates from the wall.
+  const topGrad=ctx.createLinearGradient(x,FLOOR,x+10,FLOOR+topDepth);
+  topGrad.addColorStop(0,bright?'#93a8b1':'#8ca1ab');
+  topGrad.addColorStop(.56,bright?'#7d939e':'#778c97');
+  topGrad.addColorStop(1,'#657b88');
+  ctx.fillStyle=topGrad;ctx.fillRect(x+1,FLOOR,tile-2,topDepth);
+  // Running surface wear / quiet tonal drift.
+  if(vv>.55){ctx.fillStyle=vv>.8?'rgba(210,220,224,.07)':'rgba(36,52,64,.07)';ctx.fillRect(x+8,FLOOR+2+Math.floor(v*2),tile-18,2+Math.floor(vv*3));}
+  // Clear transition from floor plane to front wall plane.
+  ctx.fillStyle='rgba(22,38,52,.58)';ctx.fillRect(x+1,FLOOR+topDepth-1,tile-2,2);
+  const faceGrad=ctx.createLinearGradient(x,FLOOR+topDepth,x+7,FLOOR+slabH);
+  faceGrad.addColorStop(0,bright?'#4d6476':'#485f71');
+  faceGrad.addColorStop(.45,bright?'#395063':'#364c60');
+  faceGrad.addColorStop(1,'#22394a');
+  ctx.fillStyle=faceGrad;ctx.fillRect(x+1,FLOOR+topDepth,tile-2,slabH-topDepth);
+  // Lower lip shadow anchors the wall below the running plane.
+  ctx.fillStyle='rgba(8,20,33,.34)';ctx.fillRect(x+4,FLOOR+slabH-3,tile-8,2);
+  // Only some blocks show a small vertical fissure.
+  if(v>.77){
     const q=x+tile*(.24+nrGameHash37(seed*17+2)*.44);
-    ctx.beginPath();ctx.moveTo(q,FLOOR+cap+7);ctx.lineTo(q-4,FLOOR+cap+17);ctx.lineTo(q+1,FLOOR+cap+29);ctx.strokeStyle='rgba(17,38,53,.55)';ctx.lineWidth=.9;ctx.stroke();
-    ctx.beginPath();ctx.moveTo(q+1,FLOOR+cap+7);ctx.lineTo(q-3,FLOOR+cap+17);ctx.strokeStyle='rgba(168,181,188,.18)';ctx.lineWidth=.45;ctx.stroke();
+    ctx.beginPath();ctx.moveTo(q,FLOOR+topDepth+5);ctx.lineTo(q-4,FLOOR+topDepth+14);ctx.lineTo(q+1,FLOOR+topDepth+25);ctx.strokeStyle='rgba(17,38,53,.48)';ctx.lineWidth=.85;ctx.stroke();
+    ctx.beginPath();ctx.moveTo(q+1,FLOOR+topDepth+5);ctx.lineTo(q-3,FLOOR+topDepth+14);ctx.strokeStyle='rgba(180,192,198,.14)';ctx.lineWidth=.4;ctx.stroke();
   }
+  // Joints start below the top plane, so the cube is clearly on the upper surface.
   const jointW=1+Math.floor(nrGameHash37(seed*31+11)*2);
-  ctx.fillStyle='rgba(11,27,41,.55)';ctx.fillRect(x+tile-jointW,FLOOR+cap+1,jointW,slabH-cap-2);
-  ctx.fillStyle='rgba(136,152,160,.12)';ctx.fillRect(x+1,FLOOR+cap+2,1,slabH-cap-6);
+  ctx.fillStyle='rgba(10,24,37,.54)';ctx.fillRect(x+tile-jointW,FLOOR+topDepth+1,jointW,slabH-topDepth-2);
+  ctx.fillStyle='rgba(139,154,162,.10)';ctx.fillRect(x+1,FLOOR+topDepth+2,1,slabH-topDepth-6);
  }
- // Recessed lower courses: simpler bricks with soft brightness changes.
- const rows=[{y:FLOOR+slabH,h:24,w:38,shift:0},{y:FLOOR+slabH+24,h:28,w:46,shift:18}];
+ // Recessed lower wall courses: darker and bluer than the floor above.
+ const rows=[{y:FLOOR+slabH,h:25,w:39,shift:0},{y:FLOOR+slabH+25,h:29,w:47,shift:19}];
  for(let r=0;r<rows.length;r++){
   const row=rows[r];if(row.y>=VH)continue;
   const start=a-(((offset*.57+row.shift)%row.w)+row.w)%row.w-row.w;
   for(let x=start;x<b+row.w;x+=row.w){
    const seed=Math.floor((x+offset*.57)/row.w)+r*211,v=nrGameHash37(seed*19+3);
-   const gr=ctx.createLinearGradient(x,row.y,x+5,row.y+row.h);
-   gr.addColorStop(0,v>.5?'#324657':'#2d4052');gr.addColorStop(.55,v>.5?'#273a4b':'#253848');gr.addColorStop(1,'#1b2d3c');
+   const gr=ctx.createLinearGradient(x,row.y,x+6,row.y+row.h);
+   gr.addColorStop(0,v>.5?'#2f4558':'#294052');gr.addColorStop(.55,v>.5?'#24384a':'#223546');gr.addColorStop(1,'#182b3b');
    ctx.fillStyle=gr;ctx.fillRect(x+1,row.y,row.w-2,Math.min(row.h,VH-row.y));
-   ctx.fillStyle='rgba(147,164,172,.06)';ctx.fillRect(x+5,row.y+4,row.w-10,1);
-   ctx.fillStyle='rgba(9,24,37,.28)';ctx.fillRect(x+4,row.y+row.h-3,row.w-8,2);
-   ctx.fillStyle='rgba(10,24,37,.38)';ctx.fillRect(x+row.w-1,row.y+2,1,Math.min(row.h-3,VH-row.y));
+   ctx.fillStyle='rgba(148,165,176,.05)';ctx.fillRect(x+5,row.y+4,row.w-10,1);
+   ctx.fillStyle='rgba(8,20,33,.26)';ctx.fillRect(x+4,row.y+row.h-3,row.w-8,2);
+   ctx.fillStyle='rgba(8,20,33,.36)';ctx.fillRect(x+row.w-1,row.y+2,1,Math.min(row.h-3,VH-row.y));
   }
  }
- ctx.beginPath();ctx.moveTo(a,FLOOR+.65);ctx.lineTo(b,FLOOR+.65);ctx.strokeStyle='rgba(185,200,207,.34)';ctx.lineWidth=1;ctx.stroke();
+ // Top highlight: this is the exact line the cube runs on.
+ ctx.beginPath();ctx.moveTo(a,FLOOR+.55);ctx.lineTo(b,FLOOR+.55);ctx.strokeStyle='rgba(201,211,216,.42)';ctx.lineWidth=1;ctx.stroke();
  ctx.restore();
 }
 function nrDrawGameStoneCube37(px,py,sq,n,angle=0){
@@ -1307,7 +1313,7 @@ function nrDrawGameStoneCube37(px,py,sq,n,angle=0){
 }
 function nrDrawGameDigit37(px,py,n,pal){
  const glyph=String(n);
- ctx.save();ctx.font='900 35px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+ ctx.save();ctx.font='900 32px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
  // Stronger carved impression: upper interior is darker, lower lip is lighter.
  ctx.fillStyle='rgba(9,23,36,.34)';ctx.fillText(glyph,px-.6,py-1.1);
  ctx.fillStyle='rgba(233,239,239,.36)';ctx.fillText(glyph,px+.55,py+1.55);
@@ -1316,16 +1322,18 @@ function nrDrawGameDigit37(px,py,n,pal){
 }
 function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);background();if(uiMode!=='story')drawWallHeightReferences();
  const gaps=objs.filter(o=>o.type==='gap');function floor(a,b){nrDrawGameStoneFloor37(a,b,state.distance*.72)}
- if(!gaps.length)floor(0,W);else{let cursor=0;for(const o of gaps){let l=screenX(o.x),r=l+o.width;floor(cursor,Math.min(W,l));cursor=Math.max(cursor,r);stroke(l,FLOOR,l,VH,'#49687b6e',2);stroke(r,FLOOR,r,VH,'#49687b6e',2);}floor(cursor,W)}
+ if(!gaps.length)floor(0,W);else{let cursor=0;for(const o of gaps){let l=screenX(o.x),r=l+o.width;floor(cursor,Math.min(W,l));cursor=Math.max(cursor,r);stroke(l,FLOOR,l,VH,'#45627566',2);stroke(r,FLOOR,r,VH,'#45627566',2);}floor(cursor,W)}
  if(uiMode!=='story')drawMovingWallGuide();
  for(const o of objs){if(o.type==='digitSwitch')drawDigitSwitch(o);if(o.type==='switchPlatform')drawSwitchPlatform(o);if(o.type==='wall')drawBlock(o);if(o.type==='spike')drawSpike(o);if(o.type==='airA')drawAirA(o);if(o.type==='airB')drawAirB(o);if(o.type==='numberGate')drawNumberGate(o);if(o.type==='numberPlatform')drawNumberPlatform(o);if(o.type==='ceiling'){let roof={type:'wall',x:o.x,width:o.width,height:0};let x=screenX(o.x),y=scrY(o.base),top=y-32;ctx.fillStyle='#14273f';ctx.fillRect(x,top,o.width,32);stroke(x,top,x+o.width,top,'#7caac9',3);drawSpike({type:'spike',x:o.x,width:o.width,count:Math.round(o.width/75),height:o.spikeH,base:o.base,down:true})}}
  drawGoal();
  if(uiMode!=='story'){drawJumpGuide();drawGapGuide();drawNumberGateGuide();drawPlatformGuide();drawSwitchGuide();drawObjectMeasures();drawMeasureBand()}
  drawGapWalls();
- let sq=SIZE,px=cameraPlayerX(),py=scrY(state.y)-sq/2,pal=nrGameCubePal37(state.face);
- ctx.fillStyle='#071827a6';ctx.beginPath();ctx.ellipse(px,FLOOR+3,30*(1-Math.min(.6,state.y/650)),4,0,0,Math.PI*2);ctx.fill();
- if(state.lastLanding>0){ctx.strokeStyle=`rgba(155,232,255,${state.lastLanding/.3})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(px,FLOOR,30+(1-state.lastLanding/.3)*25,6,0,0,Math.PI*2);ctx.stroke()}
- for(let k=0;k<4;k++)stroke(px-sq*.68-k*15,py+(k-1.5)*7,px-sq*.68-k*15+8,py+(k-1.5)*7,pal.trail+'55',1.8);
+ // Ver.3.9: the cube sits on the running line itself, not in the wall face.
+ let sq=SIZE*.90,px=cameraPlayerX(),py=scrY(state.y)-sq/2-.15,pal=nrGameCubePal37(state.face);
+ // Shadow is kept tight to the top plane so the contact point reads clearly.
+ ctx.fillStyle='#06111ca0';ctx.beginPath();ctx.ellipse(px,FLOOR+1.35,22*(1-Math.min(.56,state.y/650)),2.8,0,0,Math.PI*2);ctx.fill();
+ if(state.lastLanding>0){ctx.strokeStyle=`rgba(155,232,255,${state.lastLanding/.3})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(px,FLOOR+.8,28+(1-state.lastLanding/.3)*23,5.4,0,0,Math.PI*2);ctx.stroke()}
+ for(let k=0;k<4;k++)stroke(px-sq*.68-k*15,py+(k-1.5)*7,px-sq*.68-k*15+8,py+(k-1.5)*7,pal.trail+'4a',1.6);
  nrDrawGameStoneCube37(px,py,sq,state.face,state.angle);
  nrDrawGameDigit37(px,py,state.face,pal);
  ctx.textBaseline='alphabetic';ctx.font='800 13px system-ui';ctx.textAlign='center';ctx.fillStyle='#a7c9dd';ctx.fillText('AUTO →',px,FLOOR+90);
@@ -1455,9 +1463,9 @@ new ResizeObserver(resize).observe(stage);progress();setPage(window.location.has
 (()=>{
 'use strict';
 const items=[
- ['player','プレイヤー','PLAYER CUBE','Ver.3.6：落ち着いた青灰色の石キューブ。弱い明暗、浅い数字彫刻、控えめな傷を確認。'],
+ ['player','プレイヤー','PLAYER CUBE','Ver.3.9：キューブ底面を床上面の中央付近に合わせ、滑り感を軽減。彫刻数字と落ち着いた石材を維持。'],
  ['spike','地上トゲ','CRYSTAL SPIKES','危険を一目で判断できる結晶形のトゲ。先端はシャープに。'],
- ['ground','地面・石床','RUIN STONE FLOOR','Ver.3.6：発光・装飾を抑えた青灰色の石床。控えめな目地と石の厚みを確認。'],
+ ['ground','地面・石床','RUIN STONE FLOOR','Ver.3.9：明るい床上面と青暗い石壁を区別。奥行きと石板の角度を整理。'],
  ['gap','穴・側壁','GAP / SIDE WALL','穴の位置と危険な側壁を、装飾に埋もれず判別できるように。'],
  ['safe','青壁・安全','LANDABLE WALL','上面だけ安全。ミントの着地ラインと石の装飾を確認。'],
  ['danger','赤壁・危険','HAZARDOUS WALL','全方向危険。赤い縁・警告模様・本体の質感。'],
@@ -1474,7 +1482,7 @@ let cubeSpin=0, cubeTurns=0, cubeRoll=null, cameraView=0;
 // Use the SAME world-space constants as the real game. Height in the playable
 // engine is rendered at ZOOM=.49, not at one screen pixel per world unit.
 const RUN_SPEED=285,RUN_JUMP_V=700,RUN_GRAVITY=1850,RUN_PLAYER_WORLD_SIZE=64,RUN_GAME_ZOOM=.49;
-const RUN_PLAYER_SIZE=84,RUN_VISUAL_SCALE=RUN_GAME_ZOOM*RUN_PLAYER_SIZE/RUN_PLAYER_WORLD_SIZE;
+const RUN_PLAYER_SIZE=77,RUN_VISUAL_SCALE=RUN_GAME_ZOOM*RUN_PLAYER_SIZE/RUN_PLAYER_WORLD_SIZE; // Ver.3.8: visual scale only, physics units unchanged
 const RUN_TURN_SPEED=(Math.PI/2)/.20; // same ~0.20s rotation duration as the original game
 let runActive=false,runLast=0,runDistance=0,runHeight=0,runVelocity=0,runUsed=0,runLimit=1,runFrame=0,runStamp=0;
 let runStartFace=1,runTurnTarget=0,runLandFx=0,runLaunchFx=0,runCameraLift=0,runElapsed=0;
@@ -1786,9 +1794,9 @@ function nrSlab35(x,y,w,seed,cap=17,slabH=90){
  g.save();
  g.shadowColor='#00091181';g.shadowBlur=3;g.shadowOffsetY=2;
  const face=g.createLinearGradient(x,y+cap,x+9,y+slabH);
- face.addColorStop(0,bright?'#526b7e':'#4c6478');
- face.addColorStop(.27,bright?'#40586c':'#3b5369');
- face.addColorStop(.79,bright?'#2a4053':'#293f54');
+ face.addColorStop(0,bright?'#4d6375':'#465e71');
+ face.addColorStop(.27,bright?'#394f63':'#354b60');
+ face.addColorStop(.79,bright?'#263c52':'#243a50');
  face.addColorStop(1,'#1b3043');
  nrPath([[x+leftChip,topY-1],[x+w-rightChip,topY-1],[x+w-2,topY+5],
          [x+w-2,y+slabH-4],[x+w-6,y+slabH-2],[x+5,y+slabH-2],
@@ -1822,10 +1830,10 @@ function nrSlab35(x,y,w,seed,cap=17,slabH=90){
  g.restore();
  // The pale upper plane is part of the same stone, not a separate glowing panel.
  const top=g.createLinearGradient(x,y,x+8,y+cap);
- top.addColorStop(0,bright?'#879fac':'#8197a5');
- top.addColorStop(.55,bright?'#6c8495':'#667f91');
- top.addColorStop(1,'#4c657a');
- nrPath([[x+7,y+1],[x+w-8,y+1],[x+w-rightChip,y+cap-3],
+ top.addColorStop(0,bright?'#a0b2bb':'#96aab4');
+ top.addColorStop(.55,bright?'#8298a4':'#7b909d');
+ top.addColorStop(1,'#5b7584');
+ nrPath([[x+4,y+1],[x+w-5,y+1],[x+w-rightChip,y+cap-3],
          [x+leftChip,y+cap-3]],top);
  g.save();g.beginPath();g.rect(x+7,y+1,w-14,cap-3);g.clip();
  nrStoneGrainRect35(x,y,w,cap,seed+2,.35);g.restore();
@@ -1847,9 +1855,12 @@ function nrSlab35(x,y,w,seed,cap=17,slabH=90){
 function nrDrawStoneFloor35(x,y,w,h,offset=0){
  if(h<=0||w<=0)return;
  const isRunning=runActive&&items[pos][0]==='player';
- const tileW=isRunning?181:237,cap=isRunning?13:18,slabH=isRunning?79:89;
+ const tileW=isRunning?181:237,cap=isRunning?16:20,slabH=isRunning?79:89; // Ver.3.9: shared 2.5-D floor depth, gameplay unchanged
  g.save();g.beginPath();g.rect(x,y,w,h);g.clip();
  g.fillStyle='#142637';g.fillRect(x,y,w,h);
+ // A continuous masonry bed fills the thin joints beneath the stone caps;
+ // otherwise the larger top planes read as black triangular holes.
+ g.fillStyle='#526a78';g.fillRect(x,y,w,cap+2);
  // Recessed, staggered courses below the large top stones.
  const courses=[{y:slabH,h:42,w:112,shift:0},{y:slabH+42,h:45,w:127,shift:47},
                 {y:slabH+87,h:57,w:113,shift:26},{y:slabH+144,h:64,w:133,shift:67}];
@@ -2295,6 +2306,22 @@ function drawSwitch(){floor(88,353,842,87,!improved);const x=282,y=220,w=237,h=7
  text(String(face),x+w/2,y+21,42,'#ece1ff',950);
  const xx=722;wall(xx,153,90,200,false,!improved);g.setLineDash([10,10]);line(518,245,703,245,'#c4a3ffb3',4);g.setLineDash([]);text('→',612,221,32,'#b6e5ef',800);}
 function drawMoving(){floor(72,360,877,80,!improved);g.setLineDash([15,10]);line(200,144,822,144,improved?'#9fe9d7b0':'#7faaff9c',4);g.setLineDash([]);text('↔',515,107,70,'#b4f2df',600);wall(266,206,215,154,true,!improved);wall(580,186,160,174,false,!improved)}
+// Ver.3.9: place contact shadow at the middle of the visibly angled upper stone plane.
+// It fades and broadens with height but never alters the player's collision rectangle.
+function nrPlayerContactShadow38(cx,groundY,size,flight=0,cap=18){
+ const f=dbClamp(flight,0,1);
+ const y=groundY+cap*.51;
+ const wide=size*(.37-.11*f);
+ g.save();g.beginPath();g.rect(0,groundY,1024,Math.max(1,cap+1));g.clip();
+ const haze=g.createRadialGradient(cx,y,1,cx,y,size*.53);
+ haze.addColorStop(0,`rgba(6,17,26,${.26-.17*f})`);
+ haze.addColorStop(.55,`rgba(6,17,26,${.11-.075*f})`);
+ haze.addColorStop(1,'rgba(6,17,26,0)');
+ g.fillStyle=haze;g.fillRect(cx-size*.53,groundY,size*1.06,cap+1);
+ ellipse(cx,y,wide,Math.max(2.1,4.0-f*1.1),`rgba(2,11,18,${.68-.36*f})`);
+ if(f<.45)ellipse(cx,y-1,size*.22,1.9,`rgba(4,13,21,${.38*(1-f/.45)})`);
+ g.restore();
+}
 function playerCenterYForGround(groundY,size,spin=0,small=false){
  return groundY-dbBottomOffset(size,spin,small);
 }
@@ -2312,19 +2339,15 @@ function drawRunning(){
  const groundY=baseGroundY+runCameraLift;
  runFloor(runDistance*playerSize/RUN_PLAYER_WORLD_SIZE,runCameraLift);
  const phase=((cubeSpin%(Math.PI/2))+(Math.PI/2))%(Math.PI/2);
- const centerY=playerCenterYForGround(groundY,playerSize,phase,true)-visualJump;
+ // Bottom of the visible cube rests near the center of the 16px top plane (not on the wall).
+ const centerY=playerCenterYForGround(groundY+8.15,playerSize,phase,true)-visualJump;
  const sx=playerShadowX(px,playerSize,phase,true);
  const flight=dbClamp(visualJump/160,0,1);
- const shine=g.createRadialGradient(sx,groundY-2,1,sx,groundY-2,48);
- shine.addColorStop(0,`rgba(105,133,144,${.035-flight*.030})`);shine.addColorStop(1,'rgba(74,110,123,0)');
- g.fillStyle=shine;g.fillRect(sx-48,groundY-16,96,28);
- const shadowW=Math.max(15,31-flight*12);
- ellipse(sx,groundY-1,shadowW,Math.max(2,4.5-flight*2),`rgba(0,0,0,${.62-flight*.30})`);
- ellipse(sx,groundY-2,20,2,`rgba(83,105,115,${.045-flight*.035})`);
+ nrPlayerContactShadow38(sx,groundY,playerSize,flight,16);
  if(runLandFx>0){
   const t=1-runLandFx/.19;
-  g.beginPath();g.ellipse(sx,groundY-2,23+t*36,4+t*1.3,0,0,Math.PI*2);
-  g.strokeStyle=`rgba(162,181,186,${(1-t)*.21})`;g.lineWidth=2;g.stroke();
+  g.beginPath();g.ellipse(sx,groundY+8,20+t*31,3.8+t*.8,0,0,Math.PI*2);
+  g.strokeStyle=`rgba(162,181,186,${(1-t)*.15})`;g.lineWidth=1.5;g.stroke();
  }
  dbRoundedCube(px,centerY,playerSize,face,phase,true);
 }
@@ -2337,8 +2360,9 @@ function draw(){
     const mainGround=341;
     const mainX=512;
     if(improved){
-      shadow(playerShadowX(mainX,196,phase),mainGround,87);
-      dbRoundedCube(mainX,playerCenterYForGround(mainGround,196,phase),196,face,phase);
+      const previewSize=180; // Ver.3.9: keep the approved scale, fix plane alignment only.
+      nrPlayerContactShadow38(playerShadowX(mainX,previewSize,phase),mainGround,previewSize,0,20);
+      dbRoundedCube(mainX,playerCenterYForGround(mainGround+10.2,previewSize,phase),previewSize,face,phase);
     }else {
       shadow(515,331,140);oldCube(411,75,198,face)
     }
@@ -2351,7 +2375,7 @@ function draw(){
 function refresh(){const i=items[pos];const player=i[0]==='player';$('dbName').textContent=i[1];$('dbEnglish').textContent=i[2];$('dbDescription').textContent=i[3];$('dbCounter').textContent=String(pos+1).padStart(2,'0')+' / '+items.length;
  for(const [k,b] of [...$('dbCategories').children].entries()){b.classList.toggle('active',k===pos);b.setAttribute('aria-current',String(k===pos))}
  $('dbNew').classList.toggle('active',improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31));$('dbV24').classList.toggle('active',improved&&legacy24);$('dbV23').classList.toggle('active',improved&&legacy23);$('dbV22').classList.toggle('active',improved&&legacy22);$('dbOld').classList.toggle('active',!improved);$('dbNew').setAttribute('aria-pressed',String(improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31)));$('dbV24').setAttribute('aria-pressed',String(improved&&legacy24));$('dbV23').setAttribute('aria-pressed',String(improved&&legacy23));$('dbV22').setAttribute('aria-pressed',String(improved&&legacy22));$('dbOld').setAttribute('aria-pressed',String(!improved));$('dbV22').hidden=items[pos][0]!=='player';$('dbV23').hidden=items[pos][0]!=='player';$('dbV24').hidden=items[pos][0]!=='player';$('dbGroundBefore').hidden=items[pos][0]!=='ground'||!improved;$('dbGroundBefore').classList.toggle('active',nrFloorCompare31);$('dbGroundBefore').setAttribute('aria-pressed',String(nrFloorCompare31));$('dbGroundBefore').textContent=nrFloorCompare31?'✓ Ver.3.1 石床':'◈ Ver.3.1と比較';
- $('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=!player;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.3.6 / 控えめな遺跡石床'):'Ver.3.6 / 落ち着いた石キューブ＆床'):'旧デザイン風（比較用）';
+ $('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=!player;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.3.9 / 床面と壁面を明確化'):'Ver.3.9 / 接地位置を修正'):'旧デザイン風（比較用）';
  try{$('dbMemo').value=localStorage.getItem(memoKey(pos))||''}catch{$('dbMemo').value=''};
  for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
  $('dbExtras').hidden=items[pos][0]==='ground';$('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=!player||!runActive;$('dbRun').textContent=runActive?'■ 停止して戻る':'▶ 走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'黒背景 / 平らな床で走行確認':'黒背景 / プレイヤーと床だけ';$('dbInstruction').textContent=runActive?'画面タップでジャンプ。回転後の向き・接地・横滑りを確認。':player?'背景を消した状態で、数字・回転・接地の見た目を確認できます。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['真正面','正面＋少し奥行き','正面＋奥行き'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
