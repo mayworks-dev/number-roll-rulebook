@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.3.0 · Front-Facing Cube</title>
+<title>NUMBER ROLL — Ver.3.6 · Ruin Stone Material</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -18,7 +18,7 @@ body{display:grid;place-items:center;background:radial-gradient(ellipse at 50% 2
 #app{display:flex;flex-direction:column;gap:9px;width:min(100vw,1120px);height:min(100dvh,840px);padding:12px;background:linear-gradient(153deg,#0d1f31,#071421);overflow:hidden}
 .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex:0 0 auto;padding:2px 2px 1px}.brand{font-weight:900;color:#75dcfc;letter-spacing:.18em;font-size:11px}.top h1{font-size:clamp(17px,2.7vw,26px);letter-spacing:.13em;margin:1px 0;font-weight:830}.sub{font-size:10px;color:#8da9bc;letter-spacing:.05em}.progress{font-size:12px;white-space:nowrap;color:#9fc5d9;font-weight:800;text-align:right}.progress strong{font-size:17px;color:white;display:block}.book{display:flex;flex-direction:column;flex:1;min-height:0;border:1px solid var(--line);background:#091625;border-radius:12px;overflow:hidden}
 .book-title{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 12px;border-bottom:1px solid #263d51;flex:0 0 auto}.nameblock{display:flex;align-items:center;gap:12px;min-width:0}.chapter{display:grid;place-items:center;border:1px solid #45a2c9;color:#64d6ff;border-radius:7px;font-size:19px;font-weight:950;width:47px;height:43px;flex:0 0 47px;background:#102c42}.jp{font-size:clamp(18px,2.8vw,26px);font-weight:820;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.en{font-size:9px;font-weight:800;color:#8caabd;letter-spacing:.14em;white-space:nowrap}.tip{color:#cee4f3;font-size:11px;text-align:right;max-width:55%;line-height:1.4}.tip strong{display:block;color:#8ad7ef;font-size:9px;letter-spacing:.1em}
-.stage{position:relative;flex:1;min-height:115px;overflow:hidden;background:#12263a;touch-action:none;isolation:isolate}canvas{width:100%;height:100%;display:block;touch-action:none}
+.stage{position:relative;flex:1;min-height:115px;overflow:hidden;background:#000;touch-action:none;isolation:isolate}canvas{width:100%;height:100%;display:block;touch-action:none}
 .stage-hud{position:absolute;top:8px;left:9px;right:9px;display:flex;justify-content:space-between;gap:4px;pointer-events:none}.stats-left,.stats-right{display:flex;align-items:start;gap:5px}.stat{padding:6px 9px;border-radius:7px;background:#071625cb;border:1px solid #39576e9c;min-width:76px;backdrop-filter:blur(3px)}.stat label{display:block;font-size:9px;color:#a8bfce;white-space:nowrap}.stat b{font-size:17px;line-height:1.25;letter-spacing:.01em;font-variant-numeric:tabular-nums}.stat.slim{min-width:64px}.game-buttons{pointer-events:auto;display:flex;gap:5px}.game-icon{min-width:35px;height:34px;border-radius:7px;background:#10273ccf;color:#e5f7ff;border:1px solid #4d7591;font-size:16px;font-weight:750}.game-icon:active,.nav:active,.primary:active{filter:brightness(1.18)}
 .bottom-controls{position:absolute;bottom:10px;left:12px;right:12px;display:flex;align-items:end;justify-content:space-between;gap:8px;pointer-events:none}.hint{font-size:10px;color:#b2d0e0;line-height:1.5;text-shadow:0 2px 7px #000;max-width:60%}.hint b{display:block;font-size:11px;color:#ebf7ff}.jump{pointer-events:auto;padding:10px 18px;border:1px solid #b8f4ff;color:#082235;font-weight:900;font-size:14px;border-radius:10px;background:#5bc8ee;box-shadow:0 4px #145b78;min-width:117px;min-height:47px}.jump:disabled{opacity:.45}.jump:active{transform:translateY(2px);box-shadow:0 2px #145b78}
 .result{position:absolute;inset:0;z-index:3;display:none;align-items:center;justify-content:center;background:#071421af;backdrop-filter:blur(2px);padding:10px}.result.show{display:flex}.result-card{width:min(93%,380px);background:#0b1f30f5;border:1px solid #50738b;border-radius:13px;padding:16px 19px;text-align:center;box-shadow:0 12px 30px #0006}.result-title{font-size:clamp(18px,2.5vw,27px);font-weight:950;margin:4px 0;color:#f1faff}.result-title.win{color:#7ce4b4}.result-title.lose{color:#ff9aaf}.result-caption{color:#abc7d9;font-size:12px;line-height:1.55;margin:6px 0 12px}.result-actions{display:flex;gap:9px;justify-content:center}.primary,.secondary{padding:11px 13px;min-width:110px;min-height:41px;border-radius:8px;font-weight:820;font-size:12px}.primary{background:#56c6ed;border:1px solid #a9ecff;color:#09283c}.secondary{background:#193449;border:1px solid #4e7891;color:#e5f5ff}
@@ -191,7 +191,8 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
 .db-footer{display:flex;justify-content:space-between;gap:9px;align-items:center;color:#a4c2d5;font-size:11px}.db-footer .db-tool{min-width:120px}
 @media(max-width:710px){#designBookScreen{gap:7px;padding-left:9px;padding-right:9px}.db-shell{grid-template-columns:1fr;gap:7px;flex:none}.db-categories{display:flex;flex-direction:row;gap:5px;padding:7px;overflow-x:auto;overflow-y:hidden;min-height:52px}.db-categories-title{display:none}.db-cat{min-height:35px;flex:0 0 auto;padding:6px 9px;white-space:nowrap;font-size:11px}.db-cat small{width:19px;min-width:19px;height:20px;font-size:9px}.db-preview{border-radius:12px}.db-preview-label{top:8px;left:9px;font-size:8px}.db-preview-pill{font-size:8px;top:6px;right:7px}.db-description{font-size:11px}.db-nameline h3{font-size:18px}.db-tool{font-size:11px;padding:7px 10px;min-height:32px}.db-head h2{font-size:18px}.db-temporary{font-size:9px;padding:5px 7px}.db-back{min-width:64px;padding:6px 9px;font-size:11px}.db-status{font-size:9px;white-space:normal}}
 @media(max-height:520px) and (orientation:landscape){#designBookScreen{gap:5px;min-height:100dvh;justify-content:flex-start}.db-shell{grid-template-columns:153px minmax(0,1fr);flex:1;gap:7px}.db-categories{display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;padding:5px}.db-cat{white-space:normal;font-size:10px;min-height:31px;padding:4px 6px}.db-content{gap:5px}.db-preview{max-width:590px;align-self:center;width:100%}#designCanvas{aspect-ratio:1024/440}.db-titles{align-items:center}.db-description{font-size:10px;margin:1px 0}.db-extras{padding:4px 7px}.db-notes{padding-top:4px}.db-notes textarea{min-height:36px}.db-footer .db-tool{min-width:80px}.db-footer{font-size:9px}.db-titlebar .db-head h2{font-size:17px}}
-/* Ver.2.6: a focused player preview; other 11 design pages remain intact. */
+/* Focused player preview and ground-only material viewer; other design pages intact. */
+.db-extras[hidden]{display:none!important}
 .db-toolbar[hidden],.db-extras [hidden],.db-notes[hidden],.db-footer[hidden],.db-status[hidden],.db-preview-pill[hidden]{display:none!important}
 .db-player-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
 .db-run-button{background:linear-gradient(135deg,#76d4bb,#a5efd1);border:1px solid #d0fff0;color:#133e47;font-weight:900;border-radius:10px;padding:9px 17px;min-height:40px;box-shadow:0 4px 16px #69d9b01a}
@@ -202,6 +203,9 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
 .db-preview.is-running #designCanvas{cursor:pointer;touch-action:manipulation}
 .db-player-only-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 @media(max-width:710px){.db-run-button,.db-jump-button{padding:8px 13px;min-height:38px;font-size:12px}.db-running-info{font-size:10px}.db-extras{gap:7px}.db-preview-label{letter-spacing:.04em}}
+.db-preview{background:#000}
+#designBookScreen.player-focus .db-preview{background:#000}
+#designBookScreen.player-focus .db-preview-label,#designBookScreen.player-focus .db-preview-pill{display:none!important}
 @media(max-height:520px) and (orientation:landscape){
  #designBookScreen.player-focus .db-titlebar{min-height:33px;max-height:35px}
  #designBookScreen.player-focus .db-titlebar .db-kicker,#designBookScreen.player-focus .db-temporary,#designBookScreen.player-focus .db-titles{display:none!important}
@@ -331,14 +335,15 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
       </div>
       <div class="db-toolbar" id="dbToolbar">
-        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ 改良デザイン案</button>
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.3.6 落ち着いた石材</button>
         <button id="dbV24" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.4 と比較</button>
         <button id="dbV23" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.3 と比較</button>
         <button id="dbV22" type="button" class="db-tool" aria-pressed="false">Ver.2.2</button>
+        <button id="dbGroundBefore" type="button" class="db-tool" hidden aria-pressed="false">Ver.3.1と比較</button>
         <button id="dbOld" type="button" class="db-tool" aria-pressed="false">□ 旧デザイン風</button>
         <button id="dbBackground" type="button" class="db-tool">背景：遺跡</button>
       </div>
-      <div class="db-extras"><label id="dbDigitLabel">数字</label><div class="db-digits" id="dbDigits"></div><button type="button" id="dbRotate" class="db-tool">↻ 90°回転</button><button type="button" id="dbView" class="db-tool" aria-label="キューブを見る角度を変える">視点：斜め</button>
+      <div class="db-extras" id="dbExtras"><label id="dbDigitLabel">数字</label><div class="db-digits" id="dbDigits"></div><button type="button" id="dbRotate" class="db-tool">↻ 90°回転</button><button type="button" id="dbView" class="db-tool" aria-label="キューブを見る角度を変える">視点：斜め</button>
         <div class="db-player-only-actions" id="dbPlayerActions" hidden><button type="button" id="dbRun" class="db-run-button" aria-pressed="false">▶ 走行テスト</button><button type="button" id="dbRunJump" class="db-jump-button" hidden>↑ ジャンプ</button><span id="dbRunInfo" class="db-running-info">障害物なし・平らな床</span></div>
         <span class="db-hint" id="dbInstruction">ゲーム本体の挙動は変更しません。</span></div>
       <div class="db-notes" id="dbNotes"><label for="dbMemo">改善メモ（このパーツだけに保存）</label><textarea id="dbMemo" placeholder="例：光を弱く、角を少し丸く、数字を大きく…" rows="2"></textarea><small>メモはこのブラウザ内に仮保存。公開版のゲームには影響しません。</small></div>
@@ -1362,9 +1367,9 @@ new ResizeObserver(resize).observe(stage);progress();setPage(window.location.has
 (()=>{
 'use strict';
 const items=[
- ['player','プレイヤー','PLAYER CUBE','ほぼ真正面の立体キューブ。側面・底辺・接地・数字とジャンプを確認。'],
+ ['player','プレイヤー','PLAYER CUBE','Ver.3.6：落ち着いた青灰色の石キューブ。弱い明暗、浅い数字彫刻、控えめな傷を確認。'],
  ['spike','地上トゲ','CRYSTAL SPIKES','危険を一目で判断できる結晶形のトゲ。先端はシャープに。'],
- ['ground','地面・石床','RUIN STONE FLOOR','床の高さが読み取りやすい石積みと、控えめな苔のライン。'],
+ ['ground','地面・石床','RUIN STONE FLOOR','Ver.3.6：発光・装飾を抑えた青灰色の石床。控えめな目地と石の厚みを確認。'],
  ['gap','穴・側壁','GAP / SIDE WALL','穴の位置と危険な側壁を、装飾に埋もれず判別できるように。'],
  ['safe','青壁・安全','LANDABLE WALL','上面だけ安全。ミントの着地ラインと石の装飾を確認。'],
  ['danger','赤壁・危険','HAZARDOUS WALL','全方向危険。赤い縁・警告模様・本体の質感。'],
@@ -1397,26 +1402,394 @@ function line(x1,y1,x2,y2,color,width=2){g.beginPath();g.moveTo(x1,y1);g.lineTo(
 function text(v,x,y,size=20,color='#ebf6ff',weight=700){g.font=`${weight} ${size}px system-ui,Arial,sans-serif`;g.fillStyle=color;g.textAlign='center';g.textBaseline='middle';g.fillText(v,x,y)}
 function backdrop(){
  const w=1024,h=440;g.clearRect(0,0,w,h);
- g.fillStyle=ruins?gradient(0,0,0,h,[[0,'#152946'],[.47,'#344f76'],[1,'#6a7798']]):gradient(0,0,0,h,[[0,'#11283f'],[1,'#264863']]);g.fillRect(0,0,w,h);
- if(ruins){
-  ellipse(790,111,78,78,'#b3c1ef26');
-  for(let j=0;j<18;j++){const x=(j*173+83)%1024,y=26+(j*89)%183;ellipse(x,y,(j%3===0?2:1.2),(j%3===0?2:1.2),'#bde8f45b')}
-  function island(x,y,s){g.save();g.translate(x,y);g.scale(s,s);shape([[0,0],[154,0],[143,37],[112,62],[104,78],[85,43],[55,66],[36,25],[11,30]],'#182c4bc9');g.fillStyle='#486687bd';g.fillRect(10,-5,137,9);for(let i=0;i<4;i++){g.fillStyle='#273f5e';g.fillRect(15+i*30,-35-((i%2)*15),22,32+(i%2)*15)}g.restore()}
-  island(85,209,.95);island(816,218,1.3);island(410,144,.42);
-  for(const [x,y] of [[171,182],[905,216]]){line(x,y,x-10,440,'#b5dcff20',8);line(x+3,y,x-8,440,'#b3ecf822',2)}
-  for(let i=0;i<7;i++)ellipse(75+i*151,422+(i%2)*10,130,39,'#98b3d51c');
- }
- g.fillStyle='#08162924';g.fillRect(0,0,w,h);
+ g.fillStyle='#000';g.fillRect(0,0,w,h);
 }
-function shadow(x,y,rx=120){ellipse(x,y,rx,16,'#02152579');ellipse(x,y+3,rx*.71,6,'#66dbd017')}
+function shadow(x,y,rx=120){ellipse(x,y,rx,12,'#000b17a3');ellipse(x,y+2,rx*.65,5,'#0e203243')}
+// Ver.3.1 texture retained ONLY for A/B comparison in the temporary design book.
+// Ver.3.2 uses no photo-derived floor pieces; standalone HTML needs no assets.
+const nrStoneTexture=new Image();
+let nrStoneReady=false;
+nrStoneTexture.onload=()=>{nrStoneReady=true;if(typeof draw==='function')draw()};
+nrStoneTexture.src='data:image/webp;base64,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';
+function nrHash(i){let n=(i|0)^0x6d2b79f5;n=Math.imul(n^(n>>>15),1|n);n^=n+Math.imul(n^(n>>>7),61|n);return ((n^(n>>>14))>>>0)/4294967295}
+function nrStoneBlock(x,y,w,h,index,top=false){
+ const v=nrHash(index*7+(top?13:121));
+ g.save();
+ rr(x+.8,y+.8,w-1.8,h-2.2,top?5:4);g.clip();
+ const grad=gradient(x,y,w,h,top?[[0,'#8caed4'],[.25,'#526f9c'],[1,'#203c66']]:[[0,'#395d88'],[.48,'#223c62'],[1,'#102746']]);
+ g.fillStyle=grad;g.fillRect(x,y,w,h);
+ if(nrStoneReady){
+  const sel=top?Math.floor(nrHash(index+917)*4):4+Math.floor(nrHash(index+137)*8);
+  const col=sel%4,row=Math.floor(sel/4);
+  g.globalAlpha=top?.82:.72;
+  g.drawImage(nrStoneTexture,col*128,row*72,128,72,x,y,w,h);
+  g.globalAlpha=1;
+ }
+ const shade=g.createLinearGradient(x,y,x,y+h);
+ if(top){shade.addColorStop(0,'#b0d4ef32');shade.addColorStop(.7,'#0c27411a');shade.addColorStop(1,'#0a1c405c')}
+ else{shade.addColorStop(0,'#6081aa39');shade.addColorStop(.45,'#07142e05');shade.addColorStop(1,'#0314299a')}
+ g.fillStyle=shade;g.fillRect(x,y,w,h);
+ const crack=nrHash(index*11+4),cx=x+w*(.21+crack*.56);
+ g.beginPath();g.moveTo(cx,y+h*.08);g.lineTo(cx+w*(crack>.5?.10:-.10),y+h*.32);
+ g.lineTo(cx+w*(crack>.5?-.02:.08),y+h*.51);
+ if(!top)g.lineTo(cx+w*(crack>.5?.07:-.05),y+h*.75);
+ g.strokeStyle=top?'#193b6496':'#061a365f';g.lineWidth=top?1.25:1.7;g.stroke();
+ g.beginPath();g.moveTo(cx+1,y+h*.08);g.lineTo(cx+w*(crack>.5?.10:-.10)+1,y+h*.32);
+ g.strokeStyle='#acc9e52b';g.lineWidth=.7;g.stroke();
+ if(!top&&nrHash(index+52)>.84){
+   // Occasional restrained engraved diamond; deterministic during scrolling.
+   const px=x+w*.52,py=y+h*.52,rad=Math.min(w*.13,h*.27);
+   g.beginPath();g.moveTo(px,py-rad);g.lineTo(px+rad*.78,py);g.lineTo(px,py+rad);g.lineTo(px-rad*.78,py);g.closePath();
+   g.strokeStyle='#77bae66a';g.lineWidth=1.2;g.stroke();
+   g.beginPath();g.moveTo(px,py-rad*.42);g.lineTo(px+rad*.30,py);g.lineTo(px,py+rad*.42);g.lineTo(px-rad*.3,py);g.closePath();
+   g.strokeStyle='#376c9b75';g.stroke();
+ }
+ g.restore();
+ // Distinct beveled masonry joint, with a little cyan bounced light.
+ g.save();rr(x+1,y+1,w-2,h-2,top?5:4);
+ g.lineWidth=1.5;g.strokeStyle=top?'#b0e4ff9b':'#577fa7ab';g.stroke();
+ g.beginPath();g.moveTo(x+5,y+h-3);g.lineTo(x+w-5,y+h-3);
+ g.strokeStyle='#071d3c99';g.lineWidth=2.2;g.stroke();g.restore();
+}
+function nrDrawVine(x,y,index){
+ if(nrHash(index*17+9)<.79)return;
+ const length=21+nrHash(index+34)*33;
+ g.save();g.strokeStyle='#224e51cf';g.lineWidth=1.8;g.beginPath();g.moveTo(x,y);
+ g.bezierCurveTo(x-4,y+length*.3,x+4,y+length*.55,x+1,y+length);g.stroke();
+ for(let j=0;j<4;j++){const yy=y+6+j*length/5,side=j%2?1:-1;
+  g.beginPath();g.ellipse(x+side*4,yy,4,2.1,side*.7,0,Math.PI*2);
+  g.fillStyle=j%3?'#29675a8e':'#47877aa0';g.fill();
+ }g.restore();
+}
+function nrDrawStoneFloor31(x,y,w,h,offset=0){
+ if(h<=0||w<=0)return;
+ g.save();g.beginPath();g.rect(x,y-5,w,h+5);g.clip();
+ g.fillStyle='#07172e';g.fillRect(x,y,w,h);
+ // Top-facing flagstones: an individually detailed cap, not a flat neon stripe.
+ const topW=118,topH=25;
+ let i0=Math.floor(offset/topW)-2, i1=Math.ceil((offset+w)/topW)+2;
+ for(let i=i0;i<i1;i++){
+  const sx=x+i*topW-offset;
+  nrStoneBlock(sx,y,topW,topH,i,true);
+ }
+ // Courses of interlocking blue masonry under the walking surface.
+ const courses=[{yy:topH,hh:53,ww:126},{yy:topH+53,hh:65,ww:153},{yy:topH+118,hh:71,ww:137},{yy:topH+189,hh:85,ww:176}];
+ for(let row=0;row<courses.length;row++){
+  const c=courses[row];if(c.yy>=h)break;
+  const stagger=row%2?c.ww*.48:0;
+  const start=Math.floor((offset+stagger)/c.ww)-2;
+  const end=Math.ceil((offset+w+stagger)/c.ww)+2;
+  for(let j=start;j<end;j++){
+   const xx=x+j*c.ww-offset-stagger;
+   nrStoneBlock(xx,y+c.yy,c.ww,c.hh,j+row*1000,false);
+   if(row<2&&j%7===0)nrDrawVine(xx+c.ww-5,y+c.yy+5,j+row*1000);
+  }
+ }
+ // A thin cyan glow defines the exact gameplay collision surface.
+ g.save();g.shadowColor='#55befe';g.shadowBlur=6;
+ g.strokeStyle='#94e8ffb0';g.lineWidth=2.1;
+ g.beginPath();g.moveTo(x,y);g.lineTo(x+w,y);g.stroke();g.restore();
+ g.strokeStyle='#4da6d674';g.lineWidth=1.2;
+ g.beginPath();g.moveTo(x,y+topH-2);g.lineTo(x+w,y+topH-2);g.stroke();
+ g.restore();
+}
+
+/* Ver.3.2 — original, procedural, light-consistent moonlit platform.
+   Unlike the v3.1 comparison renderer, no extracted picture tiles are
+   rescaled onto the stones. The same cool left/top light hits every bevel. */
+let nrFloorCompare31=false;
+const nrSmoothRand=(n)=>nrHash((n|0)*127+211);
+function nrPath(points,fill,stroke='',lw=1){
+ g.beginPath();for(let k=0;k<points.length;k++){
+  const p=points[k];if(k)g.lineTo(p[0],p[1]);else g.moveTo(p[0],p[1]);
+ }g.closePath();if(fill){g.fillStyle=fill;g.fill()}if(stroke){g.strokeStyle=stroke;g.lineWidth=lw;g.stroke()}
+}
+function nrDiamond(cx,cy,r,illuminated=false){
+ nrPath([[cx,cy-r],[cx+r*.78,cy],[cx,cy+r],[cx-r*.78,cy]],null,illuminated?'#8bd6ffb0':'#6388b263',1.1);
+ nrPath([[cx,cy-r*.47],[cx+r*.35,cy],[cx,cy+r*.47],[cx-r*.35,cy]],illuminated?'#58b2dba8':'#27496d80',illuminated?'#e4ffff85':'#9fbddb24',.8);
+}
+function nrBrick32(x,y,w,h,i){
+ // Background courses are intentionally quiet: the hero stays dominant.
+ const v=nrSmoothRand(i);
+ g.save();g.fillStyle='#0a1e38';rr(x+1,y+1,w-2,h-2,4);g.fill();
+ const grad=g.createLinearGradient(x,y,x+w*.17,y+h);
+ grad.addColorStop(0,v>.52?'#3f6087':'#344f77');
+ grad.addColorStop(.45,v>.52?'#28496f':'#244267');
+ grad.addColorStop(1,'#112a4c');
+ g.fillStyle=grad;rr(x+3,y+3,w-6,h-6,3.5);g.fill();
+ g.strokeStyle='#6b9abc5e';g.lineWidth=1.1;rr(x+3,y+3,w-6,h-6,3.5);g.stroke();
+ g.strokeStyle='#9bbdd12c';g.lineWidth=.9;g.beginPath();g.moveTo(x+10,y+7);g.lineTo(x+w*.61,y+7);g.stroke();
+ if(nrSmoothRand(i+41)>.58){
+  const cx=x+w*(.25+v*.3),sy=y+7;
+  g.beginPath();g.moveTo(cx,sy);g.lineTo(cx-4,y+h*.42);g.lineTo(cx+3,y+h*.58);
+  g.strokeStyle='#9ec4e525';g.lineWidth=1;g.stroke();
+ }
+ if(nrSmoothRand(i+13)>.86)nrDiamond(x+w*.52,y+h*.52,Math.min(h*.23,13),false);
+ g.restore();
+}
+function nrSlab32(x,y,w,index){
+ const h=76,cap=19,v=nrSmoothRand(index+301);
+ // Thin cap with a restrained cyan perimeter (not neon seams everywhere).
+ g.save();
+ g.shadowColor='#051a35a0';g.shadowBlur=3;g.shadowOffsetY=2;
+ const faceGrad=g.createLinearGradient(x,y+cap,x+w*.17,y+h);
+ faceGrad.addColorStop(0,v>.53?'#3c6690':'#365f89');
+ faceGrad.addColorStop(.36,v>.53?'#28517e':'#284a72');
+ faceGrad.addColorStop(1,'#152c50');
+ g.fillStyle=faceGrad;rr(x+2,y+cap-1,w-4,h-cap-1,6);g.fill();g.restore();
+ // Wide, calm bevel; cracks and decorations live in the stone, not on top of it.
+ const topGrad=g.createLinearGradient(x,y,x+12,y+cap+7);
+ topGrad.addColorStop(0,'#9cb9da');topGrad.addColorStop(.38,'#789dc6');topGrad.addColorStop(1,'#557fa9');
+ nrPath([[x+8,y+2],[x+w-8,y+2],[x+w-3,y+cap],[x+3,y+cap]],topGrad,'#b5d8eb5d',1.1);
+ // Subtle light on upper/front edge, with a shadowed line along the lower lip.
+ g.beginPath();g.moveTo(x+5,y+cap);g.lineTo(x+w-5,y+cap);
+ g.strokeStyle='#a8ddf2a2';g.lineWidth=1.5;g.stroke();
+ g.beginPath();g.moveTo(x+7,y+h-4);g.lineTo(x+w-7,y+h-4);
+ g.strokeStyle='#0a2445d1';g.lineWidth=3;g.stroke();
+ g.strokeStyle='#6998c676';g.lineWidth=1.1;rr(x+3,y+cap,w-6,h-cap-4,5);g.stroke();
+ // The runic plate appears occasionally, and remains quite low-contrast.
+ if(index%4===0)nrDiamond(x+w*.5,y+cap+30,12,false);
+ // Sparse stone imperfections. Slightly lighter than the old photo texture.
+ if(nrSmoothRand(index+7)>.59){
+  const cx=x+w*(.18+v*.57);
+  g.beginPath();g.moveTo(cx,y+cap+8);g.lineTo(cx-6,y+cap+23);g.lineTo(cx+1,y+cap+33);
+  g.strokeStyle='#8db3d334';g.lineWidth=1;g.stroke();
+ }
+ if(nrSmoothRand(index+78)>.68){
+  g.beginPath();g.moveTo(x+w*.21,y+7);g.lineTo(x+w*.32,y+12);g.lineTo(x+w*.36,y+15);
+  g.strokeStyle='#1b426e42';g.lineWidth=1.1;g.stroke();
+ }
+ // A soft cool line ONLY at some joints. Less light than the v3.1 strip.
+ if(index%3===0){
+  g.save();g.shadowColor='#5cc7ed80';g.shadowBlur=3;
+  g.beginPath();g.moveTo(x+2,y+cap+1);g.lineTo(x+2,y+cap+42);
+  g.strokeStyle='#64b9dd70';g.lineWidth=1.5;g.stroke();g.restore();
+ }
+}
+function nrSupport32(x,y,span,depth,idx){
+ if(depth<160)return;
+ // Broken masonry buttress under the playable slab; painted in the same style.
+ const left=x+span*.23,right=x+span*.77,top=y+110,bottom=Math.min(y+depth-3,y+222);
+ nrPath([[left,top],[right,top],[right-7,bottom-28],[x+span*.57,bottom],[x+span*.44,bottom-6],[left+7,bottom-30]],
+       gradient(left,top,span*.5,bottom-top,[[0,'#2d4c74'],[.42,'#20395b'],[1,'#132743']]),'#5a8db052',1.1);
+ nrDiamond(x+span*.5,Math.min(bottom-49,top+40),13,idx%8===0);
+}
+function nrDrawStoneFloor32(x,y,w,h,offset=0){
+ if(h<=0||w<=0)return;
+ const tileW=155,slabH=76;
+ g.save();g.beginPath();g.rect(x,y-3,w,h+3);g.clip();
+ g.fillStyle='#0b1d38';g.fillRect(x,y,w,h);
+ // Support blocks stay behind the front masonry; no random photo slices.
+ let j0=Math.floor(offset/tileW)-2,j1=Math.ceil((offset+w)/tileW)+2;
+ if(h>150){
+  for(let j=j0;j<=j1;j++){
+   if(j%5!==0)continue;
+   nrSupport32(x+j*tileW-offset,y,tileW,h,j);
+  }
+ }
+ // Two staggered quiet rows under the cap.
+ const courses=[{yy:slabH,hh:49,ww:98,shift:0},{yy:slabH+49,hh:55,ww:122,shift:51},{yy:slabH+104,hh:60,ww:109,shift:25},{yy:slabH+164,hh:73,ww:143,shift:66}];
+ for(let row=0;row<courses.length;row++){
+  const c=courses[row];if(c.yy>=h)continue;
+  const start=Math.floor((offset+c.shift)/c.ww)-2;
+  const end=Math.ceil((offset+w+c.shift)/c.ww)+2;
+  for(let j=start;j<=end;j++){
+   const xx=x+j*c.ww-offset-c.shift;
+   nrBrick32(xx,y+c.yy,c.ww,c.hh,j+row*1000);
+  }
+ }
+ // The wide top slab is the key visual unit: one smooth bevel per tile.
+ for(let j=j0;j<=j1;j++){
+  const xx=x+j*tileW-offset;
+  nrSlab32(xx,y,tileW,j);
+  // Small vines only occasionally, and lower than the collision plane.
+  if(h>120&&j%7===3)nrDrawVine(xx+tileW-12,y+slabH+3,j*7+17);
+ }
+ // Precisely mark the physics surface with just a single gentle reflection.
+ g.save();g.shadowColor='#72ceee7f';g.shadowBlur=3;
+ g.beginPath();g.moveTo(x,y+.8);g.lineTo(x+w,y+.8);
+ g.strokeStyle='#9bdff0a5';g.lineWidth=1.4;g.stroke();g.restore();
+ g.restore();
+}
+/* Ver.3.6 — coherent hand-painted ruin stone for the DESIGN BOOK ONLY.
+   All ornament is procedurally anchored to world tile indices, so the
+   moving ground does not shimmer or jitter while auto-scrolling. */
+const nrStone35={
+ ink:'#102b4e',edge:'#70d3f5',top:'#a2bdd5',topShade:'#6a92b9',
+ face:'#335779',faceDark:'#183452',mortar:'#071627'
+};
+// Six cached mineral grain tiles. Soft-light combines irregular rock pores and
+// scattered deposits with the SAME gradient model used by cube and floor.
+const nrGrainCache35=new Map();
+function nrStoneNoise35(x,y,sz,seed){
+ const fx=x/sz,fy=y/sz,ix=Math.floor(fx),iy=Math.floor(fy);
+ const xx=fx-ix,yy=fy-iy,sx=xx*xx*(3-2*xx),sy=yy*yy*(3-2*yy);
+ const val=(a,b)=>nrHash((Math.imul(a+521,73856093)^Math.imul(b+97,19349663)^Math.imul(seed+13,83492791))|0);
+ const a=val(ix,iy)*(1-sx)+val(ix+1,iy)*sx;
+ const b=val(ix,iy+1)*(1-sx)+val(ix+1,iy+1)*sx;
+ return a*(1-sy)+b*sy;
+}
+function nrStoneGrain35(seed){
+ const key=((seed%7)+7)%7;
+ if(nrGrainCache35.has(key))return nrGrainCache35.get(key);
+ const c=document.createElement('canvas');c.width=196;c.height=128;
+ const t=c.getContext('2d');const im=t.createImageData(c.width,c.height),d=im.data;
+ for(let y=0;y<c.height;y++)for(let x=0;x<c.width;x++){
+  const coarse=nrStoneNoise35(x,y,38,key),middle=nrStoneNoise35(x,y,13,key+21);
+  const fine=nrStoneNoise35(x,y,3.6,key+47);
+  const weather=.46*coarse+.34*middle+.20*fine;
+  const p=(y*c.width+x)*4;
+  const gray=Math.max(23,Math.min(235,Math.round(110+(weather-.5)*195)));
+  d[p]=gray;d[p+1]=gray+2;d[p+2]=Math.min(255,gray+5);d[p+3]=255;
+ }
+ t.putImageData(im,0,0);nrGrainCache35.set(key,c);return c;
+}
+function nrStoneGrainRect35(x,y,w,h,seed,strength=.92){
+ g.save();g.globalCompositeOperation='soft-light';g.globalAlpha=strength;
+ g.drawImage(nrStoneGrain35(seed),x,y,w,h);g.restore();
+}
+
+function nrStoneMark35(x,y,seed,scale=1){
+ // A shared language of carved micro-chips, reused on the stone slabs/cube.
+ const a=nrHash(seed*37+1),b=nrHash(seed*37+2);
+ const len=(3+a*6)*scale;
+ g.beginPath();g.moveTo(x-len*.55,y+len*.24);
+ g.lineTo(x,y);g.lineTo(x+len*.4,y-len*.19);
+ g.strokeStyle='rgba(9,28,50,.43)';g.lineWidth=Math.max(.55,scale*.85);g.stroke();
+ g.beginPath();g.moveTo(x-len*.5,y+len*.24+scale);
+ g.lineTo(x+.4*len,y-len*.19+scale);
+ g.strokeStyle='rgba(193,222,237,.21)';g.lineWidth=Math.max(.35,scale*.5);g.stroke();
+}
+function nrMoss35(x,y,seed,amount=1){
+ // Tiny organic patches appear mostly near lower cracks, never as a texture sheet.
+ for(let k=0;k<8*amount;k++){
+  const a=nrHash(seed*193+k*7+5),b=nrHash(seed*177+k*11+8);
+  const px=x+(a-.5)*31,py=y+(b-.5)*12;
+  g.fillStyle=k%4===0?'#466f65a0':k%3===0?'#355e58a6':'#253e42aa';
+  g.beginPath();g.ellipse(px,py,2.1+a*3,1.2+b*2.4,(a-.5)*2,0,Math.PI*2);g.fill();
+ }
+}
+function nrBrick35(x,y,w,h,seed){
+ if(h<5)return;
+ const vary=nrHash(seed*21+66),tone=vary-.5;
+ g.save();rr(x+1.8,y+1.6,w-3.6,h-3.1,2.2);g.clip();
+ const gr=g.createLinearGradient(x,y,x+12,y+h);
+ gr.addColorStop(0,tone>0?'#31495a':'#2c4053');
+ gr.addColorStop(.58,tone>0?'#243b4d':'#25384a');
+ gr.addColorStop(1,'#172b3b');
+ g.fillStyle=gr;g.fillRect(x,y,w,h);
+ nrStoneGrainRect35(x,y,w,h,seed,.32);
+ // Lower courses recede; no neon seams or ornamental symbols.
+ if(nrHash(seed*7+19)>.84){
+  const xx=x+w*(.27+nrHash(seed+78)*.38);
+  g.beginPath();g.moveTo(xx,y+7);g.lineTo(xx-3,y+h*.39);g.lineTo(xx+1,y+h*.60);
+  g.strokeStyle='#11263872';g.lineWidth=.85;g.stroke();
+ }
+ g.restore();
+ g.save();rr(x+1.5,y+1.4,w-3,h-2.8,2.2);
+ g.strokeStyle='#49617359';g.lineWidth=.85;g.stroke();g.restore();
+}
+
+function nrSlab35(x,y,w,seed,cap=17,slabH=90){
+ // Each slab is one solid, muted mineral block. Tiny edge wear is deterministic.
+ const n=nrHash(seed*7+202),bright=n>.55,topY=y+cap;
+ const leftChip=nrHash(seed*37+4)>.72?3.5:1.5;
+ const rightChip=nrHash(seed*37+7)>.79?4:1.5;
+ g.save();
+ g.shadowColor='#00091181';g.shadowBlur=3;g.shadowOffsetY=2;
+ const face=g.createLinearGradient(x,y+cap,x+9,y+slabH);
+ face.addColorStop(0,bright?'#526b7e':'#4c6478');
+ face.addColorStop(.27,bright?'#40586c':'#3b5369');
+ face.addColorStop(.79,bright?'#2a4053':'#293f54');
+ face.addColorStop(1,'#1b3043');
+ nrPath([[x+leftChip,topY-1],[x+w-rightChip,topY-1],[x+w-2,topY+5],
+         [x+w-2,y+slabH-4],[x+w-6,y+slabH-2],[x+5,y+slabH-2],
+         [x+2,y+slabH-5],[x+2,topY+4]],face);
+ g.shadowBlur=0;g.shadowOffsetY=0;
+ g.save();g.beginPath();g.rect(x+3,topY,w-6,slabH-cap-3);g.clip();
+ nrStoneGrainRect35(x+3,topY,w-6,slabH-cap-2,seed,.47);
+ // Only one in five blocks has a short, quiet stone fissure.
+ if(((seed%5)+5)%5===2){
+  const q=x+w*(.27+nrHash(seed+91)*.38);
+  g.beginPath();g.moveTo(q,topY+9);g.lineTo(q-6,topY+21);
+  g.lineTo(q+1,topY+34);
+  g.strokeStyle='#172e43a0';g.lineWidth=1.05;g.stroke();
+  g.beginPath();g.moveTo(q+1,topY+9);g.lineTo(q-5,topY+21);
+  g.strokeStyle='#8299a63e';g.lineWidth=.55;g.stroke();
+ }
+ // Rare weathered edge chips instead of repeating engraved diamonds.
+ if(nrHash(seed*11+42)>.75){
+  const xx=x+w*(.19+nrHash(seed*3+81)*.64),yy=topY+4;
+  nrPath([[xx-6,yy],[xx-1,yy+3],[xx+3,yy+2],[xx+8,yy]],'#223a4aa3');
+  nrPath([[xx-6,yy],[xx-1,yy+3],[xx+3,yy+2]],null,'#9fb3b84d',.65);
+ }
+ if(nrHash(seed*13+88)>.76){
+  const qx=x+12+nrHash(seed*5+17)*(w-28),qy=topY+16+nrHash(seed+27)*28;
+  nrStoneMark35(qx,qy,seed,.42);
+ }
+ g.restore();
+ // The pale upper plane is part of the same stone, not a separate glowing panel.
+ const top=g.createLinearGradient(x,y,x+8,y+cap);
+ top.addColorStop(0,bright?'#879fac':'#8197a5');
+ top.addColorStop(.55,bright?'#6c8495':'#667f91');
+ top.addColorStop(1,'#4c657a');
+ nrPath([[x+7,y+1],[x+w-8,y+1],[x+w-rightChip,y+cap-3],
+         [x+leftChip,y+cap-3]],top);
+ g.save();g.beginPath();g.rect(x+7,y+1,w-14,cap-3);g.clip();
+ nrStoneGrainRect35(x,y,w,cap,seed+2,.35);g.restore();
+ // Material edge highlight (no emission). Top edge is continuous for gameplay.
+ g.beginPath();g.moveTo(x+9,y+1.5);g.lineTo(x+w-10,y+1.5);
+ g.strokeStyle='#b6c7cb64';g.lineWidth=1;g.stroke();
+ g.beginPath();g.moveTo(x+5,topY+2);g.lineTo(x+w-6,topY+2);
+ g.strokeStyle='#9fb3bc27';g.lineWidth=1;g.stroke();
+ g.beginPath();g.moveTo(x+3,y+slabH-3);g.lineTo(x+w-4,y+slabH-3);
+ g.strokeStyle='#0d24366b';g.lineWidth=1.6;g.stroke();
+ // The masonry joint varies by 1–2 px, without lifting the collision plane.
+ g.beginPath();g.moveTo(x+w-1.5,topY+2);g.lineTo(x+w-1.5,y+slabH-4);
+ g.strokeStyle='#0c213497';g.lineWidth=2+nrHash(seed+22)*1.1;g.stroke();
+ g.beginPath();g.moveTo(x+2,topY+5);g.lineTo(x+2,y+slabH-7);
+ g.strokeStyle='#7c96a02c';g.lineWidth=.85;g.stroke();
+ g.restore();
+}
+
+function nrDrawStoneFloor35(x,y,w,h,offset=0){
+ if(h<=0||w<=0)return;
+ const isRunning=runActive&&items[pos][0]==='player';
+ const tileW=isRunning?181:237,cap=isRunning?13:18,slabH=isRunning?79:89;
+ g.save();g.beginPath();g.rect(x,y,w,h);g.clip();
+ g.fillStyle='#142637';g.fillRect(x,y,w,h);
+ // Recessed, staggered courses below the large top stones.
+ const courses=[{y:slabH,h:42,w:112,shift:0},{y:slabH+42,h:45,w:127,shift:47},
+                {y:slabH+87,h:57,w:113,shift:26},{y:slabH+144,h:64,w:133,shift:67}];
+ for(let r=0;r<courses.length;r++){
+  const c=courses[r];if(c.y>=h)break;
+  const start=Math.floor((offset+c.shift)/c.w)-1;
+  const end=Math.ceil((offset+w+c.shift)/c.w)+1;
+  for(let j=start;j<=end;j++)nrBrick35(x+j*c.w-offset-c.shift,y+c.y,c.w,c.h,j+r*1133);
+ }
+ const first=Math.floor(offset/tileW)-1,last=Math.ceil((offset+w)/tileW)+1;
+ for(let j=first;j<=last;j++)nrSlab35(x+j*tileW-offset,y,tileW,j,cap,slabH);
+ // Readable ground line, without a bright continuous cyan glow.
+ g.beginPath();g.moveTo(x,y+.65);g.lineTo(x+w,y+.65);
+ g.strokeStyle='#b0c3cb52';g.lineWidth=1.05;g.stroke();
+ g.restore();
+}
+
+function nrDrawStoneFloor(x,y,w,h,offset=0){
+ if(improved&&!legacy22&&!legacy23&&!legacy24&&!nrFloorCompare31&&['player','ground'].includes(items[pos][0])){nrDrawStoneFloor35(x,y,w,h,offset);return;}
+ if(nrFloorCompare31)nrDrawStoneFloor31(x,y,w,h,offset);
+ else nrDrawStoneFloor32(x,y,w,h,offset);
+}
+
 function stoneTile(x,y,w,h,old=false){
  g.fillStyle=old?'#243c57':gradient(x,y,w,h,[[0,'#486687'],[.40,'#293f60'],[1,'#182d49']]);rr(x,y,w,h,7);g.fill();g.strokeStyle=old?'#708ca6':'#7891aa91';g.lineWidth=2;g.stroke();
  if(!old){line(x+7,y+5,x+w-7,y+5,'#95a8c045',2);line(x+6,y+h-5,x+w-7,y+h-5,'#0d233e87',3);g.strokeStyle='#94a9c22b';g.lineWidth=1;g.beginPath();g.moveTo(x+w*.43,y+4);g.lineTo(x+w*.35,y+h*.24);g.lineTo(x+w*.53,y+h*.43);g.stroke()}
 }
 function floor(x,y,w,h=100,old=false){
+ if(!old){nrDrawStoneFloor(x,y,w,h,0);return}
  g.fillStyle='#14243e';g.fillRect(x,y,w,h);
- for(let layer=0;layer<Math.ceil(h/45);layer++){const yy=y+layer*45;for(let xx=x-(layer%2)*38;xx<x+w;xx+=78){stoneTile(xx+2,yy+2,74,41,old)}}
- if(!old){g.fillStyle=gradient(x,y,0,12,[[0,'#b4f8dd'],[.45,'#86dab8'],[1,'#386b72']]);rr(x,y-4,w,12,5);g.fill();line(x+9,y+2,x+w-10,y+2,'#d4ffef9c',2);for(let k=0;k<Math.min(9,Math.round(w/74));k++){const cx=x+(k*81+31)%Math.max(w,1);ellipse(cx,y+3,7+(k%3)*2,3,'#397b6e')}}else{g.fillStyle='#57c4ed';g.fillRect(x,y-3,w,4)}
+ for(let layer=0;layer<Math.ceil(h/45);layer++){const yy=y+layer*45;for(let xx=x-(layer%2)*38;xx<x+w;xx+=78){stoneTile(xx+2,yy+2,74,41,true)}}
+ g.fillStyle='#57c4ed';g.fillRect(x,y-3,w,4);
 }
 function facetSpike(x,bottom,w,h,old=false,down=false){
  const tipY=down?bottom+h:bottom-h,rootY=bottom;
@@ -1470,14 +1843,18 @@ const dbMesh24=dbBuildMesh(.137,[-1,-.986,-.958,-.92,-.863,0,.863,.92,.958,.986,
 // The player is only 84px in this preview. Use a low-density mesh while
 // running: much less work for mobile GPUs with no meaningful lost detail.
 const dbMeshRun=dbBuildMesh(.137,[-1,-.966,-.916,-.863,0,.863,.916,.966,1]);
+// Dense enough for a beveled stone edge, but limited in 60 fps preview.
+const nrMeshStone35=dbBuildMesh(.068,[-1,-.983,-.949,-.932,0,.932,.949,.983,1]);
+const nrMeshStoneRun35=dbBuildMesh(.068,[-1,-.962,-.932,0,.932,.962,1]);
+function nrModernStone35(){return items[pos]?.[0]==='player'&&improved&&!legacy22&&!legacy23&&!legacy24;}
 function dbProjector(cx,cy,size,spin=0){
  // The playable world is a strict 2-D side scroller. Keep the modern player
  // nearly front-on (and its bottom horizontal), while preserving a tiny amount
  // of depth and rounded-edge shading. Legacy comparisons/other parts retain
  // their earlier camera.
  const playerFront=items[pos]?.[0]==='player'&&improved&&!legacy22&&!legacy23&&!legacy24;
- const yaw=playerFront?(runActive?-.045:[-.014,-.055,-.105][cameraView]):(runActive?-.24:[-.12,-.43,-.68][cameraView]);
- const pitch=playerFront?(runActive?.040:[.028,.055,.088][cameraView]):(runActive?.17:(legacy22?.30:.255));
+ const yaw=playerFront?(runActive?-.077:[-.07,-.14,-.21][cameraView]):(runActive?-.24:[-.12,-.43,-.68][cameraView]);
+ const pitch=playerFront?(runActive?.068:[.075,.105,.15][cameraView]):(runActive?.17:(legacy22?.30:.255));
  const ya=Math.cos(yaw),yb=Math.sin(yaw),pa=Math.cos(pitch),pb=Math.sin(pitch);
  const ca=Math.cos(spin),sa=Math.sin(spin);
  function rotate(q){
@@ -1494,7 +1871,7 @@ function dbProjector(cx,cy,size,spin=0){
  return {project,rotate,scale};
 }
 function dbBottomOffset(size,spin=0,small=false){
- const mesh=runActive&&small?dbMeshRun:legacy22?dbMesh22:legacy23?dbMesh23:dbMesh24;
+ const mesh=nrModernStone35()?(runActive&&small?nrMeshStoneRun35:nrMeshStone35):runActive&&small?dbMeshRun:legacy22?dbMesh22:legacy23?dbMesh23:dbMesh24;
  const p=dbProjector(0,0,size,spin);
  let maxY=-1e9;
  for(const tile of mesh){
@@ -1506,7 +1883,7 @@ function dbBottomOffset(size,spin=0,small=false){
  return maxY;
 }
 function dbShadowCenterOffset(size,spin=0,small=false){
- const mesh=runActive&&small?dbMeshRun:legacy22?dbMesh22:legacy23?dbMesh23:dbMesh24;
+ const mesh=nrModernStone35()?(runActive&&small?nrMeshStoneRun35:nrMeshStone35):runActive&&small?dbMeshRun:legacy22?dbMesh22:legacy23?dbMesh23:dbMesh24;
  const p=dbProjector(0,0,size,spin);
  let maxY=-1e9, xs=[];
  for(const tile of mesh){
@@ -1586,7 +1963,113 @@ function dbFaceNumber25(p,n,angle,opacity,size,small,pal){
  g.fillStyle=pal.ink;g.fillText(glyph,x,y);
  g.restore();
 }
+/* Ver.3.6: procedural stone/ceramic ruin cube, matching nrSlab35 lighting.
+   This is ONLY a replacement skin for the isolated Design Book preview.
+   The existing 2-D engine and 51 exercises are unmodified. */
+const nrCubeStone35={
+ // Four recognisable numbers; all faces still share the same mineral family.
+ 1:{front:'#a8beca',light:'#c1d0d6',shadow:'#839aaa',rim:'#98aebb',side:'#526c81',ink:'#18364b',glow:'#587e8d'},
+ 2:{front:'#a6c0ba',light:'#becfcb',shadow:'#819f9c',rim:'#91ada9',side:'#526c6a',ink:'#24443f',glow:'#547c73'},
+ 3:{front:'#b3b1c3',light:'#c9c8d1',shadow:'#898caa',rim:'#a4a5b7',side:'#64657f',ink:'#383750',glow:'#72708b'},
+ 4:{front:'#c4b7b0',light:'#d5cac2',shadow:'#9d8e8b',rim:'#b9aaa3',side:'#826c69',ink:'#4c3938',glow:'#88706c'}
+};
+function nrFaceLine35(p,arr,color,width=1,hi=null){
+ g.beginPath();arr.forEach(([u,v],i)=>{const q=p.project([u,v,1.018]);i?g.lineTo(q.x,q.y):g.moveTo(q.x,q.y)});
+ g.strokeStyle=color;g.lineWidth=width;g.lineCap='round';g.lineJoin='round';g.stroke();
+ if(hi){g.save();g.translate(0,.9);g.strokeStyle=hi;g.lineWidth=Math.max(.5,width*.48);g.stroke();g.restore()}
+}
+function nrFaceGlyph35(p,n,angle,opacity,small,pal){
+ if(opacity<.002)return;
+ const c=p.project([0,0,1.026]);
+ const r=p.project([.4,0,1.026]),u=p.project([0,.385,1.026]);
+ const kx=Math.hypot(r.x-c.x,r.y-c.y)/40,ky=Math.hypot(u.x-c.x,u.y-c.y)/38.5;
+ g.save();g.globalAlpha=opacity;g.translate(c.x,c.y);
+ g.rotate(angle);g.scale(kx,ky);
+ g.font='850 105px system-ui,Arial,sans-serif';g.textAlign='left';g.textBaseline='alphabetic';
+ const char=String(n),m=g.measureText(char);
+ const left=m.actualBoundingBoxLeft??0,right=m.actualBoundingBoxRight??m.width;
+ const top=m.actualBoundingBoxAscent??78,bottom=m.actualBoundingBoxDescent??0;
+ const px=(left-right)/2,py=(top-bottom)/2;
+ // Shallow cut-stone digits. A soft lower lip and a dark upper interior
+ // suggest depth, without a white outline, extruded sticker or glow.
+ g.lineJoin='round';
+ g.fillStyle='#e3e8e247';g.fillText(char,px+.5,py+1.8);
+ g.fillStyle='#0b203750';g.fillText(char,px-.7,py-.9);
+ g.fillStyle=pal.ink;g.fillText(char,px,py);
+ g.restore();
+}
+
+function nrDrawStoneCube35(cx,cy,size,n,spin=0,small=false){
+ const quarter=Math.PI/2,phase=((spin%quarter)+quarter)%quarter;
+ const endPal=nrCubeStone35[n]||nrCubeStone35[1];
+ let pal=endPal;
+ if(cubeRoll&&cubeRoll.progress!==undefined){
+  const t0=dbClamp((cubeRoll.progress-.18)/.64,0,1),t=t0*t0*(3-2*t0);
+  const from=nrCubeStone35[cubeRoll.from],to=nrCubeStone35[cubeRoll.to];
+  pal={};for(const key of Object.keys(endPal))pal[key]=dbColor(dbMix(dbRGB(from[key]),dbRGB(to[key]),t));
+ }
+ const p=dbProjector(cx,cy,size,spin),mesh=small&&runActive?nrMeshStoneRun35:nrMeshStone35;
+ const body=dbRGB(pal.front),side=dbRGB(pal.side),list=[],light=[-.42,.61,.68];
+ for(const tile of mesh){
+  const normal=p.rotate(tile.normal),mid=p.rotate(tile.mid);
+  if(normal[2]<-.14)continue;
+  const dot=normal[0]*light[0]+normal[1]*light[1]+normal[2]*light[2];
+  const sideAmt=dbClamp((normal[0]+.2)/1.1,0,1)*.59;
+  const bevelShade=dbClamp(.87+.135*dot-.045*Math.max(0,-normal[2]),.69,1.04);
+  const color=dbColor(body.map((v,i)=>((1-sideAmt)*v+sideAmt*side[i])*bevelShade));
+  list.push({z:mid[2],color,points:tile.pts.map(q=>p.project(q))});
+ }
+ list.sort((a,b)=>a.z-b.z);
+ g.save();g.shadowColor='#000b16a0';g.shadowBlur=small?1.5:3;
+ for(const tile of list){
+  g.beginPath();tile.points.forEach((q,i)=>i?g.lineTo(q.x,q.y):g.moveTo(q.x,q.y));g.closePath();
+  g.fillStyle=tile.color;g.fill();g.strokeStyle=tile.color;g.lineWidth=.53;g.stroke();g.shadowBlur=0;
+ }
+ g.restore();
+ if(p.rotate([0,0,1])[2]<.18)return;
+ const at=(u,v,z=1.011)=>[u,v,z];
+ const faceOutline=[[-.90,.94],[.85,.94],[.945,.87],[.945,-.88],[.87,-.94],[-.88,-.94],[-.945,-.87],[-.945,.84]].map(([u,v])=>at(u,v,1.017));
+ const faceInset=[[-.79,.855],[.77,.855],[.855,.77],[.855,-.77],[.75,-.855],[-.81,-.855],[-.855,-.78],[-.855,.77]].map(([u,v])=>at(u,v,1.024));
+ const a=p.project(at(-.85,.91)),b=p.project(at(.86,-.9));
+ const bevel=g.createLinearGradient(a.x,a.y,b.x,b.y);
+ bevel.addColorStop(0,pal.light);bevel.addColorStop(.5,pal.rim);bevel.addColorStop(1,pal.shadow);
+ dbPolygon3d(faceOutline,p,bevel,'#c1d4d73c',small?.35:.63);
+ // One chiseled boundary only. The material is rock, not an inset metal panel.
+ const faceFill=g.createLinearGradient(a.x,a.y,b.x,b.y);
+ faceFill.addColorStop(0,pal.light);faceFill.addColorStop(.48,pal.front);faceFill.addColorStop(1,pal.shadow);
+ dbPolygon3d(faceInset,p,faceFill,'#35526862',small?.47:.9);
+ g.save();g.beginPath();faceInset.forEach((v,i)=>{const q=p.project(v);i?g.lineTo(q.x,q.y):g.moveTo(q.x,q.y)});g.closePath();g.clip();
+ // Cached procedural mineral noise; no photograph or image-sprite needed.
+ const tex=nrStoneGrain35(3),o=p.project([-1,1,1.027]);
+ const r0=p.project([1,1,1.027]),d0=p.project([-1,-1,1.027]);
+ g.save();g.globalCompositeOperation='soft-light';g.globalAlpha=.47;
+ g.transform((r0.x-o.x)/tex.width,(r0.y-o.y)/tex.width,
+             (d0.x-o.x)/tex.height,(d0.y-o.y)/tex.height,o.x,o.y);
+ g.drawImage(tex,0,0);g.restore();
+ // One short peripheral fissure. Few fragments, no symmetric decorations.
+ if(!small){
+  nrFaceLine35(p,[[.77,.48],[.67,.35],[.71,.22],[.61,.12]],'#28455b77',.95,'#e3eef02d');
+  const q=p.project([-.76,-.64,1.028]);nrStoneMark35(q.x,q.y,42,.48);
+ }else{
+  nrFaceLine35(p,[[.78,.45],[.67,.34],[.73,.21]],'#28455b66',.53);
+ }
+ g.restore();
+ // Tiny bevel glints only where illumination reaches the chiseled edge.
+ nrFaceLine35(p,[[-.72,.77],[-.67,.80],[.56,.80]],'#e7f0ef35',small?.53:.8);
+ if(!small){
+  // Small stone chips are attached to the carved edge, not scattered everywhere.
+  nrFaceLine35(p,[[-.86,.57],[-.81,.52],[-.82,.43]],'#47677c8c',1.2);
+  nrFaceLine35(p,[[.69,-.81],[.61,-.78],[.58,-.74]],'#d8e0db52',.86);
+ }
+ if(cubeRoll&&cubeRoll.progress!==undefined){
+  const blend=dbClamp((cubeRoll.progress-.27)/.46,0,1);
+  nrFaceGlyph35(p,cubeRoll.from,phase,1-blend,small,nrCubeStone35[cubeRoll.from]);
+  nrFaceGlyph35(p,cubeRoll.to,phase-quarter,blend,small,nrCubeStone35[cubeRoll.to]);
+ }else nrFaceGlyph35(p,n,0,1,small,pal);
+}
+
 function dbRoundedCube(cx,cy,size,n,spin=0,small=false){
+ if(nrModernStone35()){nrDrawStoneCube35(cx,cy,size,n,spin,small);return;}
  const previous=legacy22,prior=legacy22||legacy23,mesh=runActive&&small?dbMeshRun:legacy22?dbMesh22:legacy23?dbMesh23:dbMesh24;
  const quarter=Math.PI/2;
  const phase=((spin%quarter)+quarter)%quarter;
@@ -1641,6 +2124,12 @@ function dbRoundedCube(cx,cy,size,n,spin=0,small=false){
   fill.addColorStop(0,previous?pal.rim:dbColor(dbMix(dbRGB(pal.rim),dbRGB(pal.main),.38)));
   fill.addColorStop(.52,pal.main);fill.addColorStop(1,dbColor(dbMix(dbRGB(pal.main),sideRGB,previous?.22:.14)));
   dbPolygon3d(outer,p,fill,previous?(small?'#f9ffff91':'#f9ffffaf'):'#f9ffff7b',previous?(small?.55:Math.max(.9,size*.007)):(small?.45:Math.max(.65,size*.0049)));
+  if(runActive&&small&&!prior){
+   // A restrained reflection of the slab's cool upper surface on the cube.
+   const bounce=g.createLinearGradient(fc.x,fc.y,ft.x,ft.y);
+   bounce.addColorStop(0,'#74d9f000');bounce.addColorStop(.72,'#74d9f000');bounce.addColorStop(1,'#70d5ec27');
+   dbPolygon3d(outer,p,bounce);
+  }
   dbPolygon3d(inner,p,null,pal.accent+(previous?'54':'38'),small?.4:(previous?.85:.54));
   if(!small){
    const markSize=previous?.096:.067;
@@ -1693,7 +2182,7 @@ function wall(x,y,w,h,safe,old=false){
   g.strokeStyle='#ffb9b5';g.lineWidth=7;line(x+w*.35,y+h*.44,x+w*.65,y+h*.65,'#ffadac',7);line(x+w*.65,y+h*.44,x+w*.35,y+h*.65,'#ffadac',7)
  }
 }
-function drawGround(){floor(150,265,728,175,!improved);if(!improved)return;for(let i=0;i<4;i++){line(220+i*150,304,239+i*150,303,'#83a6b867',3)}text('安全な着地点が分かる、薄いミントの縁',505,220,18,'#c5e9e7',650)}
+function drawGround(){floor(36,223,952,217,!improved)}
 function drawGap(){floor(66,255,350,185,!improved);floor(672,255,285,185,!improved);if(improved){line(415,260,415,430,'#ff9ba685',5);line(671,260,671,430,'#ff9ba685',5);for(let y=275;y<425;y+=21){line(413,y,421,y+8,'#ffd0bf83',2);line(668,y,660,y+8,'#ffd0bf83',2)}}else{line(417,255,417,440,'#ff7085',3);line(671,255,671,440,'#ff7085',3)}ellipse(544,416,90,13,'#121a37ac');cube(252,137,74,face,!improved);g.setLineDash([9,12]);g.beginPath();g.moveTo(340,180);g.quadraticCurveTo(515,38,733,202);g.strokeStyle='#b6ffe4ad';g.lineWidth=3;g.stroke();g.setLineDash([])}
 function drawAir(safe){floor(105,359,815,81,!improved);shadow(533,325,120);if(!safe){spikeBase(348,132,326,!improved);for(let i=0;i<3;i++){facetSpike(354+i*106,158,100,107,!improved,true);facetSpike(354+i*106,132,100,50,!improved,false)}}else{
   wall(356,132,312,40,true,!improved);if(improved){for(let i=0;i<3;i++){facetSpike(367+i*102,176,94,112,false,true)}line(374,126,646,126,'#bbffe6',3)}else{for(let i=0;i<3;i++)facetSpike(365+i*104,174,94,110,true,true)}
@@ -1721,85 +2210,46 @@ function playerShadowX(px,size,spin=0,small=false){
  return px+dbShadowCenterOffset(size,spin,small)*.52;
 }
 function runFloor(offset,cameraLift=0){
- const y=341+cameraLift, tileW=78, shift=((offset%tileW)+tileW)%tileW;
- g.fillStyle='#11243a';g.fillRect(0,y,1024,99);
- // Repeating masonry. The scrolling texture makes automatic advance visible.
- for(let row=0;row<3;row++){
-  const yy=y+row*35;
-  for(let x=-tileW-shift+(row%2?tileW/2:0);x<1060;x+=tileW)stoneTile(x+2,yy+2,74,32,false);
- }
- g.fillStyle='#7fd7b4';g.fillRect(0,y-3,1024,7);
- g.fillStyle='#b8ffe6';g.fillRect(0,y-3,1024,2);
- for(let i=0;i<21;i++){
-  const x=i*64-((offset*.95)%64);
-  ellipse(x,y+2,3.6,1.5,'#244e5d9e');
- }
+ const y=341+cameraLift;
+ nrDrawStoneFloor(0,y,1024,Math.max(200,440-y),offset);
 }
 function drawRunning(){
  backdrop();
- // Distant ruins scroll slowly. The floor remains the visual anchor.
- const slide=(runDistance*.055)%400;
- for(let i=-1;i<5;i++){
-  const x=i*400-slide;
-  g.fillStyle='#7892bd13';g.fillRect(x+93,196,53,145);g.fillRect(x+158,237,13,104);
- }
  const px=252,baseGroundY=341,playerSize=RUN_PLAYER_SIZE;
  const visualJump=runHeight*RUN_VISUAL_SCALE;
- // Keep the floor visible at all times; move the camera only a little on higher jumps.
  const groundY=baseGroundY+runCameraLift;
  runFloor(runDistance*playerSize/RUN_PLAYER_WORLD_SIZE,runCameraLift);
  const phase=((cubeSpin%(Math.PI/2))+(Math.PI/2))%(Math.PI/2);
  const centerY=playerCenterYForGround(groundY,playerSize,phase,true)-visualJump;
  const sx=playerShadowX(px,playerSize,phase,true);
  const flight=dbClamp(visualJump/160,0,1);
+ const shine=g.createRadialGradient(sx,groundY-2,1,sx,groundY-2,48);
+ shine.addColorStop(0,`rgba(105,133,144,${.035-flight*.030})`);shine.addColorStop(1,'rgba(74,110,123,0)');
+ g.fillStyle=shine;g.fillRect(sx-48,groundY-16,96,28);
  const shadowW=Math.max(15,31-flight*12);
- ellipse(sx,groundY-1,shadowW,Math.max(2,4.5-flight*2),`rgba(3,21,32,${.56-flight*.34})`);
- ellipse(sx,groundY-2,20,2,`rgba(120,217,199,${.18-flight*.15})`);
- if(runHeight<.01){
-  for(let i=0;i<3;i++){
-   const dx=((runDistance*.19+i*22)%77);
-   ellipse(sx-42-dx,groundY-3-(i%2)*2,1.7,1,'#9bd9c044');
-  }
- }
+ ellipse(sx,groundY-1,shadowW,Math.max(2,4.5-flight*2),`rgba(0,0,0,${.62-flight*.30})`);
+ ellipse(sx,groundY-2,20,2,`rgba(83,105,115,${.045-flight*.035})`);
  if(runLandFx>0){
   const t=1-runLandFx/.19;
   g.beginPath();g.ellipse(sx,groundY-2,23+t*36,4+t*1.3,0,0,Math.PI*2);
-  g.strokeStyle=`rgba(169,247,219,${(1-t)*.40})`;g.lineWidth=2;g.stroke();
+  g.strokeStyle=`rgba(162,181,186,${(1-t)*.21})`;g.lineWidth=2;g.stroke();
  }
  dbRoundedCube(px,centerY,playerSize,face,phase,true);
- g.save();g.fillStyle='#091e34c6';rr(413,59,252,57,12);g.fill();g.strokeStyle='#6a96ab75';g.lineWidth=1.5;g.stroke();g.restore();
- text('AUTO RUN  ·  FLAT FLOOR',539,77,15,'#b6e9d8',850);
- text(`DISTANCE  ${Math.floor(runDistance/64)} マス`,539,100,17,'#edf8ff',850);
- g.save();g.fillStyle='#091e34bd';rr(754,60,250,57,12);g.fill();g.restore();
- text(`数字  ${face}`,815,88,20,'#d7f6ed',900);
- text(`ジャンプ  ${Math.max(0,runLimit-runUsed)} / ${runLimit}`,924,88,16,'#d6edff',800);
 }
 function draw(){
  if(runActive&&items[pos][0]==='player'){drawRunning();return}
  backdrop();const id=items[pos][0];
  if(id==='player'){
-    floor(130,345,770,95,!improved);
+    floor(130,341,770,99,!improved);
+    const phase=((cubeSpin%(Math.PI/2))+(Math.PI/2))%(Math.PI/2);
+    const mainGround=341;
+    const mainX=512;
     if(improved){
-      const portrait=window.matchMedia&&window.matchMedia('(max-width:710px) and (orientation:portrait)').matches;
-      const phase=((cubeSpin%(Math.PI/2))+(Math.PI/2))%(Math.PI/2);
-      if(portrait){
-        const mainGround=341,smallGround=333;
-        const mainX=425,smallX=844;
-        shadow(playerShadowX(mainX,280,phase),mainGround,105);dbRoundedCube(mainX,playerCenterYForGround(mainGround,280,phase),280,face,phase);
-        shadow(playerShadowX(smallX,83,phase,true),smallGround,28);dbRoundedCube(smallX,playerCenterYForGround(smallGround,83,phase,true),83,face,phase,true);
-        text('ゲームサイズ',845,350,19,'#b8d9e9',740);
-      }else{
-        const mainGround=341,smallGround=280,smallGround2=280;
-        const mainX=381,smallX=752,smallX2=889;
-        shadow(playerShadowX(mainX,196,phase),mainGround,87);dbRoundedCube(mainX,playerCenterYForGround(mainGround,196,phase),196,face,phase);
-        g.save();g.fillStyle='#071d33aa';rr(642,72,326,261,14);g.fill();g.strokeStyle='#83aecb61';g.lineWidth=1.5;g.stroke();g.restore();
-        text('GAME SIZE / 小さくした場合',804,100,17,'#d0ebf2',750);
-        shadow(playerShadowX(smallX,92,phase,true),smallGround,35);dbRoundedCube(smallX,playerCenterYForGround(smallGround,92,phase,true),92,face,phase,true);
-        shadow(playerShadowX(smallX2,63,phase,true),smallGround2,25);dbRoundedCube(smallX2,playerCenterYForGround(smallGround2,63,phase,true),63,face,phase,true);
-        text('92 px',752,294,16,'#a9d4e2',750);text('63 px',890,294,16,'#a9d4e2',750);
-        text('角・数字・シルエットを比較',806,317,13,'#95c0d1',600);
-      }
-    }else {shadow(515,331,140);oldCube(411,75,198,face)}
+      shadow(playerShadowX(mainX,196,phase),mainGround,87);
+      dbRoundedCube(mainX,playerCenterYForGround(mainGround,196,phase),196,face,phase);
+    }else {
+      shadow(515,331,140);oldCube(411,75,198,face)
+    }
    }
  else if(id==='spike')drawSpikes();else if(id==='ground')drawGround();else if(id==='gap')drawGap();
  else if(id==='safe'||id==='danger'){floor(135,358,761,82,!improved);shadow(520,346);wall(id==='safe'?381:414,id==='safe'?101:79,id==='safe'?277:210,id==='safe'?260:280,id==='safe',!improved)}
@@ -1808,12 +2258,12 @@ function draw(){
 }
 function refresh(){const i=items[pos];const player=i[0]==='player';$('dbName').textContent=i[1];$('dbEnglish').textContent=i[2];$('dbDescription').textContent=i[3];$('dbCounter').textContent=String(pos+1).padStart(2,'0')+' / '+items.length;
  for(const [k,b] of [...$('dbCategories').children].entries()){b.classList.toggle('active',k===pos);b.setAttribute('aria-current',String(k===pos))}
- $('dbNew').classList.toggle('active',improved&&!legacy22&&!legacy23&&!legacy24);$('dbV24').classList.toggle('active',improved&&legacy24);$('dbV23').classList.toggle('active',improved&&legacy23);$('dbV22').classList.toggle('active',improved&&legacy22);$('dbOld').classList.toggle('active',!improved);$('dbNew').setAttribute('aria-pressed',String(improved&&!legacy22&&!legacy23&&!legacy24));$('dbV24').setAttribute('aria-pressed',String(improved&&legacy24));$('dbV23').setAttribute('aria-pressed',String(improved&&legacy23));$('dbV22').setAttribute('aria-pressed',String(improved&&legacy22));$('dbOld').setAttribute('aria-pressed',String(!improved));$('dbV22').hidden=items[pos][0]!=='player';$('dbV23').hidden=items[pos][0]!=='player';$('dbV24').hidden=items[pos][0]!=='player';
- $('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=!player;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbBackground').textContent=ruins?'背景：遺跡':'背景：単色';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':'Ver.3.0 / 正面向き・接地 改善'):'旧デザイン風（比較用）';
+ $('dbNew').classList.toggle('active',improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31));$('dbV24').classList.toggle('active',improved&&legacy24);$('dbV23').classList.toggle('active',improved&&legacy23);$('dbV22').classList.toggle('active',improved&&legacy22);$('dbOld').classList.toggle('active',!improved);$('dbNew').setAttribute('aria-pressed',String(improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31)));$('dbV24').setAttribute('aria-pressed',String(improved&&legacy24));$('dbV23').setAttribute('aria-pressed',String(improved&&legacy23));$('dbV22').setAttribute('aria-pressed',String(improved&&legacy22));$('dbOld').setAttribute('aria-pressed',String(!improved));$('dbV22').hidden=items[pos][0]!=='player';$('dbV23').hidden=items[pos][0]!=='player';$('dbV24').hidden=items[pos][0]!=='player';$('dbGroundBefore').hidden=items[pos][0]!=='ground'||!improved;$('dbGroundBefore').classList.toggle('active',nrFloorCompare31);$('dbGroundBefore').setAttribute('aria-pressed',String(nrFloorCompare31));$('dbGroundBefore').textContent=nrFloorCompare31?'✓ Ver.3.1 石床':'◈ Ver.3.1と比較';
+ $('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=!player;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.3.6 / 控えめな遺跡石床'):'Ver.3.6 / 落ち着いた石キューブ＆床'):'旧デザイン風（比較用）';
  try{$('dbMemo').value=localStorage.getItem(memoKey(pos))||''}catch{$('dbMemo').value=''};
  for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
- $('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=!player||!runActive;$('dbRun').textContent=runActive?'■ 停止して戻る':'▶ 走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'平らな床 / 数字・回転・接地を確認':'障害物なし・平らな床';$('dbInstruction').textContent=runActive?'画面タップでジャンプ。数字が回転後にまっすぐ戻るか確認できます。':player?'数字切替・90°回転を確認できます。走行テストは本編と別です。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['真正面','正面＋少し奥行き','正面＋奥行き'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
-function select(n){stopRun(false);pos=(n+items.length)%items.length;refresh()}
+ $('dbExtras').hidden=items[pos][0]==='ground';$('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=!player||!runActive;$('dbRun').textContent=runActive?'■ 停止して戻る':'▶ 走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'黒背景 / 平らな床で走行確認':'黒背景 / プレイヤーと床だけ';$('dbInstruction').textContent=runActive?'画面タップでジャンプ。回転後の向き・接地・横滑りを確認。':player?'背景を消した状態で、数字・回転・接地の見た目を確認できます。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['真正面','正面＋少し奥行き','正面＋奥行き'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
+function select(n){stopRun(false);pos=(n+items.length)%items.length;if(items[pos][0]!=='ground')nrFloorCompare31=false;refresh()}
 function stopRun(redraw=true){
  if(!runActive)return;
  runActive=false;runLast=0;runHeight=0;runVelocity=0;cubeRoll=null;cubeSpin=0;cubeTurns=0;runTurnTarget=0;runCameraLift=0;runLandFx=0;runLaunchFx=0;
@@ -1883,7 +2333,7 @@ $('dbRunJump').onclick=runJump;
 $('designCanvas').addEventListener('pointerdown',e=>{if(runActive){e.preventDefault();runJump()}});
 for(let i=0;i<items.length;i++){const b=document.createElement('button');b.type='button';b.className='db-cat';b.innerHTML=`<small>${String(i+1).padStart(2,'0')}</small><span>${items[i][1]}</span>`;b.onclick=()=>select(i);$('dbCategories').appendChild(b)}
 for(let d=1;d<=4;d++){const b=document.createElement('button');b.type='button';b.className='db-digit';b.dataset.digit=String(d);b.textContent=d;b.onclick=()=>{cubeRoll=null;cubeSpin=0;cubeTurns=0;face=d;refresh()};$('dbDigits').appendChild(b)}
-$('dbNew').onclick=()=>{improved=true;legacy22=false;legacy23=false;legacy24=false;refresh()};$('dbV24').onclick=()=>{improved=true;legacy22=false;legacy23=false;legacy24=true;refresh()};$('dbV23').onclick=()=>{improved=true;legacy22=false;legacy23=true;legacy24=false;refresh()};$('dbV22').onclick=()=>{improved=true;legacy22=true;legacy23=false;legacy24=false;refresh()};$('dbOld').onclick=()=>{improved=false;legacy22=false;legacy23=false;legacy24=false;refresh()};$('dbBackground').onclick=()=>{ruins=!ruins;refresh()};
+$('dbNew').onclick=()=>{improved=true;legacy22=false;legacy23=false;legacy24=false;nrFloorCompare31=false;refresh()};$('dbV24').onclick=()=>{improved=true;legacy22=false;legacy23=false;legacy24=true;refresh()};$('dbV23').onclick=()=>{improved=true;legacy22=false;legacy23=true;legacy24=false;refresh()};$('dbV22').onclick=()=>{improved=true;legacy22=true;legacy23=false;legacy24=false;refresh()};$('dbOld').onclick=()=>{improved=false;legacy22=false;legacy23=false;legacy24=false;refresh()};$('dbBackground').onclick=()=>{ruins=!ruins;refresh()};$('dbGroundBefore').onclick=()=>{nrFloorCompare31=!nrFloorCompare31;refresh()};
 $('dbView').onclick=()=>{cameraView=(cameraView+1)%3;refresh()};
 $('dbRotate').onclick=()=>{
  if(cubeRoll)return;
