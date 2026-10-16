@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.3.9 · Floor Plane & Contact</title>
+<title>NUMBER ROLL — Ver.4.0 · Front Contact Adjustment</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -335,7 +335,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
       </div>
       <div class="db-toolbar" id="dbToolbar">
-        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.3.9 接地・奥行き調整</button>
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.0 手前側の接地調整</button>
         <button id="dbV24" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.4 と比較</button>
         <button id="dbV23" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.3 と比較</button>
         <button id="dbV22" type="button" class="db-tool" aria-pressed="false">Ver.2.2</button>
@@ -1328,11 +1328,11 @@ function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);b
  drawGoal();
  if(uiMode!=='story'){drawJumpGuide();drawGapGuide();drawNumberGateGuide();drawPlatformGuide();drawSwitchGuide();drawObjectMeasures();drawMeasureBand()}
  drawGapWalls();
- // Ver.3.9: the cube sits on the running line itself, not in the wall face.
- let sq=SIZE*.90,px=cameraPlayerX(),py=scrY(state.y)-sq/2-.15,pal=nrGameCubePal37(state.face);
+ // Ver.4.0: shift the sprite and its shadow 3.5 render units toward the viewer; physics unchanged.
+ let sq=SIZE*.90,px=cameraPlayerX(),py=scrY(state.y)-sq/2-.15+3.5,pal=nrGameCubePal37(state.face);
  // Shadow is kept tight to the top plane so the contact point reads clearly.
- ctx.fillStyle='#06111ca0';ctx.beginPath();ctx.ellipse(px,FLOOR+1.35,22*(1-Math.min(.56,state.y/650)),2.8,0,0,Math.PI*2);ctx.fill();
- if(state.lastLanding>0){ctx.strokeStyle=`rgba(155,232,255,${state.lastLanding/.3})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(px,FLOOR+.8,28+(1-state.lastLanding/.3)*23,5.4,0,0,Math.PI*2);ctx.stroke()}
+ ctx.fillStyle='#06111ca0';ctx.beginPath();ctx.ellipse(px,FLOOR+4.85,22*(1-Math.min(.56,state.y/650)),2.8,0,0,Math.PI*2);ctx.fill();
+ if(state.lastLanding>0){ctx.strokeStyle=`rgba(155,232,255,${state.lastLanding/.3})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(px,FLOOR+4.3,28+(1-state.lastLanding/.3)*23,4.0,0,0,Math.PI*2);ctx.stroke()}
  for(let k=0;k<4;k++)stroke(px-sq*.68-k*15,py+(k-1.5)*7,px-sq*.68-k*15+8,py+(k-1.5)*7,pal.trail+'4a',1.6);
  nrDrawGameStoneCube37(px,py,sq,state.face,state.angle);
  nrDrawGameDigit37(px,py,state.face,pal);
@@ -1463,9 +1463,9 @@ new ResizeObserver(resize).observe(stage);progress();setPage(window.location.has
 (()=>{
 'use strict';
 const items=[
- ['player','プレイヤー','PLAYER CUBE','Ver.3.9：キューブ底面を床上面の中央付近に合わせ、滑り感を軽減。彫刻数字と落ち着いた石材を維持。'],
+ ['player','プレイヤー','PLAYER CUBE','Ver.4.0：キューブを床上面の手前側へ約3.5px移動。接地影も合わせ、石材・数字・サイズは維持。'],
  ['spike','地上トゲ','CRYSTAL SPIKES','危険を一目で判断できる結晶形のトゲ。先端はシャープに。'],
- ['ground','地面・石床','RUIN STONE FLOOR','Ver.3.9：明るい床上面と青暗い石壁を区別。奥行きと石板の角度を整理。'],
+ ['ground','地面・石床','RUIN STONE FLOOR','Ver.4.0：明るい床上面と青暗い石壁の区別、床の角度と奥行きはVer.3.9を維持。'],
  ['gap','穴・側壁','GAP / SIDE WALL','穴の位置と危険な側壁を、装飾に埋もれず判別できるように。'],
  ['safe','青壁・安全','LANDABLE WALL','上面だけ安全。ミントの着地ラインと石の装飾を確認。'],
  ['danger','赤壁・危険','HAZARDOUS WALL','全方向危険。赤い縁・警告模様・本体の質感。'],
@@ -1482,6 +1482,7 @@ let cubeSpin=0, cubeTurns=0, cubeRoll=null, cameraView=0;
 // Use the SAME world-space constants as the real game. Height in the playable
 // engine is rendered at ZOOM=.49, not at one screen pixel per world unit.
 const RUN_SPEED=285,RUN_JUMP_V=700,RUN_GRAVITY=1850,RUN_PLAYER_WORLD_SIZE=64,RUN_GAME_ZOOM=.49;
+const NR_FRONT_OFFSET40=3.5; // canvas px toward the near edge of the top slab; rendering only
 const RUN_PLAYER_SIZE=77,RUN_VISUAL_SCALE=RUN_GAME_ZOOM*RUN_PLAYER_SIZE/RUN_PLAYER_WORLD_SIZE; // Ver.3.8: visual scale only, physics units unchanged
 const RUN_TURN_SPEED=(Math.PI/2)/.20; // same ~0.20s rotation duration as the original game
 let runActive=false,runLast=0,runDistance=0,runHeight=0,runVelocity=0,runUsed=0,runLimit=1,runFrame=0,runStamp=0;
@@ -2306,13 +2307,13 @@ function drawSwitch(){floor(88,353,842,87,!improved);const x=282,y=220,w=237,h=7
  text(String(face),x+w/2,y+21,42,'#ece1ff',950);
  const xx=722;wall(xx,153,90,200,false,!improved);g.setLineDash([10,10]);line(518,245,703,245,'#c4a3ffb3',4);g.setLineDash([]);text('→',612,221,32,'#b6e5ef',800);}
 function drawMoving(){floor(72,360,877,80,!improved);g.setLineDash([15,10]);line(200,144,822,144,improved?'#9fe9d7b0':'#7faaff9c',4);g.setLineDash([]);text('↔',515,107,70,'#b4f2df',600);wall(266,206,215,154,true,!improved);wall(580,186,160,174,false,!improved)}
-// Ver.3.9: place contact shadow at the middle of the visibly angled upper stone plane.
+// Ver.4.0: keep the shadow aligned to the cube, a few pixels nearer the front of the stone plane.
 // It fades and broadens with height but never alters the player's collision rectangle.
 function nrPlayerContactShadow38(cx,groundY,size,flight=0,cap=18){
  const f=dbClamp(flight,0,1);
- const y=groundY+cap*.51;
+ const y=groundY+cap*.51+NR_FRONT_OFFSET40;
  const wide=size*(.37-.11*f);
- g.save();g.beginPath();g.rect(0,groundY,1024,Math.max(1,cap+1));g.clip();
+ g.save();g.beginPath();g.rect(0,groundY,1024,Math.max(1,cap));g.clip();
  const haze=g.createRadialGradient(cx,y,1,cx,y,size*.53);
  haze.addColorStop(0,`rgba(6,17,26,${.26-.17*f})`);
  haze.addColorStop(.55,`rgba(6,17,26,${.11-.075*f})`);
@@ -2340,13 +2341,13 @@ function drawRunning(){
  runFloor(runDistance*playerSize/RUN_PLAYER_WORLD_SIZE,runCameraLift);
  const phase=((cubeSpin%(Math.PI/2))+(Math.PI/2))%(Math.PI/2);
  // Bottom of the visible cube rests near the center of the 16px top plane (not on the wall).
- const centerY=playerCenterYForGround(groundY+8.15,playerSize,phase,true)-visualJump;
+ const centerY=playerCenterYForGround(groundY+8.15+NR_FRONT_OFFSET40,playerSize,phase,true)-visualJump;
  const sx=playerShadowX(px,playerSize,phase,true);
  const flight=dbClamp(visualJump/160,0,1);
  nrPlayerContactShadow38(sx,groundY,playerSize,flight,16);
  if(runLandFx>0){
   const t=1-runLandFx/.19;
-  g.beginPath();g.ellipse(sx,groundY+8,20+t*31,3.8+t*.8,0,0,Math.PI*2);
+  g.beginPath();g.ellipse(sx,groundY+8+NR_FRONT_OFFSET40,20+t*31,3.8+t*.8,0,0,Math.PI*2);
   g.strokeStyle=`rgba(162,181,186,${(1-t)*.15})`;g.lineWidth=1.5;g.stroke();
  }
  dbRoundedCube(px,centerY,playerSize,face,phase,true);
@@ -2360,9 +2361,9 @@ function draw(){
     const mainGround=341;
     const mainX=512;
     if(improved){
-      const previewSize=180; // Ver.3.9: keep the approved scale, fix plane alignment only.
+      const previewSize=180; // Ver.4.0: keep approved scale and floor geometry.
       nrPlayerContactShadow38(playerShadowX(mainX,previewSize,phase),mainGround,previewSize,0,20);
-      dbRoundedCube(mainX,playerCenterYForGround(mainGround+10.2,previewSize,phase),previewSize,face,phase);
+      dbRoundedCube(mainX,playerCenterYForGround(mainGround+10.2+NR_FRONT_OFFSET40,previewSize,phase),previewSize,face,phase);
     }else {
       shadow(515,331,140);oldCube(411,75,198,face)
     }
@@ -2375,7 +2376,7 @@ function draw(){
 function refresh(){const i=items[pos];const player=i[0]==='player';$('dbName').textContent=i[1];$('dbEnglish').textContent=i[2];$('dbDescription').textContent=i[3];$('dbCounter').textContent=String(pos+1).padStart(2,'0')+' / '+items.length;
  for(const [k,b] of [...$('dbCategories').children].entries()){b.classList.toggle('active',k===pos);b.setAttribute('aria-current',String(k===pos))}
  $('dbNew').classList.toggle('active',improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31));$('dbV24').classList.toggle('active',improved&&legacy24);$('dbV23').classList.toggle('active',improved&&legacy23);$('dbV22').classList.toggle('active',improved&&legacy22);$('dbOld').classList.toggle('active',!improved);$('dbNew').setAttribute('aria-pressed',String(improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31)));$('dbV24').setAttribute('aria-pressed',String(improved&&legacy24));$('dbV23').setAttribute('aria-pressed',String(improved&&legacy23));$('dbV22').setAttribute('aria-pressed',String(improved&&legacy22));$('dbOld').setAttribute('aria-pressed',String(!improved));$('dbV22').hidden=items[pos][0]!=='player';$('dbV23').hidden=items[pos][0]!=='player';$('dbV24').hidden=items[pos][0]!=='player';$('dbGroundBefore').hidden=items[pos][0]!=='ground'||!improved;$('dbGroundBefore').classList.toggle('active',nrFloorCompare31);$('dbGroundBefore').setAttribute('aria-pressed',String(nrFloorCompare31));$('dbGroundBefore').textContent=nrFloorCompare31?'✓ Ver.3.1 石床':'◈ Ver.3.1と比較';
- $('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=!player;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.3.9 / 床面と壁面を明確化'):'Ver.3.9 / 接地位置を修正'):'旧デザイン風（比較用）';
+ $('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=!player;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.4.0 / 床面と壁面を維持'):'Ver.4.0 / 手前側へ微調整'):'旧デザイン風（比較用）';
  try{$('dbMemo').value=localStorage.getItem(memoKey(pos))||''}catch{$('dbMemo').value=''};
  for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
  $('dbExtras').hidden=items[pos][0]==='ground';$('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=!player||!runActive;$('dbRun').textContent=runActive?'■ 停止して戻る':'▶ 走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'黒背景 / 平らな床で走行確認':'黒背景 / プレイヤーと床だけ';$('dbInstruction').textContent=runActive?'画面タップでジャンプ。回転後の向き・接地・横滑りを確認。':player?'背景を消した状態で、数字・回転・接地の見た目を確認できます。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['真正面','正面＋少し奥行き','正面＋奥行き'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
