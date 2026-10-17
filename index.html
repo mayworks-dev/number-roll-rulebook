@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.4.2 · Stronger Motion & Slightly Smaller Cube</title>
+<title>NUMBER ROLL — Ver.4.8 · Natural Multi-Jump</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -219,6 +219,116 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
 }
 /* === TEMP DESIGN PREVIEW BOOK END === */
 
+
+/* NUMBER ROLL Ver.4.4 / clear design book, immersive full-viewport run UI */
+#designBookScreen:not(.db-running){max-width:1390px;width:min(100%,1390px);gap:12px;padding:clamp(9px,1.4vw,18px);}
+#designBookScreen:not(.db-running) .db-titlebar{min-height:48px;align-items:center;}
+#designBookScreen:not(.db-running) .db-head h2{font-size:clamp(18px,2.3vw,26px);}
+#designBookScreen:not(.db-running) .db-kicker{font-size:10px;letter-spacing:.18em;}
+#designBookScreen .db-temporary,
+#designBookScreen .db-notes,
+#designBookScreen #dbBackground,
+#designBookScreen #dbView,
+#designBookScreen #dbOld,
+#designBookScreen #dbV22,
+#designBookScreen #dbV23,
+#designBookScreen #dbV24,
+#designBookScreen #dbGroundBefore,
+#designBookScreen #dbRunJump,
+#designBookScreen #dbRunInfo,
+#designBookScreen #dbInstruction,
+#designBookScreen #dbPreviewLabel,
+#designBookScreen #dbModeLabel {display:none!important;}
+#designBookScreen:not(.db-running) .db-shell{grid-template-columns:clamp(165px,18vw,225px) minmax(0,1fr);gap:12px;min-height:0;flex:1;}
+#designBookScreen:not(.db-running) .db-categories{padding:9px;gap:5px;}
+#designBookScreen:not(.db-running) .db-cat{min-height:42px;font-size:12px;}
+#designBookScreen:not(.db-running) .db-content{min-height:0;gap:9px;}
+#designBookScreen:not(.db-running) .db-titles{padding:2px 4px;align-items:center;}
+#designBookScreen:not(.db-running) .db-preview{width:100%;max-width:none;align-self:stretch;border-radius:13px;border-color:#688daa88;}
+#designBookScreen:not(.db-running) .db-toolbar{gap:8px;}
+#designBookScreen:not(.db-running) .db-extras{gap:10px;padding:9px 12px;}
+#designBookScreen:not(.db-running) .db-player-only-actions{margin-left:auto;}
+#designBookScreen:not(.db-running) .db-run-button{padding:10px 20px;min-height:42px;font-size:13px;}
+#designBookScreen:not(.db-running) .db-footer{margin-top:auto;padding:7px 0;}
+#designBookScreen:not(.db-running) .db-footer span{display:none;}
+#designBookScreen:not(.db-running) .db-footer .db-tool{min-width:135px;}
+#designBookScreen:not(.db-running) .db-status{font-size:11px;}
+#designBookScreen:not(.db-running) .db-nameline{min-width:0;}
+#designBookScreen:not(.db-running) .db-description{max-width:800px;}
+#designBookScreen .db-run-exit{display:none;}
+#designBookScreen.db-running{position:fixed!important;inset:0!important;z-index:9999!important;
+ margin:0!important;padding:0!important;width:100vw!important;max-width:none!important;
+ height:100dvh!important;max-height:none!important;min-height:0!important;
+ border:0!important;border-radius:0!important;background:#000!important;overflow:hidden!important;display:block!important;}
+#designBookScreen.db-running .db-titlebar,
+#designBookScreen.db-running .db-categories,
+#designBookScreen.db-running .db-titles,
+#designBookScreen.db-running .db-toolbar,
+#designBookScreen.db-running .db-extras,
+#designBookScreen.db-running .db-footer,
+#designBookScreen.db-running .db-notes{display:none!important;}
+#designBookScreen.db-running .db-shell,
+#designBookScreen.db-running .db-content{display:block!important;width:100%!important;height:100%!important;
+ min-height:0!important;max-height:none!important;margin:0!important;padding:0!important;overflow:hidden!important;}
+#designBookScreen.db-running .db-preview{position:absolute!important;inset:0!important;
+ width:100%!important;height:100%!important;max-width:none!important;max-height:none!important;
+ margin:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;
+ background:#000!important;display:flex!important;align-items:center;justify-content:center;overflow:hidden!important;
+ cursor:pointer;touch-action:manipulation;}
+#designBookScreen.db-running #designCanvas{display:block;position:relative;width:100%!important;
+ height:100%!important;max-width:none!important;max-height:none!important;aspect-ratio:auto!important;
+ object-fit:contain;cursor:pointer;touch-action:manipulation;user-select:none;-webkit-user-select:none;}
+#designBookScreen.db-running .db-run-exit{display:flex!important;align-items:center;justify-content:center;
+ position:fixed;z-index:10001;left:max(14px,env(safe-area-inset-left));
+ top:max(12px,env(safe-area-inset-top));min-height:46px;padding:10px 18px;
+ background:#152e47ed;border:1px solid #83adcc;color:#eef8ff;border-radius:12px;
+ font-size:clamp(13px,1.5vw,17px);font-weight:850;letter-spacing:.02em;
+ box-shadow:0 4px 16px #0008;pointer-events:auto;cursor:pointer;touch-action:manipulation;}
+#designBookScreen.db-running .db-run-exit:active{background:#244b69;}
+@media(max-width:710px){
+ #designBookScreen:not(.db-running){gap:7px;padding:9px;}
+ #designBookScreen:not(.db-running) .db-titlebar{min-height:40px;}
+ #designBookScreen:not(.db-running) .db-shell{grid-template-columns:1fr;gap:8px;flex:none;}
+ #designBookScreen:not(.db-running) .db-categories{display:flex;flex-direction:row;gap:6px;overflow-x:auto;overflow-y:hidden;min-height:52px;padding:6px;}
+ #designBookScreen:not(.db-running) .db-cat{flex:0 0 auto;min-height:40px;white-space:nowrap;}
+ #designBookScreen:not(.db-running) .db-extras{flex-wrap:wrap;gap:8px;}
+ #designBookScreen:not(.db-running) .db-player-only-actions{margin-left:0;width:100%;}
+ #designBookScreen:not(.db-running) .db-run-button{width:100%;min-height:43px;}
+ #designBookScreen:not(.db-running) .db-footer{padding:7px 0;}
+ #designBookScreen:not(.db-running) .db-footer .db-tool{min-width:0;flex:1;}
+ #designBookScreen:not(.db-running) .db-back{min-width:90px;}
+ #designBookScreen.db-running .db-run-exit{min-height:42px;left:max(10px,env(safe-area-inset-left));top:max(10px,env(safe-area-inset-top));padding:8px 14px;}
+}
+@media(max-width:710px) and (orientation:portrait){
+ /* The run canvas is zoomed without distortion on a tall phone: player remains visible. */
+ #designBookScreen.db-running #designCanvas{position:absolute!important;left:0!important;top:50%!important;
+ width:260vw!important;height:auto!important;max-height:none!important;aspect-ratio:1024/440!important;
+ transform:translate(-25vw,-50%);object-fit:contain;}
+}
+@media(max-height:520px) and (orientation:landscape){
+ #designBookScreen:not(.db-running){gap:4px;padding:5px;}
+ #designBookScreen:not(.db-running) .db-titlebar{min-height:34px;}
+ #designBookScreen:not(.db-running) .db-shell{grid-template-columns:135px minmax(0,1fr);height:auto;flex:1;max-height:none;overflow:hidden;}
+ #designBookScreen:not(.db-running) .db-content{overflow:auto;gap:4px;}
+ #designBookScreen:not(.db-running) .db-categories{display:flex;flex-direction:column;overflow-y:auto;overflow-x:hidden;gap:3px;padding:4px;}
+ #designBookScreen:not(.db-running) .db-cat{white-space:normal;min-height:30px;padding:4px 6px;font-size:10px;}
+ #designBookScreen:not(.db-running) .db-titles{display:flex!important;min-height:0;}
+ #designBookScreen:not(.db-running) .db-preview{max-width:none!important;width:100%!important;flex:0 0 auto;}
+ #designBookScreen:not(.db-running) .db-extras{padding:5px;}
+ #designBookScreen:not(.db-running) .db-footer{padding:1px 0;}
+}
+
+@media(max-height:520px) and (orientation:landscape){
+ #designBookScreen:not(.db-running) .db-nameline small,
+ #designBookScreen:not(.db-running) .db-description{display:none!important;}
+ #designBookScreen:not(.db-running) .db-titles{min-height:25px!important;padding:0 5px!important;}
+ #designBookScreen:not(.db-running) .db-nameline h3{font-size:16px!important;margin:0!important;}
+ #designBookScreen:not(.db-running) .db-preview{max-width:min(100%,520px)!important;width:100%!important;flex:0 0 auto!important;}
+ #designBookScreen:not(.db-running) .db-content{align-items:center;justify-content:flex-start;}
+ #designBookScreen:not(.db-running) .db-titles,
+ #designBookScreen:not(.db-running) .db-extras,
+ #designBookScreen:not(.db-running) .db-footer{width:100%!important;}
+}
 </style>
 </head>
 <body>
@@ -322,20 +432,21 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
 <section id="designBookScreen" class="front-screen db-screen" hidden aria-label="仮設デザイン確認ブック">
   <div class="db-titlebar">
     <button type="button" id="dbBack" class="front-button db-back">‹ HOME</button>
-    <div class="db-head"><div class="db-kicker">NUMBER ROLL · WORK IN PROGRESS</div><h2>デザイン確認ブック</h2></div>
-    <div class="db-temporary">仮設 / 後で削除</div>
+    <div class="db-head"><div class="db-kicker">NUMBER ROLL · UI VER.4.8</div><h2>デザイン確認ブック</h2></div>
+    <div class="db-temporary" aria-hidden="true"></div>
   </div>
   <div class="db-shell">
     <nav class="db-categories glass" id="dbCategories" aria-label="デザイン確認対象"></nav>
     <div class="db-content">
       <div class="db-titles"><div class="db-nameline"><h3 id="dbName">プレイヤー</h3><small id="dbEnglish">PLAYER CUBE</small><p class="db-description" id="dbDescription">見た目の比較と確認ができます。</p></div><div class="db-status" id="dbCounter">01 / 12</div></div>
       <div class="db-preview" id="dbPreview">
+        <button type="button" id="dbRunExit" class="db-run-exit" hidden>■ 停止して戻る</button>
         <canvas id="designCanvas" width="1024" height="440" aria-label="選択したパーツのプレビュー"></canvas>
         <div class="db-preview-label" id="dbPreviewLabel"><span></span> DESIGN PREVIEW / TEMP</div>
         <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
       </div>
       <div class="db-toolbar" id="dbToolbar">
-        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.2 動きとサイズ</button>
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.8 多段ジャンプ調整</button>
         <button id="dbV24" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.4 と比較</button>
         <button id="dbV23" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.3 と比較</button>
         <button id="dbV22" type="button" class="db-tool" aria-pressed="false">Ver.2.2</button>
@@ -344,7 +455,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <button id="dbBackground" type="button" class="db-tool">背景：遺跡</button>
       </div>
       <div class="db-extras" id="dbExtras"><label id="dbDigitLabel">数字</label><div class="db-digits" id="dbDigits"></div><button type="button" id="dbRotate" class="db-tool">↻ 90°回転</button><button type="button" id="dbView" class="db-tool" aria-label="キューブを見る角度を変える">視点：斜め</button>
-        <div class="db-player-only-actions" id="dbPlayerActions" hidden><button type="button" id="dbRun" class="db-run-button" aria-pressed="false">▶ 走行テスト</button><button type="button" id="dbRunJump" class="db-jump-button" hidden>↑ ジャンプ</button><span id="dbRunInfo" class="db-running-info">障害物なし・平らな床</span></div>
+        <div class="db-player-only-actions" id="dbPlayerActions" hidden><button type="button" id="dbRun" class="db-run-button" aria-pressed="false">▶ 走行テスト</button><button type="button" id="dbRunJump" class="db-jump-button" hidden>↑ ジャンプ</button><span id="dbRunInfo" class="db-running-info">画面タップでジャンプ</span></div>
         <span class="db-hint" id="dbInstruction">ゲーム本体の挙動は変更しません。</span></div>
       <div class="db-notes" id="dbNotes"><label for="dbMemo">改善メモ（このパーツだけに保存）</label><textarea id="dbMemo" placeholder="例：光を弱く、角を少し丸く、数字を大きく…" rows="2"></textarea><small>メモはこのブラウザ内に仮保存。公開版のゲームには影響しません。</small></div>
       <div class="db-footer" id="dbFooter"><button type="button" id="dbPrevious" class="db-tool">◀ 前のパーツ</button><span>完成デザインではなく比較・調整用の仮置き</span><button type="button" id="dbNext" class="db-tool">次のパーツ ▶</button></div>
@@ -355,13 +466,82 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
 </div>
 
 <script>
+/* NUMBER ROLL · procedural hazard stone. One shared renderer for real play & preview.
+   Art has no sprites, web calls or hitbox changes. Original authored 2D shapes. */
+window.NRSpikeArt=(()=>{
+ function hash(n){n=(n|0)^0x57b2d013;n=Math.imul(n^(n>>>16),0x7feb352d);n=Math.imul(n^(n>>>15),0x846ca68b);return ((n^(n>>>16))>>>0)/4294967295}
+ function poly(c,pts,fill,stroke=null,lw=1){c.beginPath();pts.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();if(fill){c.fillStyle=fill;c.fill()}if(stroke){c.strokeStyle=stroke;c.lineWidth=lw;c.stroke()}}
+ function edge(c,pts,color,lw=1){c.beginPath();pts.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.strokeStyle=color;c.lineWidth=lw;c.lineCap='round';c.lineJoin='round';c.stroke()}
+ function spike(c,x,root,w,h,down=false,seed=0){
+  if(w<=1||h<=1)return;
+  // Exact collision triangle: base x..x+w, apex at x+w/2.
+  const d=down?1:-1, tip=root+d*h,mid=x+w*.5,flank=h*.28;
+  c.save();
+  const body=c.createLinearGradient(mid,tip,mid,root);
+  body.addColorStop(0,'#f1c2c1');body.addColorStop(.27,'#c9a5aa');
+  body.addColorStop(.61,'#655360');body.addColorStop(1,'#322b38');
+  poly(c,[[x,root],[mid,tip],[x+w,root]],body,'#c66e73',Math.min(1.4,w*.024));
+  // Chiselled mineral facets; bright side reads as a hard stone shard.
+  poly(c,[[x+w*.10,root+d*1],[mid,tip+d*1.5],[mid-w*.055,root+d*2]],'#d2c4c6ad');
+  poly(c,[[mid,tip+d*1.5],[x+w*.88,root+d*1],[mid-w*.055,root+d*2]],'#342f4568');
+  poly(c,[[mid,tip+d*2],[mid+w*.09,tip-d*flank],[mid+w*.03,root+d*2]],'#f1bdc66a');
+  // Red fissures are embedded in stone, not an all-over neon outline.
+  c.save();c.shadowColor='#ff4b51';c.shadowBlur=Math.min(5,w*.065);
+  edge(c,[[mid,root+d*2],[mid+w*.10,root+d*h*.23],[mid+w*.025,root+d*h*.43],[mid+w*.14,root+d*h*.57]],'#e5464b',Math.max(.85,Math.min(2,w*.032)));
+  edge(c,[[mid+w*.025,root+d*h*.43],[mid-w*.12,root+d*h*.57]],'#ca3c48',Math.max(.55,Math.min(1.15,w*.02)));
+  c.restore();
+  // Narrow dark sockets fit INSIDE the triangle so the hit shape stays honest.
+  const slot=Math.min(h*.15,w*.14);
+  poly(c,[[x+w*.15,root],[x+w*.85,root],[x+w*.73,root+d*slot],[x+w*.27,root+d*slot]],'#2c2733d9');
+  edge(c,[[x+w*.28,root+d*2],[mid,root+d*3],[x+w*.72,root+d*2]],'#ef494f',Math.max(1,Math.min(2,w*.035)));
+  // A restrained single chip; stable per obstacle, not shimmer/noise.
+  if(w>23&&hash(seed+4)>.48){const sx=x+w*(.30+hash(seed+7)*.22),sy=root+d*h*.34;
+   edge(c,[[sx,sy],[sx+w*.045,sy+d*h*.085],[sx+w*.008,sy+d*h*.12]],'#dad0d237',.65);}
+  c.restore();
+ }
+ function slab(c,x,y,w,h,safeTop=true){
+  if(w<2||h<2)return;c.save();
+  const body=c.createLinearGradient(x,y,x+12,y+h);
+  body.addColorStop(0,'#536d81');body.addColorStop(.18,'#3d566d');body.addColorStop(1,'#213549');
+  poly(c,[[x+4,y],[x+w-4,y],[x+w,y+4],[x+w,y+h-4],[x+w-4,y+h],[x+4,y+h],[x,y+h-4],[x,y+4]],body,'#71899a7d',1.05);
+  const top=c.createLinearGradient(x,y,x,y+Math.min(6,h*.32));
+  top.addColorStop(0,'#adbdc4');top.addColorStop(1,'#758e9e');
+  poly(c,[[x+4,y],[x+w-4,y],[x+w-7,y+Math.min(7,h*.34)],[x+6,y+Math.min(7,h*.34)]],top);
+  c.fillStyle='rgba(8,21,35,.30)';c.fillRect(x+4,y+h-5,Math.max(1,w-8),3);
+  if(w>65){edge(c,[[x+w*.72,y+9],[x+w*.69,y+Math.min(h*.55,26)],[x+w*.74,y+Math.min(h*.77,37)]],'#15293b66',1);}
+  // B is safe only on its *upper* edge. Its sides/underside remain unsafe.
+  if(safeTop){c.save();c.shadowColor='#65bfa7';c.shadowBlur=3;
+   edge(c,[[x+5,y+1.2],[x+w-5,y+1.2]],'#a5ead1',Math.max(1.4,Math.min(2.7,w*.014)));c.restore();
+   edge(c,[[x+3,y+4],[x+3,y+h-3]],'#c75c635e',1.5);
+   edge(c,[[x+w-3,y+4],[x+w-3,y+h-3]],'#c75c635e',1.5);
+  }
+  c.restore();
+ }
+ function diamond(c,x,top,w,h){
+  if(w<1||h<1)return;
+  const m=x+w*.5,cy=top+h*.5;
+  c.save();c.shadowColor='#ca384a';c.shadowBlur=Math.min(5,w*.08);
+  poly(c,[[m,top],[x+w,cy],[m,top+h],[x,cy]],'#3a2c3c','#dc606b',1.7);c.shadowBlur=0;
+  poly(c,[[m,top],[x+w,cy],[m,cy]],'#8c7585');
+  poly(c,[[m,top],[m,cy],[x,cy]],'#c6a3a7');
+  poly(c,[[x,cy],[m,cy],[m,top+h]],'#554459');
+  poly(c,[[x+w,cy],[m,top+h],[m,cy]],'#2a2537');
+  edge(c,[[m,top+h*.12],[m+w*.07,top+h*.36],[m,cy],[m-w*.075,top+h*.68],[m,top+h*.88]],'#e24951',Math.max(1.3,w*.026));
+  edge(c,[[m,cy],[x+w*.76,top+h*.43]],'#eb4e50',Math.max(.9,w*.015));
+  edge(c,[[m,cy],[x+w*.24,top+h*.62]],'#b43a46',Math.max(.8,w*.013));
+  c.restore();
+ }
+ return {spike,slab,diamond};
+})();
+</script>
+<script>
 (()=>{
 'use strict';
 const calibrationEntries=[
  {n:'T-01',jp:'トゲ / 1ジャンプ用',en:'SPIKE TEST · 1 JUMP',face:1,type:'calibration',target:1,initialCount:1,tip:'1回のジャンプで越えられるか確認',desc:'1段ジャンプで飛び越えるトゲの幅を測ろう。個数を増減して、無理なく飛べる上限を確認する。',spec:[['目標','1段ジャンプ'],['初期トゲ','1個'],['調整','±1個'],['基準','1マス=64']]},
- {n:'T-02',jp:'トゲ / 2ジャンプ用',en:'SPIKE TEST · 2 JUMPS',face:2,type:'calibration',target:2,initialCount:5,tip:'着地前の空中ジャンプで距離を伸ばす',desc:'5個の連続トゲを2回のジャンプで越えられるか検証する。ジャンプの間隔によって飛距離が変わる。',spec:[['目標','2段ジャンプ'],['初期トゲ','5個'],['調整','±1個'],['基準','1マス=64']]},
- {n:'T-03',jp:'トゲ / 3ジャンプ用',en:'SPIKE TEST · 3 JUMPS',face:3,type:'calibration',target:3,initialCount:9,tip:'飛び始めと追加ジャンプのタイミングを合わせよう',desc:'9個の連続トゲを3回のジャンプで越える検証。失敗する場合は個数を減らして安全な長さを探そう。',spec:[['目標','3段ジャンプ'],['初期トゲ','9個'],['調整','±1個'],['基準','1マス=64']]},
- {n:'T-04',jp:'トゲ / 4ジャンプ用',en:'SPIKE TEST · 4 JUMPS',face:4,type:'calibration',target:4,initialCount:13,tip:'4回を一度に使わず、空中での間隔を考える',desc:'13個の連続トゲを4回のジャンプで越える検証。現段階は仮の長さなので操作して上限を見つけよう。',spec:[['目標','4段ジャンプ'],['初期トゲ','13個'],['調整','±1個'],['基準','1マス=64']]}
+ {n:'T-02',jp:'トゲ / 2ジャンプ用',en:'SPIKE TEST · 2 JUMPS',face:2,type:'calibration',target:2,initialCount:2,tip:'2回で2トゲを余裕をもって越えよう',desc:'2トゲを2回のジャンプで安全に越え、3トゲはタイミング次第で挑戦できる難易度を確認する。',spec:[['目標','2段ジャンプ'],['初期トゲ','2個'],['調整','±1個'],['基準','1マス=64']]},
+ {n:'T-03',jp:'トゲ / 3ジャンプ用',en:'SPIKE TEST · 3 JUMPS',face:3,type:'calibration',target:3,initialCount:3,tip:'3回で3トゲを越えよう',desc:'3トゲを3回のジャンプで安全に越え、4トゲはタイミング次第で挑戦できるバランスを確認する。',spec:[['目標','3段ジャンプ'],['初期トゲ','3個'],['調整','±1個'],['基準','1マス=64']]},
+ {n:'T-04',jp:'トゲ / 4ジャンプ用',en:'SPIKE TEST · 4 JUMPS',face:4,type:'calibration',target:4,initialCount:4,tip:'4回で4トゲを越えよう',desc:'4トゲを4回のジャンプで越える。5トゲは通常ステージでは使用しない想定。',spec:[['目標','4段ジャンプ'],['初期トゲ','4個'],['調整','±1個'],['基準','1マス=64']]}
 ];
 // 各段の理論最高高度 = 700² / (2×1850) × 段数 = 約132.4 × 段数 (world units)
 // (n-1)段では届かずn段で余裕を残せる中間値を採用する。
@@ -388,8 +568,7 @@ const baseEntries=[
  {n:'09',jp:'狭い通路',en:'NARROW CORRIDOR',face:2,type:'corridor',tip:'床トゲを越えたら着地して低く進む',desc:'床のトゲと天井のトゲが続く。最初に跳んで、その後は天井に当たらないよう進もう。',spec:[['種類','複合'],['推奨','1回＋低空'],['危険','上下のトゲ'],['難易度','★★★']]},
  {n:'10',jp:'階段状の壁',en:'STAIRCASE WALL',face:4,type:'stairs',tip:'段の上に着地すると回数が回復',desc:'だんだん高くなる足場。各段に着地しながら、ジャンプ回数を補充して進もう。',spec:[['種類','地形'],['推奨','連続ジャンプ'],['判定','壁の側面'],['難易度','★★★']]}
 ];
-// 穴調整の基準幅：前のジャンプ段数の理論飛距離以上・必要回数なら余裕。
-// 1マス=64、速度285、初速700、重力1850。幅はプレイしながら調整できる。
+// 穴調整の基準幅：検証用の初期値。多段ジャンプ再調整後は実プレイで別途検証する。
 const gapEntries=[
  {n:'G-01',jp:'穴 / 1ジャンプ用',en:'PIT TEST · 1 JUMP',face:1,type:'gapCalibration',target:1,initialWidth:144,tip:'穴の直前からジャンプして対岸に着地',desc:'最初の穴。踏み切り位置を変えながら、1回のジャンプで安定して渡れる幅を探そう。',spec:[['目標','1段ジャンプ'],['基準幅','2.25マス'],['調整','±0.25マス'],['判定','穴の側壁 / 画面外']]},
  {n:'G-02',jp:'穴 / 2ジャンプ用',en:'PIT TEST · 2 JUMPS',face:2,type:'gapCalibration',target:2,initialWidth:304,tip:'途中で2回目のジャンプを入れて距離を伸ばす',desc:'1回では届かない長さ。着地前に空中ジャンプを追加し、余裕を持って渡れる幅を確かめよう。',spec:[['目標','2段ジャンプ'],['基準幅','4.75マス'],['調整','±0.25マス'],['判定','穴の側壁 / 画面外']]},
@@ -449,7 +628,8 @@ const entries=[...calibrationEntries,...wallEntries,...baseEntries,...gapEntries
 const $=id=>document.getElementById(id), stage=$('stage'),canvas=$('game'),ctx=canvas.getContext('2d',{alpha:false});
 const COLORS={1:['#4fc3f7','#123d55'],2:['#94df84','#204e2b'],3:['#ffbc68','#5c3e14'],4:['#be9bff','#36244f']};
 const GRID_UNIT=64; // 横1マス = 64ゲーム単位
-const GRAVITY=1850, JUMP=700, SPEED=285, ZOOM=.49, SIZE=64, VH=540, FLOOR=426;
+// Ver.4.8: consistent lift on jumps 2–4. Keep the first takeoff, gravity and run speed.
+const GRAVITY=1850, JUMP=810, AIR_JUMP=740, SPEED=285, ZOOM=.49, SIZE=64, VH=540, FLOOR=426;
 const NUMBER_GATE_VERTICAL_UNIT=SIZE/ZOOM; // number gate: 1 visual-square of height; declaration initialized after SIZE
 let idx=0, W=960, scale=1, dpr=1,last=0, state,objs=[],goal=0,cleared=[],silent=false;
 let uiMode="home", storyNumber=1,doorPage=0,screenBeforeSettings="home";
@@ -465,7 +645,7 @@ try{
 const max=(a,b)=>Math.max(a,b),min=(a,b)=>Math.min(a,b);
 function save(){try{localStorage.setItem('numberRollRulebookClear13',JSON.stringify(cleared));}catch{}}
 function progress(){$('bookProgress').textContent=cleared.length+' / '+entries.length;}
-const SPIKE_PITCH=56; // 検証用トゲ1個の幅。0.875マス。まず固定して数で比較
+const SPIKE_PITCH=59; // Ver.4.6: 検証用の地上トゲ幅を約5%拡大（当たり判定も追従）
 const spikeCounts=calibrationEntries.map(p=>p.initialCount);
 const wallSettings=wallEntries.map(p=>({height:p.initialHeight,width:p.initialWidth}));
 const gapSettings=gapEntries.map(p=>p.initialWidth);
@@ -536,7 +716,19 @@ function restorePlatform(){
  createLevel();newState();refreshPlatformBar();showResult('ready');draw();
 }
 function rectObj(x,width,height){return {type:'wall',x,width,height}}
-function spikeObj(x,width,count,height,base=0,down=false){return {type:'spike',x,width,count,height,base,down}}
+// Ver.4.8 — heights of 1–4 ground spikes are tuned to the common jump arc.
+// Pixels in the design-book runner and world units in the 51 practice levels
+// use different scales: convert through ZOOM to keep the apparent height aligned.
+const NR48_SPIKE_HEIGHT_PX=[[0,0],[52,58],[77,84],[99,107],[116,125]];
+function nr48GroundSpikeHeight(count){
+ const range=NR48_SPIKE_HEIGHT_PX[count];
+ return range ? Math.round(((range[0]+range[1])*.5)/ZOOM) : null;
+}
+function spikeObj(x,width,count,height,base=0,down=false){
+ const calibrationWidth=Math.abs(width-count*SPIKE_PITCH)<.001;
+ const tuned=base===0&&!down&&count>=1&&count<=4?nr48GroundSpikeHeight(count):null;
+ return {type:'spike',x,width:calibrationWidth?width:Math.round(width*1.05),count,height:tuned??Math.round(height*1.08),base,down};
+}
 // A: all sides hazardous. B: green safe platform top and hazardous undersurface/sides.
 function airA(x,width,base,height){return {type:'airA',x,width,base,height}}
 function airB(x,width,height,spikeH=74){return {type:'airB',x,width,height,spikeH,landings:0}}
@@ -751,7 +943,7 @@ function storyResult(kind){
 function hideResult(){$('result').classList.remove('show')}
 function fail(reason){if(state.status!=='running')return;state.status='lost';state.cause=reason;showResult('lose');sfx('fail');haptic(35);ui()}
 function win(){if(state.status!=='running')return;state.status='won';if(!cleared.includes(idx)){cleared.push(idx);save();progress();}if(uiMode==='story')onStoryClear();showResult('win');sfx('clear');haptic(28);ui();}
-function jump(){if(state.status==='ready'){start();return;}if(state.status!=='running')return;const s=state;if(s.air&&s.used>=s.limit)return;if(!s.air){s.limit=s.face;s.used=0;}s.air=true;s.used++;s.totalJumps++;s.vy=JUMP;s.groundH=0;s.turnFrom=s.angle;s.turnTo+=Math.PI/2;s.turn=0;s.face=s.face%4+1;s.groundObject=null;sfx('jump');ui();}
+function jump(){if(state.status==='ready'){start();return;}if(state.status!=='running')return;const s=state;if(s.air&&s.used>=s.limit)return;if(!s.air){s.limit=s.face;s.used=0;}s.air=true;s.used++;s.totalJumps++;s.vy=s.used===1?JUMP:AIR_JUMP;s.groundH=0;s.turnFrom=s.angle;s.turnTo+=Math.PI/2;s.turn=0;s.face=s.face%4+1;s.groundObject=null;sfx('jump');ui();}
 function togglePause(){if(state.status==='running'){state.status='paused';showResult('paused')}else if(state.status==='paused'){state.status='running';hideResult()}last=0;ui()}
 function ui(){const s=state;if(!s)return;let left=s.air?Math.max(0,s.limit-s.used):s.face,total=s.air?s.limit:s.face;$('face').textContent=s.face;$('face').style.color=COLORS[s.face][0];$('jumps').textContent=`${left} / ${total}`;$('distance').textContent=Math.round(Math.min(1,s.distance/(goal-240))*100)+'%';
  if(entries[idx].type==='digitSwitch'||entries[idx].type==='combo'&&entries[idx].combo==='switchSpike'){
@@ -1065,7 +1257,13 @@ function drawNumberPlatform(o){
  ctx.font='bold 11px system-ui';ctx.fillStyle='#b6f8d3';ctx.fillText('LAND '+o.required,x+w/2,y-15);
  ctx.restore();
 }
-function drawSpike(o){if(o.switchId&&switchEffectActive(o.switchId)){drawEffectGhost(o,'収納中');return;}const dw=o.width/o.count;ctx.save();ctx.shadowColor='#ff7794';ctx.shadowBlur=13;for(let k=0;k<o.count;k++){let x=screenX(o.x+k*dw),x2=x+dw,cy=scrY(o.base),tip=scrY(o.base+(o.down?-o.height:o.height));ctx.beginPath();ctx.moveTo(x,cy);ctx.lineTo(x+dw/2,tip);ctx.lineTo(x2,cy);ctx.closePath();ctx.fillStyle='#6b1d38';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle='#ff8da2';ctx.stroke();}ctx.restore()}
+function drawSpike(o){
+ if(o.switchId&&switchEffectActive(o.switchId)){drawEffectGhost(o,'収納中');return;}
+ const dw=o.width/o.count,root=scrY(o.base),tip=scrY(o.base+(o.down?-o.height:o.height));
+ for(let k=0;k<o.count;k++){
+  NRSpikeArt.spike(ctx,screenX(o.x+k*dw),root,dw,Math.abs(tip-root),!!o.down,k+o.x|0);
+ }
+}
 // 実際にゴールできた入力タイミングの中央付近（start秒 / 追加ジャンプ間隔秒）。
 // 操作の個人差を吸収するため厳密な正解位置ではなく目安として表示。
 const JUMP_GUIDES={
@@ -1131,22 +1329,15 @@ function drawGapGuide(){
  }
 }
 function drawAirA(o){
- const x=screenX(o.x),cx=x+o.width/2,top=scrY(o.base+o.height),bottom=scrY(o.base),mid=(top+bottom)/2;
- ctx.save();ctx.fillStyle='#682037';ctx.strokeStyle='#ff8199';ctx.shadowColor='#ff718a';ctx.shadowBlur=13;ctx.lineWidth=3;
- ctx.beginPath();ctx.moveTo(cx,top);ctx.lineTo(x+o.width,mid);ctx.lineTo(cx,bottom);ctx.lineTo(x,mid);ctx.closePath();ctx.fill();ctx.stroke();
- ctx.shadowBlur=0;ctx.strokeStyle='#ffb1c0';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(cx,top+11);ctx.lineTo(cx,bottom-11);ctx.moveTo(x+15,mid);ctx.lineTo(x+o.width-15,mid);ctx.stroke();
- ctx.font='900 12px system-ui';ctx.textAlign='center';ctx.fillStyle='#ffd1dc';ctx.fillText('A  ×',cx,top-13);ctx.restore();
+ const x=screenX(o.x),top=scrY(o.base+o.height),h=o.height*ZOOM;
+ NRSpikeArt.diamond(ctx,x,top,o.width,h);
 }
 function drawAirB(o){
- const x=screenX(o.x),top=scrY(o.height),w=o.width,h=14*ZOOM,tip=o.spikeH*ZOOM;
- ctx.save();ctx.shadowColor='#ff728b';ctx.shadowBlur=11;ctx.fillStyle='#482036';ctx.strokeStyle='#ff839a';ctx.lineWidth=2.5;
- for(let i=0;i<3;i++){
-  const a=x+i*w/3,b=x+(i+1)*w/3;
-  ctx.beginPath();ctx.moveTo(a,top+h);ctx.lineTo((a+b)/2,top+h+tip);ctx.lineTo(b,top+h);ctx.closePath();ctx.fill();ctx.stroke();
- }
- ctx.fillStyle='#26354e';ctx.fillRect(x,top,w,h);ctx.strokeStyle='#ff839a';ctx.strokeRect(x,top,w,h);
- ctx.shadowColor='#81ffd3';ctx.shadowBlur=8;stroke(x+3,top,x+w-3,top,'#81ffd3',4);
- ctx.shadowBlur=0;ctx.font='900 11px system-ui';ctx.fillStyle='#a2ffd9';ctx.textAlign='center';ctx.fillText('B  ✓ LAND',x+w/2,top-12);ctx.restore();
+ const x=screenX(o.x),y=scrY(o.height),w=o.width;
+ const rim=15*ZOOM,tip=o.spikeH*ZOOM;
+ // Safe ledge, narrow lethal rim, then three red crystal hazards underneath.
+ NRSpikeArt.slab(ctx,x,y,w,rim,true);
+ for(let j=0;j<3;j++)NRSpikeArt.spike(ctx,x+j*w/3,y+rim,w/3,tip,true,j+50);
 }
 function drawEffectGhost(o,label){
  const x=screenX(o.x),w=o.width,y=o.type==='wall'?scrY(o.height):scrY(o.height||80),h=o.type==='wall'?o.height*ZOOM:Math.max(18,(o.height||80)*ZOOM);
@@ -1313,7 +1504,7 @@ function nrDrawGameStoneCube37(px,py,sq,n,angle=0){
 }
 function nrDrawGameDigit37(px,py,n,pal){
  const glyph=String(n);
- ctx.save();ctx.font='900 32px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
+ ctx.save();ctx.font='900 31px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
  // Stronger carved impression: upper interior is darker, lower lip is lighter.
  ctx.fillStyle='rgba(9,23,36,.34)';ctx.fillText(glyph,px-.6,py-1.1);
  ctx.fillStyle='rgba(233,239,239,.36)';ctx.fillText(glyph,px+.55,py+1.55);
@@ -1324,12 +1515,12 @@ function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);b
  const gaps=objs.filter(o=>o.type==='gap');function floor(a,b){nrDrawGameStoneFloor37(a,b,state.distance*.72)}
  if(!gaps.length)floor(0,W);else{let cursor=0;for(const o of gaps){let l=screenX(o.x),r=l+o.width;floor(cursor,Math.min(W,l));cursor=Math.max(cursor,r);stroke(l,FLOOR,l,VH,'#45627566',2);stroke(r,FLOOR,r,VH,'#45627566',2);}floor(cursor,W)}
  if(uiMode!=='story')drawMovingWallGuide();
- for(const o of objs){if(o.type==='digitSwitch')drawDigitSwitch(o);if(o.type==='switchPlatform')drawSwitchPlatform(o);if(o.type==='wall')drawBlock(o);if(o.type==='spike')drawSpike(o);if(o.type==='airA')drawAirA(o);if(o.type==='airB')drawAirB(o);if(o.type==='numberGate')drawNumberGate(o);if(o.type==='numberPlatform')drawNumberPlatform(o);if(o.type==='ceiling'){let roof={type:'wall',x:o.x,width:o.width,height:0};let x=screenX(o.x),y=scrY(o.base),top=y-32;ctx.fillStyle='#14273f';ctx.fillRect(x,top,o.width,32);stroke(x,top,x+o.width,top,'#7caac9',3);drawSpike({type:'spike',x:o.x,width:o.width,count:Math.round(o.width/75),height:o.spikeH,base:o.base,down:true})}}
+ for(const o of objs){if(o.type==='digitSwitch')drawDigitSwitch(o);if(o.type==='switchPlatform')drawSwitchPlatform(o);if(o.type==='wall')drawBlock(o);if(o.type==='spike')drawSpike(o);if(o.type==='airA')drawAirA(o);if(o.type==='airB')drawAirB(o);if(o.type==='numberGate')drawNumberGate(o);if(o.type==='numberPlatform')drawNumberPlatform(o);if(o.type==='ceiling'){const x=screenX(o.x),root=scrY(o.base);NRSpikeArt.slab(ctx,x,root-27,o.width,27,false);drawSpike({type:'spike',x:o.x,width:o.width,count:Math.round(o.width/75),height:o.spikeH,base:o.base,down:true})}}
  drawGoal();
  if(uiMode!=='story'){drawJumpGuide();drawGapGuide();drawNumberGateGuide();drawPlatformGuide();drawSwitchGuide();drawObjectMeasures();drawMeasureBand()}
  drawGapWalls();
  // Ver.4.0: shift the sprite and its shadow 3.5 render units toward the viewer; physics unchanged.
- let sq=SIZE*.90,px=cameraPlayerX(),py=scrY(state.y)-sq/2-.15+3.5,pal=nrGameCubePal37(state.face);
+ let sq=SIZE*.875,px=cameraPlayerX(),py=scrY(state.y)-sq/2-.15+3.5,pal=nrGameCubePal37(state.face);
  // Shadow is kept tight to the top plane so the contact point reads clearly.
  ctx.fillStyle='#06111ca0';ctx.beginPath();ctx.ellipse(px,FLOOR+4.85,22*(1-Math.min(.56,state.y/650)),2.8,0,0,Math.PI*2);ctx.fill();
  if(state.lastLanding>0){ctx.strokeStyle=`rgba(155,232,255,${state.lastLanding/.3})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(px,FLOOR+4.3,28+(1-state.lastLanding/.3)*23,4.0,0,0,Math.PI*2);ctx.stroke()}
@@ -1464,13 +1655,14 @@ new ResizeObserver(resize).observe(stage);progress();setPage(window.location.has
 'use strict';
 const items=[
  ['player','プレイヤー','PLAYER CUBE','Ver.4.2：石の質感と接地位置は維持しつつ、走行粉じんを見やすくし、プレイヤーを少しだけ小さく調整。'],
- ['spike','地上トゲ','CRYSTAL SPIKES','危険を一目で判断できる結晶形のトゲ。先端はシャープに。'],
+ ['spike','地上トゲ','RED RUIN SPIKES','Ver.4.3：青灰石に赤い亀裂を刻んだ地上トゲ。薄い装飾ではなく形で危険を伝える。'],
+ ['ceiling','上トゲ','CEILING SPIKES','赤い亀裂のある石のトゲが天井から下を向く。ジャンプの高さやタイミングを確認。'],
  ['ground','地面・石床','RUIN STONE FLOOR','Ver.4.0：明るい床上面と青暗い石壁の区別、床の角度と奥行きはVer.3.9を維持。'],
  ['gap','穴・側壁','GAP / SIDE WALL','穴の位置と危険な側壁を、装飾に埋もれず判別できるように。'],
  ['safe','青壁・安全','LANDABLE WALL','上面だけ安全。ミントの着地ラインと石の装飾を確認。'],
  ['danger','赤壁・危険','HAZARDOUS WALL','全方向危険。赤い縁・警告模様・本体の質感。'],
- ['airA','空中トゲA','AIR SPIKES / DANGER','上・横・下のすべてが危険な浮遊結晶。'],
- ['airB','空中トゲB','AIR SPIKES / LANDABLE TOP','緑色の上面に着地OK。横と下は危険と分かる見た目。'],
+ ['airA','空中トゲA','AIR SPIKES / DANGER','Ver.4.3：上下左右すべて危険。安全そうな天面を作らず、赤い亀裂のある浮遊石に統一。'],
+ ['airB','空中トゲB','AIR SPIKES / LANDABLE TOP','Ver.4.3：青灰色の浮遊石床に着地できる。淡い緑の上面のみ安全、側面と下の赤トゲは危険。'],
  ['gate','数字の壁','NUMBER GATE','数字一致で通過。赤い部分は常に危険な認証ゲート。'],
  ['platform','数字足場','NUMBER PLATFORM','指定の数字で上から着地。側面・下面は危険。下抜け可能。'],
  ['switch','数字スイッチ','NUMBER SWITCH','指定数字で触れると対応する仕掛けが作動する。'],
@@ -1481,9 +1673,10 @@ let cubeSpin=0, cubeTurns=0, cubeRoll=null, cameraView=0;
 // Temporary running-preview state. It does not interact with the playable engine.
 // Use the SAME world-space constants as the real game. Height in the playable
 // engine is rendered at ZOOM=.49, not at one screen pixel per world unit.
-const RUN_SPEED=285,RUN_JUMP_V=700,RUN_GRAVITY=1850,RUN_PLAYER_WORLD_SIZE=64,RUN_GAME_ZOOM=.49;
+// Match the playable engine exactly. Extra jumps feel like a real second/third/fourth takeoff.
+const RUN_SPEED=285,RUN_JUMP_V=810,RUN_AIR_JUMP_V=740,RUN_GRAVITY=1850,RUN_PLAYER_WORLD_SIZE=64,RUN_GAME_ZOOM=.49;
 const NR_FRONT_OFFSET40=3.5; // canvas px toward the near edge of the top slab; rendering only
-const RUN_PLAYER_SIZE=74,RUN_VISUAL_SCALE=RUN_GAME_ZOOM*RUN_PLAYER_SIZE/RUN_PLAYER_WORLD_SIZE; // Ver.4.2: slightly smaller visual size only; physics unchanged
+const RUN_PLAYER_SIZE=72,RUN_VISUAL_SCALE=RUN_GAME_ZOOM*RUN_PLAYER_SIZE/RUN_PLAYER_WORLD_SIZE; // Ver.4.6: cube ~3% smaller in test view
 const RUN_TURN_SPEED=(Math.PI/2)/.20; // same ~0.20s rotation duration as the original game
 let runActive=false,runLast=0,runDistance=0,runHeight=0,runVelocity=0,runUsed=0,runLimit=1,runFrame=0,runStamp=0;
 let runStartFace=1,runTurnTarget=0,runLandFx=0,runLaunchFx=0,runCameraLift=0,runElapsed=0;
@@ -1858,7 +2051,7 @@ function nrSlab35(x,y,w,seed,cap=17,slabH=90){
 
 function nrDrawStoneFloor35(x,y,w,h,offset=0){
  if(h<=0||w<=0)return;
- const isRunning=runActive&&items[pos][0]==='player';
+ const isRunning=runActive;
  const tileW=isRunning?181:237,cap=isRunning?16:20,slabH=isRunning?79:89; // Ver.3.9: shared 2.5-D floor depth, gameplay unchanged
  g.save();g.beginPath();g.rect(x,y,w,h);g.clip();
  g.fillStyle='#142637';g.fillRect(x,y,w,h);
@@ -1883,7 +2076,7 @@ function nrDrawStoneFloor35(x,y,w,h,offset=0){
 }
 
 function nrDrawStoneFloor(x,y,w,h,offset=0){
- if(improved&&!legacy22&&!legacy23&&!legacy24&&!nrFloorCompare31&&['player','ground'].includes(items[pos][0])){nrDrawStoneFloor35(x,y,w,h,offset);return;}
+ if(improved&&!legacy22&&!legacy23&&!legacy24&&!nrFloorCompare31&&(runActive||['player','ground','spike','airA','airB'].includes(items[pos][0]))){nrDrawStoneFloor35(x,y,w,h,offset);return;}
  if(nrFloorCompare31)nrDrawStoneFloor31(x,y,w,h,offset);
  else nrDrawStoneFloor32(x,y,w,h,offset);
 }
@@ -1905,7 +2098,23 @@ function facetSpike(x,bottom,w,h,old=false,down=false){
  shape([[x+w*.48,tipY],[x+w*.47,rootY],[x+w*.16,rootY]],'#ffd5cd72');shape([[x+w*.48,tipY],[x+w*.85,rootY],[x+w*.47,rootY]],'#963159a9');line(x+w*.48,tipY+Math.sign(rootY-tipY)*8,x+w*.47,rootY-6,'#ffdae0a0',1.5)
 }
 function spikeBase(x,y,w,old=false){stoneTile(x,y,w,26,old);if(!old){for(let a=0;a<w-12;a+=16)line(x+a+5,y+21,x+a+10,y+21,'#ffb69b78',1)}}
-function drawSpikes(){floor(120,333,780,107,!improved);const y=333;spikeBase(331,y-18,338,!improved);for(let n=0;n<4;n++)facetSpike(341+n*82,y-19,73,n===1?146:106,!improved)}
+function nrObstaclePreviewCube(x,ground,size=112){
+ const cy=playerCenterYForGround(ground+9.1+NR_FRONT_OFFSET40,size,0,false);
+ nrPlayerContactShadow38(x,ground,size,0,16);
+ dbRoundedCube(x,cy,size,1,0,false);
+}
+function drawCeilingSpikes45(){
+ nrDrawStoneFloor(66,357,892,83,0);
+ nrObstaclePreviewCube(201,357,110);
+ NRSpikeArt.slab(g,401,105,405,25,false);
+ for(let j=0;j<4;j++)NRSpikeArt.spike(g,408+j*100,130,88,114,true,j+35);
+}
+function drawSpikes(){
+ floor(66,335,892,105,!improved);
+ if(!improved){spikeBase(365,315,342,true);for(let j=0;j<4;j++)facetSpike(370+j*82,315,73,103,true);return;}
+ nrObstaclePreviewCube(196,335,114);
+ for(let j=0;j<4;j++)NRSpikeArt.spike(g,422+j*100,335,95,123,false,j*37+11); // Ver.4.8: four-spike height reference
+}
 /* Rounded solid cube renderer: one continuous parametric rounded-box surface.
    Temporary design-book preview only; the actual game physics and render path stay unchanged. */
 const dbRGB=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
@@ -1953,13 +2162,13 @@ const dbMeshRun=dbBuildMesh(.137,[-1,-.966,-.916,-.863,0,.863,.916,.966,1]);
 // Dense enough for a beveled stone edge, but limited in 60 fps preview.
 const nrMeshStone35=dbBuildMesh(.068,[-1,-.983,-.949,-.932,0,.932,.949,.983,1]);
 const nrMeshStoneRun35=dbBuildMesh(.068,[-1,-.962,-.932,0,.932,.962,1]);
-function nrModernStone35(){return items[pos]?.[0]==='player'&&improved&&!legacy22&&!legacy23&&!legacy24;}
+function nrModernStone35(){return ['player','spike','airA','airB'].includes(items[pos]?.[0])&&improved&&!legacy22&&!legacy23&&!legacy24;}
 function dbProjector(cx,cy,size,spin=0){
  // The playable world is a strict 2-D side scroller. Keep the modern player
  // nearly front-on (and its bottom horizontal), while preserving a tiny amount
  // of depth and rounded-edge shading. Legacy comparisons/other parts retain
  // their earlier camera.
- const playerFront=items[pos]?.[0]==='player'&&improved&&!legacy22&&!legacy23&&!legacy24;
+ const playerFront=['player','spike','airA','airB'].includes(items[pos]?.[0])&&improved&&!legacy22&&!legacy23&&!legacy24;
  const yaw=playerFront?(runActive?-.077:[-.07,-.14,-.21][cameraView]):(runActive?-.24:[-.12,-.43,-.68][cameraView]);
  const pitch=playerFront?(runActive?.068:[.075,.105,.15][cameraView]):(runActive?.17:(legacy22?.30:.255));
  const ya=Math.cos(yaw),yb=Math.sin(yaw),pa=Math.cos(pitch),pb=Math.sin(pitch);
@@ -2291,9 +2500,23 @@ function wall(x,y,w,h,safe,old=false){
 }
 function drawGround(){floor(36,223,952,217,!improved)}
 function drawGap(){floor(66,255,350,185,!improved);floor(672,255,285,185,!improved);if(improved){line(415,260,415,430,'#ff9ba685',5);line(671,260,671,430,'#ff9ba685',5);for(let y=275;y<425;y+=21){line(413,y,421,y+8,'#ffd0bf83',2);line(668,y,660,y+8,'#ffd0bf83',2)}}else{line(417,255,417,440,'#ff7085',3);line(671,255,671,440,'#ff7085',3)}ellipse(544,416,90,13,'#121a37ac');cube(252,137,74,face,!improved);g.setLineDash([9,12]);g.beginPath();g.moveTo(340,180);g.quadraticCurveTo(515,38,733,202);g.strokeStyle='#b6ffe4ad';g.lineWidth=3;g.stroke();g.setLineDash([])}
-function drawAir(safe){floor(105,359,815,81,!improved);shadow(533,325,120);if(!safe){spikeBase(348,132,326,!improved);for(let i=0;i<3;i++){facetSpike(354+i*106,158,100,107,!improved,true);facetSpike(354+i*106,132,100,50,!improved,false)}}else{
-  wall(356,132,312,40,true,!improved);if(improved){for(let i=0;i<3;i++){facetSpike(367+i*102,176,94,112,false,true)}line(374,126,646,126,'#bbffe6',3)}else{for(let i=0;i<3;i++)facetSpike(365+i*104,174,94,110,true,true)}
- }}
+function drawAir(safe){
+ floor(80,359,870,81,!improved);
+ if(!improved){
+  if(!safe){spikeBase(348,132,326,true);for(let j=0;j<3;j++){facetSpike(354+j*106,158,100,107,true,true);facetSpike(354+j*106,132,100,50,true,false);}}
+  else{wall(356,132,312,40,true,true);for(let j=0;j<3;j++)facetSpike(367+j*102,176,94,112,true,true);}
+  return;
+ }
+ nrObstaclePreviewCube(221,359,112);
+ if(safe){
+  const x=425,y=139,w=351,rim=35;
+  NRSpikeArt.slab(g,x,y,w,rim,true);
+  for(let j=0;j<3;j++)NRSpikeArt.spike(g,x+j*w/3,y+rim,w/3,105,true,100+j);
+ }else{
+  // Every side of an A diamond is red and fatal. No false green landing ledge.
+  for(let j=0;j<3;j++)NRSpikeArt.diamond(g,431+j*125,128,108,154);
+ }
+}
 function drawGate(){floor(190,361,655,79,!improved);
  const x=454,y=28,w=135,h=335;g.save();g.shadowBlur=20;g.shadowColor='#a67cff6b';g.fillStyle=improved?'#6e56a78a':'#595fa6a0';rr(x,y,w,h,12);g.fill();g.shadowBlur=0;g.strokeStyle='#bda5fe';g.lineWidth=4;g.stroke();g.restore();
  if(improved){g.strokeStyle='#dbc0ff80';g.lineWidth=2;rr(x+18,y+24,w-36,h-48,7);g.stroke();for(let yy=75;yy<335;yy+=37){g.save();g.translate(x+23,yy);g.rotate(Math.PI/4);g.strokeStyle='#c6b1f4b0';g.lineWidth=2;g.strokeRect(0,0,9,9);g.restore()}}
@@ -2374,12 +2597,235 @@ function nrDrawRunDust41(){
  }
  g.restore();
 }
+// Keep this in sync with the real-game ground-spike height palette (separate IIFE).
+const NR48_RUN_SPIKE_HEIGHT_PX=[[0,0],[52,58],[77,84],[99,107],[116,125]];
+/* Ver.4.8: endless, category-isolated obstacle trials with tuned jump rhythm/spike heights.
+   Everything below is separate from the 51-level physics/collision engine. */
+const NR45_SCALE=RUN_PLAYER_SIZE/RUN_PLAYER_WORLD_SIZE;
+let trialObjects=[],trialNextX=0,trialSerial=0,trialRetry=0,trialDeaths=0,trialPassed=0,trialSurface=0,trialOnSurface=true,trialSeed=0,trialInitialFace=1;
+function trialRand(){trialSeed=(Math.imul(1664525,trialSeed)+1013904223)>>>0;return trialSeed/4294967296}
+function trialInt(a,b){return a+Math.floor(trialRand()*(b-a+1))}
+function trialKind(){return items[pos][0]}
+function trialStart(){
+ trialObjects=[];trialSerial=0;trialRetry=0;trialPassed=0;trialDeaths=0;
+ trialSurface=0;trialOnSurface=true;trialInitialFace=face;
+ trialSeed=((Date.now()&0xfffffff)^(pos*0x9e3779b9))>>>0;
+ trialNextX=850;trialFill();
+}
+function trialReset(){
+ trialRetry=0;runDistance=0;runHeight=0;runVelocity=0;runUsed=0;
+ runLimit=trialInitialFace;face=trialInitialFace;runStartFace=face;
+ cubeSpin=0;cubeRoll=null;cubeTurns=0;runTurnTarget=0;trialSurface=0;trialOnSurface=true;
+ runLandFx=0;runLaunchFx=0;runCameraLift=0;runDust41.length=0;
+ // A fresh, varied set follows every collision; no stop or menu interaction required.
+ trialObjects=[];trialNextX=850;trialFill();
+}
+function trialFail(){if(trialRetry>0)return;trialDeaths++;trialRetry=.58;nrEmitRunDust41('land')}
+function trialFill(){
+ const kind=trialKind();if(kind==='player'||kind==='ground')return;
+ const view=runDistance*NR45_SCALE;
+ while(trialNextX<view+1850){
+  let o={id:++trialSerial,kind,x:trialNextX,w:75,hit:false};
+  if(kind==='spike'){
+   o.count=trialInt(1,4); // 5-spike rows are not used in the normal endless trial.
+   o.pitch=Math.round(trialInt(41,48)*1.05); // Keep established spike spacing.
+   o.w=o.count*o.pitch;
+   const heightRange=NR48_RUN_SPIKE_HEIGHT_PX[o.count];
+   o.h=trialInt(heightRange[0],heightRange[1]); // 1 low, 2–4 progressively taller.
+  }
+  else if(kind==='ceiling'){o.count=trialInt(1,3);o.pitch=trialInt(42,50);o.w=o.count*o.pitch;o.h=trialInt(54,75);o.bottom=trialInt(91,144);}
+  else if(kind==='gap'){o.w=trialInt(95,150);}
+  else if(kind==='safe'){o.w=trialInt(74,107);o.h=trialInt(42,83);}
+  else if(kind==='danger'){o.w=trialInt(55,85);o.h=trialInt(42,86);}
+  else if(kind==='airA'){o.w=trialInt(70,94);o.h=trialInt(70,105);o.bottom=trialInt(38,96);}
+  else if(kind==='airB'){o.w=trialInt(100,142);o.h=trialInt(53,89);o.slab=22;o.bottom=trialInt(46,72);}
+  else if(kind==='gate'){o.w=trialInt(42,61);o.target=trialInt(1,4);o.variant=trialInt(0,2);o.h=230;}
+  else if(kind==='platform'){o.w=trialInt(96,135);o.h=trialInt(61,94);o.target=trialInt(1,4);}
+  else if(kind==='switch'){o.w=52;o.target=trialInt(1,4);o.barrierX=o.x+trialInt(185,245);o.barrierW=trialInt(49,69);o.barrierH=trialInt(50,73);o.activated=false;}
+  else if(kind==='moving'){o.w=trialInt(74,104);o.h=trialInt(43,76);o.safe=trialInt(0,1)===1;o.axis=trialInt(0,1);o.range=trialInt(16,38);o.phase=trialRand()*Math.PI*2;}
+  trialObjects.push(o);
+  let pause=trialInt(360,520);
+  if(kind==='gate'||kind==='switch'||kind==='moving')pause+=140;
+  trialNextX+=Math.max(o.w,kind==='switch'?o.barrierX-o.x+o.barrierW:0)+pause;
+ }
+ for(const o of trialObjects){const finish=o.barrierX?o.barrierX+o.barrierW:o.x+o.w;if(!o.hit&&finish<view-40){o.hit=true;trialPassed++;}}
+ trialObjects=trialObjects.filter(o=>o.x+Math.max(o.w,o.barrierX?o.barrierX-o.x+o.barrierW:0)>view-260);
+}
+function trialScreenX(o){return 252+o.x-runDistance*NR45_SCALE}
+function trialGroundY(){return 341+runCameraLift+8.15+NR_FRONT_OFFSET40}
+function trialRects(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
+function trialPolyHit(points,box){
+ // SAT: avoid punishing a player who clears the sloping corners of a spike.
+ const axes=[[1,0],[0,1]];
+ for(let i=0;i<points.length;i++){const q=points[i],r=points[(i+1)%points.length];axes.push([-(r[1]-q[1]),r[0]-q[0]])}
+ const corners=[[box.x,box.y],[box.x+box.w,box.y],[box.x+box.w,box.y+box.h],[box.x,box.y+box.h]];
+ for(const [ax,ay] of axes){
+  let amin=Infinity,amax=-Infinity,bmin=Infinity,bmax=-Infinity;
+  for(const q of points){let v=q[0]*ax+q[1]*ay;amin=Math.min(amin,v);amax=Math.max(amax,v)}
+  for(const q of corners){let v=q[0]*ax+q[1]*ay;bmin=Math.min(bmin,v);bmax=Math.max(bmax,v)}
+  if(amax<bmin+.001||bmax<amin+.001)return false;
+ }
+ return true;
+}
+function trialPose(o){
+ const ground=trialGroundY(),px=trialScreenX(o);let x=px,y=ground-(o.h||0),w=o.w,h=o.h||0;
+ if(o.kind==='ceiling'){y=ground-o.bottom-o.h}
+ if(o.kind==='airA'){y=ground-o.bottom-o.h}
+ if(o.kind==='airB'){y=ground-o.bottom-o.h}
+ if(o.kind==='platform'){y=ground-o.h}
+ if(o.kind==='moving'){
+  const t=runElapsed*1.9+o.phase;
+  if(o.axis===0)y+=Math.sin(t)*o.range;
+  else x+=Math.sin(t)*o.range;
+ }
+ return {x,y,w,h,ground};
+}
+function trialPlayerBox(){
+ const bottom=trialGroundY()-runHeight*RUN_VISUAL_SCALE;
+ return {x:252-RUN_PLAYER_SIZE*.39,y:bottom-RUN_PLAYER_SIZE*.90,w:RUN_PLAYER_SIZE*.78,h:RUN_PLAYER_SIZE*.88};
+}
+function trialLandAt(height){
+ runHeight=height;runVelocity=0;runUsed=0;runLimit=face;trialSurface=height;trialOnSurface=true;
+ runLandFx=.19;nrEmitRunDust41('land');
+}
+function trialCheck(dt,oldHeight){
+ if(trialRetry>0)return;
+ const kind=trialKind();if(kind==='player'||kind==='ground')return;
+ const px=runDistance*NR45_SCALE;
+ const ground=trialGroundY(),box=trialPlayerBox();
+ // Safe platforms become ground only when reached from above on the way down.
+ const supports=[];
+ if(!trialObjects.some(o=>o.kind==='gap'&&o.x<px+8&&o.x+o.w>px-8))supports.push(0);
+ for(const o of trialObjects){
+  const p=trialPose(o),horizontal=box.x+box.w>p.x+7&&box.x<p.x+p.w-7;
+  if(!horizontal)continue;
+  if(o.kind==='safe'||o.kind==='platform'&&face===o.target||o.kind==='airB'||o.kind==='moving'&&o.safe){
+   const roof=(ground-p.y)/RUN_VISUAL_SCALE;
+   supports.push(roof);
+  }
+ }
+ // Contact from above, preserving the ability to fall off the edge naturally.
+ if(runVelocity<=0){
+  let candidate=null;
+  for(const s of supports){if(oldHeight>=s-4&&runHeight<=s&&(!candidate||s>candidate))candidate=s;}
+  if(candidate!==null){
+   if(!trialOnSurface||Math.abs(trialSurface-candidate)>.02||runVelocity!==0)trialLandAt(candidate);
+   else {runHeight=candidate;runVelocity=0;}
+  }else trialOnSurface=false;
+ }
+ let collision=false;
+ for(const o of trialObjects){
+  const p=trialPose(o);if(p.x>box.x+box.w+70||p.x+p.w<box.x-70)continue;
+  if(o.kind==='spike'){
+   for(let i=0;i<o.count;i++){
+    const x=p.x+i*o.pitch;
+    if(trialPolyHit([[x,ground],[x+o.pitch/2,ground-o.h],[x+o.pitch,ground]],box))collision=true;
+   }
+  }else if(o.kind==='ceiling'){
+   for(let i=0;i<o.count;i++){
+    const x=p.x+i*o.pitch;
+    if(trialPolyHit([[x,p.y],[x+o.pitch/2,p.y+o.h],[x+o.pitch,p.y]],box))collision=true;
+   }
+  }else if(o.kind==='gap'){
+   // Hitting the far vertical side while below surface is a failure.
+   if(p.x+p.w>box.x&&p.x+p.w<box.x+box.w+7&&runHeight< -7)collision=true;
+  }else if(o.kind==='safe'||o.kind==='danger'||o.kind==='platform'||o.kind==='moving'){
+   const rect={x:p.x,y:p.y,w:p.w,h:Math.max(1,ground-p.y)};
+   if(o.kind==='platform')rect.h=23;
+   const isSafe=o.kind==='safe'||o.kind==='moving'&&o.safe||o.kind==='platform'&&face===o.target;
+   // Only the very top is safe. Side and bottom of a blue wall remain harmful.
+   if(trialRects(box,rect)&&!(isSafe&&runHeight*RUN_VISUAL_SCALE>=ground-p.y-4&&runVelocity<=0))collision=true;
+  }else if(o.kind==='airA'){
+   const cy=p.y+p.h/2;
+   collision=collision||trialPolyHit([[p.x+p.w/2,p.y],[p.x+p.w,cy],[p.x+p.w/2,p.y+p.h],[p.x,cy]],box);
+  }else if(o.kind==='airB'){
+   const slab={x:p.x,y:p.y,w:p.w,h:o.slab};
+   if(trialRects(box,slab)&&!(runVelocity<=0&&runHeight*RUN_VISUAL_SCALE>=ground-p.y-4))collision=true;
+   for(let i=0;i<3;i++){
+    const x=p.x+i*p.w/3;
+    if(trialPolyHit([[x,p.y+o.slab],[x+p.w/6,p.y+o.slab+o.h-o.slab],[x+p.w/3,p.y+o.slab]],box))collision=true;
+   }
+  }else if(o.kind==='gate'){
+   const openings=trialGateOpening(o,ground);
+   if(box.x+box.w>p.x&&box.x<p.x+p.w&&
+      (face!==o.target||box.y<openings.top||box.y+box.h>openings.bottom))collision=true;
+  }else if(o.kind==='switch'){
+   const marker={x:p.x,y:ground-74,w:o.w,h:27};
+   if(face===o.target&&trialRects(box,marker))o.activated=true;
+   const barrier={x:p.x+(o.barrierX-o.x),y:ground-o.barrierH,w:o.barrierW,h:o.barrierH};
+   if(!o.activated&&trialRects(box,barrier))collision=true;
+  }
+ }
+ if(runHeight< -160||collision)trialFail();
+}
+function trialGateOpening(o,ground){
+ const depth=o.variant===0?215:o.variant===1?118:110;
+ const bottom=o.variant===2?ground-50:ground+3;
+ return {top:bottom-depth,bottom};
+}
+function trialUpdate(dt,oldHeight){
+ if(trialRetry>0){trialRetry=Math.max(0,trialRetry-dt);if(trialRetry===0)trialReset();return;}
+ trialFill();trialCheck(dt,oldHeight);
+}
+function trialDrawObjects(){
+ const kind=trialKind();if(kind==='player'||kind==='ground')return;
+ const ground=trialGroundY();
+ for(const o of trialObjects){
+  const p=trialPose(o),{x,y,w}=p;
+  if(x>1150||x+w< -120)continue;
+  if(o.kind==='spike'){
+   for(let i=0;i<o.count;i++)NRSpikeArt.spike(g,x+i*o.pitch,ground,o.pitch,o.h,false,o.id*13+i);
+  }else if(o.kind==='ceiling'){
+   NRSpikeArt.slab(g,x,y-23,w,23,false);
+   for(let i=0;i<o.count;i++)NRSpikeArt.spike(g,x+i*o.pitch,y,o.pitch,o.h,true,o.id*17+i);
+  }else if(o.kind==='gap'){
+   // Only the opening is rendered by the split floor, below.
+   line(x,ground+4,x,440,'#ba596351',1.6);
+   line(x+w,ground+4,x+w,440,'#ba596351',1.6);
+  }else if(o.kind==='safe'||o.kind==='danger'||o.kind==='moving'){
+   wall(x,y,w,Math.max(6,ground-y),o.kind==='safe'||o.safe===true,false);
+  }else if(o.kind==='airA')NRSpikeArt.diamond(g,x,y,w,o.h);
+  else if(o.kind==='airB'){
+   NRSpikeArt.slab(g,x,y,w,o.slab,true);
+   for(let j=0;j<3;j++)NRSpikeArt.spike(g,x+j*w/3,y+o.slab,w/3,o.h-o.slab,true,o.id*3+j);
+  }else if(o.kind==='gate'){
+   const op=trialGateOpening(o,ground);
+   g.save();g.fillStyle='#61468e';g.fillRect(x,ground-223,w,226);
+   g.fillStyle='#191b36';g.fillRect(x+4,op.top,w-8,op.bottom-op.top);
+   g.strokeStyle='#d0b4ff';g.lineWidth=2;g.strokeRect(x,ground-223,w,226);
+   g.strokeStyle='#ff7990';g.lineWidth=2;g.strokeRect(x+4,op.top,w-8,op.bottom-op.top);
+   text(String(o.target),x+w/2,op.top+(op.bottom-op.top)/2,Math.min(33,w*.62),'#faf0ff',900);g.restore();
+  }else if(o.kind==='platform'){
+   g.save();g.fillStyle='#514568';g.fillRect(x,y,w,23);g.strokeStyle='#b5a0cc';g.lineWidth=2;g.strokeRect(x,y,w,23);
+   line(x+3,y+1,x+w-3,y+1,'#a7e6c8',3);text(String(o.target),x+w/2,y+12,23,'#f1e9ff');g.restore();
+  }else if(o.kind==='switch'){
+   g.save();g.fillStyle=o.activated?'#467a6d':'#5a4976';rr(x,ground-74,w,27,5);g.fill();g.strokeStyle=o.activated?'#b2e5d2':'#c7b3e4';g.lineWidth=2;g.stroke();
+   text(String(o.target),x+w/2,ground-60,20,'#f4eaff');g.restore();
+   if(!o.activated)wall(x+(o.barrierX-o.x),ground-o.barrierH,o.barrierW,o.barrierH,false,false);
+  }
+ }
+ if(trialRetry>0){
+  g.save();g.fillStyle='rgba(3,8,16,.3)';g.fillRect(0,0,1024,440);
+  g.fillStyle='#f2bfc7';g.font='700 18px system-ui';g.textAlign='center';g.fillText('ミス — 自動で再挑戦',512,170);g.restore();
+ }
+}
+function trialDrawFloor(offset,groundY){
+ const gaps=trialObjects.filter(o=>o.kind==='gap');
+ if(!gaps.length){runFloor(offset,runCameraLift);return;}
+ let start=0;
+ for(const o of gaps){const a=Math.max(0,trialScreenX(o)),b=Math.min(1024,trialScreenX(o)+o.w);
+  if(a>start)nrDrawStoneFloor(start,groundY,a-start,Math.max(200,440-groundY),offset+start);
+  start=Math.max(start,b);
+ }
+ if(start<1024)nrDrawStoneFloor(start,groundY,1024-start,Math.max(200,440-groundY),offset+start);
+}
+
 function drawRunning(){
  backdrop();
  const px=252,baseGroundY=341,playerSize=RUN_PLAYER_SIZE;
  const visualJump=runHeight*RUN_VISUAL_SCALE;
  const groundY=baseGroundY+runCameraLift;
- runFloor(runDistance*playerSize/RUN_PLAYER_WORLD_SIZE,runCameraLift);
+ trialDrawFloor(runDistance*playerSize/RUN_PLAYER_WORLD_SIZE,groundY);
  const phase=((cubeSpin%(Math.PI/2))+(Math.PI/2))%(Math.PI/2);
  // Bottom of the visible cube rests near the center of the 16px top plane (not on the wall).
  const centerY=playerCenterYForGround(groundY+8.15+NR_FRONT_OFFSET40,playerSize,phase,true)-visualJump;
@@ -2387,6 +2833,7 @@ function drawRunning(){
  const flight=dbClamp(visualJump/160,0,1);
  nrPlayerContactShadow38(sx,groundY,playerSize,flight,16);
  nrDrawRunDust41();
+ trialDrawObjects();
  if(runLandFx>0){
   const t=1-runLandFx/.19;
   g.beginPath();g.ellipse(sx,groundY+8+NR_FRONT_OFFSET40,20+t*31,3.8+t*.8,0,0,Math.PI*2);
@@ -2395,7 +2842,7 @@ function drawRunning(){
  dbRoundedCube(px,centerY,playerSize,face,phase,true);
 }
 function draw(){
- if(runActive&&items[pos][0]==='player'){drawRunning();return}
+ if(runActive){drawRunning();return}
  backdrop();const id=items[pos][0];
  if(id==='player'){
     floor(130,341,770,99,!improved);
@@ -2403,14 +2850,14 @@ function draw(){
     const mainGround=341;
     const mainX=512;
     if(improved){
-      const previewSize=172; // Ver.4.2: slightly smaller preview cube; floor geometry unchanged.
+      const previewSize=167; // Ver.4.6: cube ~3% smaller in static design preview.
       nrPlayerContactShadow38(playerShadowX(mainX,previewSize,phase),mainGround,previewSize,0,20);
       dbRoundedCube(mainX,playerCenterYForGround(mainGround+10.2+NR_FRONT_OFFSET40,previewSize,phase),previewSize,face,phase);
     }else {
       shadow(515,331,140);oldCube(411,75,198,face)
     }
    }
- else if(id==='spike')drawSpikes();else if(id==='ground')drawGround();else if(id==='gap')drawGap();
+ else if(id==='spike')drawSpikes();else if(id==='ceiling')drawCeilingSpikes45();else if(id==='ground')drawGround();else if(id==='gap')drawGap();
  else if(id==='safe'||id==='danger'){floor(135,358,761,82,!improved);shadow(520,346);wall(id==='safe'?381:414,id==='safe'?101:79,id==='safe'?277:210,id==='safe'?260:280,id==='safe',!improved)}
  else if(id==='airA'||id==='airB')drawAir(id==='airB');else if(id==='gate')drawGate();else if(id==='platform')drawPlatform();else if(id==='switch')drawSwitch();else if(id==='moving')drawMoving();
  // Neutral rule-of-thumb object preview: side figures keep strong central visibility.
@@ -2418,14 +2865,14 @@ function draw(){
 function refresh(){const i=items[pos];const player=i[0]==='player';$('dbName').textContent=i[1];$('dbEnglish').textContent=i[2];$('dbDescription').textContent=i[3];$('dbCounter').textContent=String(pos+1).padStart(2,'0')+' / '+items.length;
  for(const [k,b] of [...$('dbCategories').children].entries()){b.classList.toggle('active',k===pos);b.setAttribute('aria-current',String(k===pos))}
  $('dbNew').classList.toggle('active',improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31));$('dbV24').classList.toggle('active',improved&&legacy24);$('dbV23').classList.toggle('active',improved&&legacy23);$('dbV22').classList.toggle('active',improved&&legacy22);$('dbOld').classList.toggle('active',!improved);$('dbNew').setAttribute('aria-pressed',String(improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31)));$('dbV24').setAttribute('aria-pressed',String(improved&&legacy24));$('dbV23').setAttribute('aria-pressed',String(improved&&legacy23));$('dbV22').setAttribute('aria-pressed',String(improved&&legacy22));$('dbOld').setAttribute('aria-pressed',String(!improved));$('dbV22').hidden=items[pos][0]!=='player';$('dbV23').hidden=items[pos][0]!=='player';$('dbV24').hidden=items[pos][0]!=='player';$('dbGroundBefore').hidden=items[pos][0]!=='ground'||!improved;$('dbGroundBefore').classList.toggle('active',nrFloorCompare31);$('dbGroundBefore').setAttribute('aria-pressed',String(nrFloorCompare31));$('dbGroundBefore').textContent=nrFloorCompare31?'✓ Ver.3.1 石床':'◈ Ver.3.1と比較';
- $('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=!player;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.4.2 / 石材と接地面は維持'):'Ver.4.2 / 動きとサイズを調整'):'旧デザイン風（比較用）';
+ $('designBookScreen').classList.toggle('db-running',runActive);$('dbRunExit').hidden=!runActive;$('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=false;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.4.2 / 石材と接地面は維持'):'Ver.4.8 / 自然な追加ジャンプ・トゲの高さ調整'):'旧デザイン風（比較用）';
  try{$('dbMemo').value=localStorage.getItem(memoKey(pos))||''}catch{$('dbMemo').value=''};
  for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
- $('dbExtras').hidden=items[pos][0]==='ground';$('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=!player||!runActive;$('dbRun').textContent=runActive?'■ 停止して戻る':'▶ 走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'黒背景 / 石粉の疾走感と着地演出を確認':'黒背景 / プレイヤーと床だけ';$('dbInstruction').textContent=runActive?'画面タップでジャンプ。回転後の向き・接地・横滑りを確認。':player?'背景を消した状態で、数字・回転・接地の見た目を確認できます。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['真正面','正面＋少し奥行き','正面＋奥行き'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
+ $('dbExtras').hidden=false;$('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=true;$('dbRun').textContent='▶ 無限走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'選択した障害物がランダムに続きます':'黒背景 / 選択した障害物を無限に練習';$('dbInstruction').textContent=runActive?'画面タップでジャンプ。回転後の向き・接地・横滑りを確認。':player?'背景を消した状態で、数字・回転・接地の見た目を確認できます。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['真正面','正面＋少し奥行き','正面＋奥行き'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
 function select(n){stopRun(false);pos=(n+items.length)%items.length;if(items[pos][0]!=='ground')nrFloorCompare31=false;refresh()}
 function stopRun(redraw=true){
  if(!runActive)return;
- runActive=false;runLast=0;runHeight=0;runVelocity=0;cubeRoll=null;cubeSpin=0;cubeTurns=0;runTurnTarget=0;runCameraLift=0;runLandFx=0;runLaunchFx=0;runDust41.length=0;runDustTimer41=0;runDustSerial41=0;
+ runActive=false;runLast=0;runHeight=0;runVelocity=0;cubeRoll=null;cubeSpin=0;cubeTurns=0;runTurnTarget=0;runCameraLift=0;runLandFx=0;runLaunchFx=0;runDust41.length=0;runDustTimer41=0;runDustSerial41=0;trialObjects=[];trialRetry=0;
  cancelAnimationFrame(runFrame);
  if(redraw)refresh();
 }
@@ -2433,16 +2880,16 @@ function startRun(){
  if(runActive)return;
  runActive=true;runDistance=0;runHeight=0;runVelocity=0;runUsed=0;runLimit=face;runStartFace=face;
  runDust41.length=0;runDustTimer41=0;runDustSerial41=0;
- cubeRoll=null;cubeSpin=0;cubeTurns=0;runTurnTarget=0;runLast=0;runStamp=0;runCameraLift=0;runLandFx=0;runLaunchFx=0;runElapsed=0;
+ cubeRoll=null;cubeSpin=0;cubeTurns=0;runTurnTarget=0;runLast=0;runStamp=0;runCameraLift=0;runLandFx=0;runLaunchFx=0;runElapsed=0;trialStart();
  refresh();runFrame=requestAnimationFrame(runTick);
 }
 function runJump(){
  if(!runActive)return;
- if(runUsed>=runLimit)return;
- if(runHeight<.05&&runUsed===0)runLimit=face;
- runUsed++;
- if(runHeight<.5)nrEmitRunDust41('jump');
- runVelocity=RUN_JUMP_V;
+ if(trialRetry>0||runUsed>=runLimit)return;
+ if(trialOnSurface&&runUsed===0)runLimit=face;
+ runUsed++;trialOnSurface=false;
+ if(Math.abs(runHeight-trialSurface)<.5)nrEmitRunDust41('jump');
+ runVelocity=runUsed===1?RUN_JUMP_V:RUN_AIR_JUMP_V;
  runLaunchFx=.13;
  face=face%4+1; // The real game also advances the face immediately on jumping.
  runTurnTarget+=Math.PI/2; // Queue a full turn; never snap backwards on repeated taps.
@@ -2452,22 +2899,20 @@ function runTick(now){
  if($('designBookScreen').hidden||document.hidden){runLast=now;runFrame=requestAnimationFrame(runTick);return}
  if(!runLast)runLast=now;
  const dt=Math.min(.033,Math.max(0,(now-runLast)/1000));runLast=now;
- runElapsed+=dt;runDistance+=RUN_SPEED*dt;
+ runElapsed+=dt;if(trialRetry<=0)runDistance+=RUN_SPEED*dt;
  runLandFx=Math.max(0,runLandFx-dt);runLaunchFx=Math.max(0,runLaunchFx-dt);
  // Ver.4.2: clearer trail of muted stone dust for more perceived speed.
- if(runHeight<.25&&runVelocity<=0){
+ if(trialOnSurface&&trialRetry<=0&&runVelocity<=0){
   runDustTimer41+=dt;
   while(runDustTimer41>=.05){nrEmitRunDust41('trail');runDustTimer41-=.05;}
  }else runDustTimer41=0;
  nrUpdateRunDust41(dt);
- if(runHeight>0||runVelocity>0){
-  const oldHeight=runHeight;
-  runHeight=Math.max(0,runHeight+runVelocity*dt-RUN_GRAVITY*dt*dt/2);
+ const oldHeight=runHeight;
+ if(trialRetry<=0&&(!trialOnSurface||runVelocity>0)){
+  runHeight+=runVelocity*dt-RUN_GRAVITY*dt*dt/2;
   runVelocity-=RUN_GRAVITY*dt;
-  if(runHeight<=0&&oldHeight>0){
-   runHeight=0;runVelocity=0;runUsed=0;runLimit=face;runLandFx=.19;nrEmitRunDust41('land');
-  }
  }
+ trialUpdate(dt,oldHeight);
  // Match the playable game's ~0.20s quarter-turns, but show each turn inside
  // one stable presentation angle. The cube lands upright instead of ending on
  // four unrelated static viewpoints.
@@ -2497,7 +2942,17 @@ function runTick(now){
 $('dbRun').onclick=()=>{if(runActive)stopRun();else startRun()};
 $('dbRunJump').onclick=runJump;
 // When running, tapping anywhere in the preview performs the same jump action.
-$('designCanvas').addEventListener('pointerdown',e=>{if(runActive){e.preventDefault();runJump()}});
+$('dbPreview').addEventListener('pointerdown',e=>{
+ if(!runActive||e.target.closest('#dbRunExit'))return;
+ e.preventDefault();runJump();
+});
+$('dbRunExit').addEventListener('pointerdown',e=>e.stopPropagation());
+$('dbRunExit').onclick=e=>{e.stopPropagation();stopRun();};
+window.addEventListener('keydown',e=>{
+ if(!runActive||e.repeat)return;
+ if(['Space','ArrowUp','KeyW'].includes(e.code)){e.preventDefault();runJump();}
+ else if(e.code==='Escape'){e.preventDefault();stopRun();}
+});
 for(let i=0;i<items.length;i++){const b=document.createElement('button');b.type='button';b.className='db-cat';b.innerHTML=`<small>${String(i+1).padStart(2,'0')}</small><span>${items[i][1]}</span>`;b.onclick=()=>select(i);$('dbCategories').appendChild(b)}
 for(let d=1;d<=4;d++){const b=document.createElement('button');b.type='button';b.className='db-digit';b.dataset.digit=String(d);b.textContent=d;b.onclick=()=>{cubeRoll=null;cubeSpin=0;cubeTurns=0;face=d;refresh()};$('dbDigits').appendChild(b)}
 $('dbNew').onclick=()=>{improved=true;legacy22=false;legacy23=false;legacy24=false;nrFloorCompare31=false;refresh()};$('dbV24').onclick=()=>{improved=true;legacy22=false;legacy23=false;legacy24=true;refresh()};$('dbV23').onclick=()=>{improved=true;legacy22=false;legacy23=true;legacy24=false;refresh()};$('dbV22').onclick=()=>{improved=true;legacy22=true;legacy23=false;legacy24=false;refresh()};$('dbOld').onclick=()=>{improved=false;legacy22=false;legacy23=false;legacy24=false;refresh()};$('dbBackground').onclick=()=>{ruins=!ruins;refresh()};$('dbGroundBefore').onclick=()=>{nrFloorCompare31=!nrFloorCompare31;refresh()};
@@ -2523,7 +2978,7 @@ $('dbRotate').onclick=()=>{
 $('dbPrevious').onclick=()=>select(pos-1);$('dbNext').onclick=()=>select(pos+1);$('dbMemo').addEventListener('input',()=>{try{localStorage.setItem(memoKey(pos),$('dbMemo').value)}catch{}});
 $('dbBack').onclick=()=>{stopRun();window.__NRUI.showScreen('home')};
 refresh();
-window.__NRDesign={startRun,stopRun,runJump,select,rotate:()=>$('dbRotate').click(),get:()=>({id:items[pos][0],face,improved,ruins,cameraView,spin:cubeSpin,legacy22,legacy23,legacy24,animating:!!cubeRoll,rollProgress:cubeRoll?.progress??null,running:runActive,runDistance,runHeight,runUsed,runLimit,count:items.length})};
+window.__NRDesign={startRun,stopRun,runJump,select,rotate:()=>$('dbRotate').click(),get:()=>({id:items[pos][0],face,improved,ruins,cameraView,spin:cubeSpin,legacy22,legacy23,legacy24,animating:!!cubeRoll,rollProgress:cubeRoll?.progress??null,running:runActive,runDistance,runHeight,runUsed,runLimit,count:items.length,trialObjects:trialObjects.map(o=>({...o})),trialDeaths,trialPassed,trialRetry})};
 })();
 /* === TEMP DESIGN PREVIEW BOOK END === */
 
