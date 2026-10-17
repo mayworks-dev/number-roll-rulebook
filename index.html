@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.4.8 · Natural Multi-Jump</title>
+<title>NUMBER ROLL — Ver.4.9 · Staircase Ground Spikes</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -432,7 +432,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
 <section id="designBookScreen" class="front-screen db-screen" hidden aria-label="仮設デザイン確認ブック">
   <div class="db-titlebar">
     <button type="button" id="dbBack" class="front-button db-back">‹ HOME</button>
-    <div class="db-head"><div class="db-kicker">NUMBER ROLL · UI VER.4.8</div><h2>デザイン確認ブック</h2></div>
+    <div class="db-head"><div class="db-kicker">NUMBER ROLL · UI VER.4.9</div><h2>デザイン確認ブック</h2></div>
     <div class="db-temporary" aria-hidden="true"></div>
   </div>
   <div class="db-shell">
@@ -446,7 +446,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
       </div>
       <div class="db-toolbar" id="dbToolbar">
-        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.8 多段ジャンプ調整</button>
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.9 階段型トゲ</button>
         <button id="dbV24" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.4 と比較</button>
         <button id="dbV23" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.3 と比較</button>
         <button id="dbV22" type="button" class="db-tool" aria-pressed="false">Ver.2.2</button>
@@ -716,18 +716,20 @@ function restorePlatform(){
  createLevel();newState();refreshPlatformBar();showResult('ready');draw();
 }
 function rectObj(x,width,height){return {type:'wall',x,width,height}}
-// Ver.4.8 — heights of 1–4 ground spikes are tuned to the common jump arc.
-// Pixels in the design-book runner and world units in the 51 practice levels
-// use different scales: convert through ZOOM to keep the apparent height aligned.
-const NR48_SPIKE_HEIGHT_PX=[[0,0],[52,58],[77,84],[99,107],[116,125]];
-function nr48GroundSpikeHeight(count){
- const range=NR48_SPIKE_HEIGHT_PX[count];
- return range ? Math.round(((range[0]+range[1])*.5)/ZOOM) : null;
+// Ver.4.9: gradual ascending spike rows, in the same left-to-right order
+// as the runner. Values are authoring pixels; story physics uses world units.
+// Only ground spikes with 1–4 tips use steps. Ceiling/air/5+ remain unchanged.
+const NR49_SPIKE_STEPS_PX=[[],[56],[56,81],[56,79,103],[56,76,97,121]];
+function nr49WorldSteps(count){
+ const steps=NR49_SPIKE_STEPS_PX[count];
+ return steps ? steps.map(h=>Math.round(h/ZOOM)) : null;
 }
 function spikeObj(x,width,count,height,base=0,down=false){
  const calibrationWidth=Math.abs(width-count*SPIKE_PITCH)<.001;
- const tuned=base===0&&!down&&count>=1&&count<=4?nr48GroundSpikeHeight(count):null;
- return {type:'spike',x,width:calibrationWidth?width:Math.round(width*1.05),count,height:tuned??Math.round(height*1.08),base,down};
+ const steps=base===0&&!down&&count>=1&&count<=4?nr49WorldSteps(count):null;
+ return {type:'spike',x,width:calibrationWidth?width:Math.round(width*1.05),count,
+  height:steps?Math.max(...steps):Math.round(height*1.08),
+  ...(steps?{spikeHeights:steps}:{}),base,down};
 }
 // A: all sides hazardous. B: green safe platform top and hazardous undersurface/sides.
 function airA(x,width,base,height){return {type:'airA',x,width,base,height}}
@@ -985,9 +987,9 @@ function triangleHit(points, rect){ // SAT for a triangle against a rectangular 
  }return true;
 }
 function hitSpike(o,rect){const width=o.width/o.count;for(let k=0;k<o.count;k++){
- const a=o.x+k*width,b=a+width;
+ const a=o.x+k*width,b=a+width,h=o.spikeHeights?.[k]??o.height;
  if(b<rect.l||a>rect.r)continue;
- let tri=o.down?[[a,o.base],[b,o.base],[a+width/2,o.base-o.height]]:[[a,o.base],[b,o.base],[a+width/2,o.base+o.height]];
+ const tri=o.down?[[a,o.base],[b,o.base],[a+width/2,o.base-h]]:[[a,o.base],[b,o.base],[a+width/2,o.base+h]];
  if(triangleHit(tri,rect))return true;
  }return false;}
 function hitAirA(o,rc){
@@ -1259,9 +1261,10 @@ function drawNumberPlatform(o){
 }
 function drawSpike(o){
  if(o.switchId&&switchEffectActive(o.switchId)){drawEffectGhost(o,'収納中');return;}
- const dw=o.width/o.count,root=scrY(o.base),tip=scrY(o.base+(o.down?-o.height:o.height));
+ const dw=o.width/o.count,root=scrY(o.base);
  for(let k=0;k<o.count;k++){
-  NRSpikeArt.spike(ctx,screenX(o.x+k*dw),root,dw,Math.abs(tip-root),!!o.down,k+o.x|0);
+  const height=o.spikeHeights?.[k]??o.height;
+  NRSpikeArt.spike(ctx,screenX(o.x+k*dw),root,dw,Math.abs(scrY(o.base+(o.down?-height:height))-root),!!o.down,k+o.x|0);
  }
 }
 // 実際にゴールできた入力タイミングの中央付近（start秒 / 追加ジャンプ間隔秒）。
@@ -1655,7 +1658,7 @@ new ResizeObserver(resize).observe(stage);progress();setPage(window.location.has
 'use strict';
 const items=[
  ['player','プレイヤー','PLAYER CUBE','Ver.4.2：石の質感と接地位置は維持しつつ、走行粉じんを見やすくし、プレイヤーを少しだけ小さく調整。'],
- ['spike','地上トゲ','RED RUIN SPIKES','Ver.4.3：青灰石に赤い亀裂を刻んだ地上トゲ。薄い装飾ではなく形で危険を伝える。'],
+ ['spike','地上トゲ','RED RUIN SPIKES','Ver.4.9：地上トゲを左から低→高の階段型に変更。1〜4本をランダム生成し、見た目と当たり判定を一致。'],
  ['ceiling','上トゲ','CEILING SPIKES','赤い亀裂のある石のトゲが天井から下を向く。ジャンプの高さやタイミングを確認。'],
  ['ground','地面・石床','RUIN STONE FLOOR','Ver.4.0：明るい床上面と青暗い石壁の区別、床の角度と奥行きはVer.3.9を維持。'],
  ['gap','穴・側壁','GAP / SIDE WALL','穴の位置と危険な側壁を、装飾に埋もれず判別できるように。'],
@@ -2113,7 +2116,7 @@ function drawSpikes(){
  floor(66,335,892,105,!improved);
  if(!improved){spikeBase(365,315,342,true);for(let j=0;j<4;j++)facetSpike(370+j*82,315,73,103,true);return;}
  nrObstaclePreviewCube(196,335,114);
- for(let j=0;j<4;j++)NRSpikeArt.spike(g,422+j*100,335,95,123,false,j*37+11); // Ver.4.8: four-spike height reference
+ for(let j=0;j<4;j++)NRSpikeArt.spike(g,422+j*100,335,95,NR49_RUN_SPIKE_STEPS_PX[4][j],false,j*37+11); // Ver.4.9 staircase reference
 }
 /* Rounded solid cube renderer: one continuous parametric rounded-box surface.
    Temporary design-book preview only; the actual game physics and render path stay unchanged. */
@@ -2597,9 +2600,10 @@ function nrDrawRunDust41(){
  }
  g.restore();
 }
-// Keep this in sync with the real-game ground-spike height palette (separate IIFE).
-const NR48_RUN_SPIKE_HEIGHT_PX=[[0,0],[52,58],[77,84],[99,107],[116,125]];
-/* Ver.4.8: endless, category-isolated obstacle trials with tuned jump rhythm/spike heights.
+// Keep these steps aligned with NR49_SPIKE_STEPS_PX in the story IIFE.
+// Independent, tiny per-row variation; ascending order is guaranteed.
+const NR49_RUN_SPIKE_STEPS_PX=[[],[56],[56,81],[56,79,103],[56,76,97,121]];
+/* Ver.4.9: ascending ground-spike rows in endless/category-isolated trials.
    Everything below is separate from the 51-level physics/collision engine. */
 const NR45_SCALE=RUN_PLAYER_SIZE/RUN_PLAYER_WORLD_SIZE;
 let trialObjects=[],trialNextX=0,trialSerial=0,trialRetry=0,trialDeaths=0,trialPassed=0,trialSurface=0,trialOnSurface=true,trialSeed=0,trialInitialFace=1;
@@ -2627,11 +2631,12 @@ function trialFill(){
  while(trialNextX<view+1850){
   let o={id:++trialSerial,kind,x:trialNextX,w:75,hit:false};
   if(kind==='spike'){
-   o.count=trialInt(1,4); // 5-spike rows are not used in the normal endless trial.
-   o.pitch=Math.round(trialInt(41,48)*1.05); // Keep established spike spacing.
+   o.count=trialInt(1,4); // Max four, as planned for NUMBER ROLL.
+   o.pitch=Math.round(trialInt(41,48)*1.05); // Same spacing as Ver.4.8.
    o.w=o.count*o.pitch;
-   const heightRange=NR48_RUN_SPIKE_HEIGHT_PX[o.count];
-   o.h=trialInt(heightRange[0],heightRange[1]); // 1 low, 2–4 progressively taller.
+   const offset=trialInt(-2,2); // Gentle row variation; never changes the staircase order.
+   o.heights=NR49_RUN_SPIKE_STEPS_PX[o.count].map(h=>h+offset);
+   o.h=Math.max(...o.heights); // Compatibility for broad-phase positioning.
   }
   else if(kind==='ceiling'){o.count=trialInt(1,3);o.pitch=trialInt(42,50);o.w=o.count*o.pitch;o.h=trialInt(54,75);o.bottom=trialInt(91,144);}
   else if(kind==='gap'){o.w=trialInt(95,150);}
@@ -2718,8 +2723,8 @@ function trialCheck(dt,oldHeight){
   const p=trialPose(o);if(p.x>box.x+box.w+70||p.x+p.w<box.x-70)continue;
   if(o.kind==='spike'){
    for(let i=0;i<o.count;i++){
-    const x=p.x+i*o.pitch;
-    if(trialPolyHit([[x,ground],[x+o.pitch/2,ground-o.h],[x+o.pitch,ground]],box))collision=true;
+    const x=p.x+i*o.pitch,h=o.heights[i];
+    if(trialPolyHit([[x,ground],[x+o.pitch/2,ground-h],[x+o.pitch,ground]],box))collision=true;
    }
   }else if(o.kind==='ceiling'){
    for(let i=0;i<o.count;i++){
@@ -2774,7 +2779,7 @@ function trialDrawObjects(){
   const p=trialPose(o),{x,y,w}=p;
   if(x>1150||x+w< -120)continue;
   if(o.kind==='spike'){
-   for(let i=0;i<o.count;i++)NRSpikeArt.spike(g,x+i*o.pitch,ground,o.pitch,o.h,false,o.id*13+i);
+   for(let i=0;i<o.count;i++)NRSpikeArt.spike(g,x+i*o.pitch,ground,o.pitch,o.heights[i],false,o.id*13+i);
   }else if(o.kind==='ceiling'){
    NRSpikeArt.slab(g,x,y-23,w,23,false);
    for(let i=0;i<o.count;i++)NRSpikeArt.spike(g,x+i*o.pitch,y,o.pitch,o.h,true,o.id*17+i);
@@ -2865,7 +2870,7 @@ function draw(){
 function refresh(){const i=items[pos];const player=i[0]==='player';$('dbName').textContent=i[1];$('dbEnglish').textContent=i[2];$('dbDescription').textContent=i[3];$('dbCounter').textContent=String(pos+1).padStart(2,'0')+' / '+items.length;
  for(const [k,b] of [...$('dbCategories').children].entries()){b.classList.toggle('active',k===pos);b.setAttribute('aria-current',String(k===pos))}
  $('dbNew').classList.toggle('active',improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31));$('dbV24').classList.toggle('active',improved&&legacy24);$('dbV23').classList.toggle('active',improved&&legacy23);$('dbV22').classList.toggle('active',improved&&legacy22);$('dbOld').classList.toggle('active',!improved);$('dbNew').setAttribute('aria-pressed',String(improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31)));$('dbV24').setAttribute('aria-pressed',String(improved&&legacy24));$('dbV23').setAttribute('aria-pressed',String(improved&&legacy23));$('dbV22').setAttribute('aria-pressed',String(improved&&legacy22));$('dbOld').setAttribute('aria-pressed',String(!improved));$('dbV22').hidden=items[pos][0]!=='player';$('dbV23').hidden=items[pos][0]!=='player';$('dbV24').hidden=items[pos][0]!=='player';$('dbGroundBefore').hidden=items[pos][0]!=='ground'||!improved;$('dbGroundBefore').classList.toggle('active',nrFloorCompare31);$('dbGroundBefore').setAttribute('aria-pressed',String(nrFloorCompare31));$('dbGroundBefore').textContent=nrFloorCompare31?'✓ Ver.3.1 石床':'◈ Ver.3.1と比較';
- $('designBookScreen').classList.toggle('db-running',runActive);$('dbRunExit').hidden=!runActive;$('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=false;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.4.2 / 石材と接地面は維持'):'Ver.4.8 / 自然な追加ジャンプ・トゲの高さ調整'):'旧デザイン風（比較用）';
+ $('designBookScreen').classList.toggle('db-running',runActive);$('dbRunExit').hidden=!runActive;$('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=false;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.4.2 / 石材と接地面は維持'):'Ver.4.9 / 地上トゲを階段型に変更'):'旧デザイン風（比較用）';
  try{$('dbMemo').value=localStorage.getItem(memoKey(pos))||''}catch{$('dbMemo').value=''};
  for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
  $('dbExtras').hidden=false;$('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=true;$('dbRun').textContent='▶ 無限走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'選択した障害物がランダムに続きます':'黒背景 / 選択した障害物を無限に練習';$('dbInstruction').textContent=runActive?'画面タップでジャンプ。回転後の向き・接地・横滑りを確認。':player?'背景を消した状態で、数字・回転・接地の見た目を確認できます。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['真正面','正面＋少し奥行き','正面＋奥行き'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
