@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.4.23 · Air Spike A/B Design Update</title>
+<title>NUMBER ROLL — Ver.4.24 · Retro Pixel Art</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -398,7 +398,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
   </section>
   <nav class="footer"><button id="prev" class="nav" type="button">◀ 前の障害物</button><div class="center"><button id="catalogButton" class="nav" type="button">☷ 一覧</button><button id="ruleButton" class="nav" type="button">？ 操作</button></div><button id="next" class="nav" type="button">次の障害物 ▶</button></nav>
   <div class="note">Ver.2.0 UI統合版 / Ver.1.6 複合コース対応｜接触せず飛び越え・通り抜けできればクリア。スイッチの起動や足場着地は必須ではありません。</div>
-  <div class="overlay" id="overlay"><div class="overlay-head"><h2 id="overlayTitle">障害物一覧</h2><button class="close" id="close" type="button">✕ 戻る</button></div><div class="catalog" id="catalog"></div><div id="rules" style="display:none;overflow:auto;touch-action:pan-y;color:#d1e5f3;line-height:1.75;font-size:14px;padding:6px 4px"><p><b>自動で右に進む四角形</b>をジャンプで操作します。画面のどこかをタップするか、Space・↑・Wキーでジャンプします。</p><p>ジャンプするたびに四角形は<b>時計回りに90°回転</b>し、上の数字が1→2→3→4→1の順に変わります。数字ごとに色も変わります。</p><p><b>着地した時の数字</b>が、次の着地までに使えるジャンプ回数です。空中で数字が変わっても、途中で回数の上限は変わりません。</p><p>最初の4ページはトゲ1 / 5 / 9 / 13個から検証できます。その次の8ページは、青枠・赤枠の壁を1〜4ジャンプ分の高さで練習できます。穴の幅の調整ページと空中トゲA/Bの単体・複合練習に続き、数字の壁4パターンと数字足場1〜4、数字スイッチ3種類を試せます。数字の壁は0.5マス幅で、紫の数字エリアは入った瞬間の数字が一致すれば通過できます。赤い部分は常に危険。数字エリアの途中で数字が変わっても判定は維持しますが、赤に接触すると失敗します。数字足場は上面のみ数字が一致すると安全に着地でき、ジャンプ回数が回復します。不一致で着地すると失敗。側面と下面は数字に関係なく危険ですが、十分な隙間があれば接触せずに下を通り抜けてもクリアできます。足場への着地は必須ではありません。数字スイッチは上面の数字が一致する状態で触れると、対応する仕掛け1つだけが一定時間変化します。スイッチを起動しなくても、仕掛けを安全に飛び越えたり回避できればクリアです。数字が違えばスイッチは素通りでき、何も起きません。壁の消去・穴の足場出現・トゲの後退を試せます。効果時間が切れると元に戻ります。縦の高さは見た目のプレイヤーサイズを1マスとして0.25マス刻みで調整します。壁の高さは0.25マス刻み、幅は0.5マス刻みで調整できます。Ver.0.8は壁の高さを「ひとつ少ないジャンプ回数では届かず、目標回数なら余裕がある」中間高度に再設計しました。青枠壁は幅2マス、赤枠は0.75マスを基準にしています。プレイ中の▲1〜4はジャンプする位置の目安です。青枠の壁は上に着地できてジャンプ回数が回復しますが、赤枠の壁は上も側面も危険です。穴の幅は0.25マス単位で調整できます。空中トゲAは全面接触禁止。空中トゲBは緑色の上面に着地可能で、着地するとジャンプ回数が回復します。Bの下面・側面は危険です。Bに着地せず、接触を避けて通過できてもクリアです。トゲ・壁などへの衝突は失敗。ただし、安全に上を飛び越えたり触れずに通過できればクリアです。数字の壁は画面上まで続くため、数字の一致で通過する必要があります。穴は落下中でもジャンプ回数が残っていれば復帰可能。穴の左右の側壁への衝突、または四角形が画面下へ完全に消えると失敗。青く光る<b>GOAL</b>を通ればクリア。失敗したら「リトライ」で何度でも練習できます。</p><p>Ver.1.6では、青枠壁＋トゲ、穴＋数字足場、数字壁＋トゲ、数字スイッチ＋トゲ、移動壁＋穴、天井トゲ＋中央数字壁の6つの複合練習コースを追加しています。複合コースは障害物を安全に避けてGOALへ到達すればクリアです。<b>特定の仕掛けを必ず使う必要はありません。</b></p><p>操作：タップ / Space / ↑ / W = ジャンプ、R = リトライ、P = 一時停止、← / → = ページ移動。数字の色は <span style="color:#4fc3f7">1 青</span>・<span style="color:#94df84">2 緑</span>・<span style="color:#ffbc68">3 オレンジ</span>・<span style="color:#be9bff">4 紫</span>。</p></div></div>
+  <div class="overlay" id="overlay"><div class="overlay-head"><h2 id="overlayTitle">障害物一覧</h2><button class="close" id="close" type="button">✕ 戻る</button></div><div class="catalog" id="catalog"></div><div id="rules" style="display:none;overflow:auto;touch-action:pan-y;color:#d1e5f3;line-height:1.75;font-size:14px;padding:6px 4px"><p><b>自動で右に進む四角形</b>をジャンプで操作します。画面のどこかをタップするか、Space・↑・Wキーでジャンプします。</p><p>ジャンプするたびに四角形は<b>時計回りに90°回転</b>し、上の数字が1→2→3→4→1の順に変わります。数字ごとに色も変わります。</p><p><b>着地した時の数字</b>が、次の着地までに使えるジャンプ回数です。空中で数字が変わっても、途中で回数の上限は変わりません。</p><p>最初の4ページはトゲ1 / 5 / 9 / 13個から検証できます。その次の8ページは、青枠・赤枠の壁を1〜4ジャンプ分の高さで練習できます。穴の幅の調整ページと空中トゲA/Bの単体・複合練習に続き、数字の壁4パターンと数字足場1〜4、数字スイッチ3種類を試せます。数字の壁は0.5マス幅で、紫の数字エリアは入った瞬間の数字が一致すれば通過できます。赤い部分は常に危険。数字エリアの途中で数字が変わっても判定は維持しますが、赤に接触すると失敗します。数字足場は上面のみ数字が一致すると安全に着地でき、ジャンプ回数が回復します。不一致で着地すると失敗。側面と下面は数字に関係なく危険ですが、十分な隙間があれば接触せずに下を通り抜けてもクリアできます。足場への着地は必須ではありません。数字スイッチは上面の数字が一致する状態で触れると、対応する仕掛け1つだけが一定時間変化します。スイッチを起動しなくても、仕掛けを安全に飛び越えたり回避できればクリアです。数字が違えばスイッチは素通りでき、何も起きません。壁の消去・穴の足場出現・トゲの後退を試せます。効果時間が切れると元に戻ります。縦の高さは見た目のプレイヤーサイズを1マスとして0.25マス刻みで調整します。壁の高さは0.25マス刻み、幅は0.5マス刻みで調整できます。Ver.0.8は壁の高さを「ひとつ少ないジャンプ回数では届かず、目標回数なら余裕がある」中間高度に再設計しました。青枠壁は幅2マス、赤枠は0.75マスを基準にしています。プレイ中の▲1〜4はジャンプする位置の目安です。青枠の壁は上に着地できてジャンプ回数が回復しますが、赤枠の壁は上も側面も危険です。穴の幅は0.25マス単位で調整できます。空中トゲAは全面接触禁止。上トゲ（旧空中トゲB）は上面に着地可能で、着地するとジャンプ回数が回復します。Bの下面・側面は危険です。Bに着地せず、接触を避けて通過できてもクリアです。トゲ・壁などへの衝突は失敗。ただし、安全に上を飛び越えたり触れずに通過できればクリアです。数字の壁は画面上まで続くため、数字の一致で通過する必要があります。穴は落下中でもジャンプ回数が残っていれば復帰可能。穴の左右の側壁への衝突、または四角形が画面下へ完全に消えると失敗。青く光る<b>GOAL</b>を通ればクリア。失敗したら「リトライ」で何度でも練習できます。</p><p>Ver.1.6では、青枠壁＋トゲ、穴＋数字足場、数字壁＋トゲ、数字スイッチ＋トゲ、移動壁＋穴、天井トゲ＋中央数字壁の6つの複合練習コースを追加しています。複合コースは障害物を安全に避けてGOALへ到達すればクリアです。<b>特定の仕掛けを必ず使う必要はありません。</b></p><p>操作：タップ / Space / ↑ / W = ジャンプ、R = リトライ、P = 一時停止、← / → = ページ移動。数字の色は <span style="color:#4fc3f7">1 青</span>・<span style="color:#94df84">2 緑</span>・<span style="color:#ffbc68">3 オレンジ</span>・<span style="color:#be9bff">4 紫</span>。</p></div></div>
 </main>
 
 <div id="front" aria-label="NUMBER ROLL メニュー">
@@ -432,7 +432,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
 <section id="designBookScreen" class="front-screen db-screen" hidden aria-label="仮設デザイン確認ブック">
   <div class="db-titlebar">
     <button type="button" id="dbBack" class="front-button db-back">‹ HOME</button>
-    <div class="db-head"><div class="db-kicker">NUMBER ROLL · UI VER.4.11</div><h2>デザイン確認ブック</h2></div>
+    <div class="db-head"><div class="db-kicker">NUMBER ROLL · PIXEL VER.4.24</div><h2>デザイン確認ブック</h2></div>
     <div class="db-temporary" aria-hidden="true"></div>
   </div>
   <div class="db-shell">
@@ -446,7 +446,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
       </div>
       <div class="db-toolbar" id="dbToolbar">
-        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.22 赤ライン強化</button>
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.24 レトロ統一</button>
         <button id="dbV24" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.4 と比較</button>
         <button id="dbV23" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.3 と比較</button>
         <button id="dbV22" type="button" class="db-tool" aria-pressed="false">Ver.2.2</button>
@@ -466,6 +466,203 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
 </div>
 
 <script>
+/* NUMBER ROLL Ver.4.24 — shared crisp 16-bit stone pixels (procedural Canvas; no image assets). */
+window.NRRetro=(()=>{
+ const palette={
+  stone:['#152637','#20374c','#29445e','#35536e','#496681','#6a88a2','#90abc2'],
+  dark:['#111a27','#1a2838','#243245','#303e50','#3d5065','#5e7388','#8194a9'],
+  red:['#4b101c','#871827','#d52839','#f14448','#ff7770','#ffc0a1'],
+  white:['#536d89','#8099b2','#b7cbdc','#d7e5f1','#eff7ff']
+ };
+ const cache=new Map();
+ function hash(n){n=Math.imul((n|0)^0x59b74c31,0x7feb352d);n=Math.imul(n^(n>>>15),0x846ca68b);return ((n^(n>>>16))>>>0)/4294967295;}
+ function cached(key,w,h,painter){
+  let bmp=cache.get(key);if(bmp)return bmp;
+  bmp=document.createElement('canvas');bmp.width=Math.max(2,w);bmp.height=Math.max(2,h);
+  const q=bmp.getContext('2d',{alpha:true});q.imageSmoothingEnabled=false;
+  painter(q,bmp.width,bmp.height);
+  if(cache.size>1700)cache.clear();cache.set(key,bmp);return bmp;
+ }
+ function blit(c,bmp,x,y,w,h){if(w<=0||h<=0)return;
+  c.save();c.imageSmoothingEnabled=false;c.shadowBlur=0;
+  c.drawImage(bmp,Math.round(x),Math.round(y),Math.round(w),Math.round(h));c.restore();
+ }
+ function stone(q,x,y,w,h,seed,variant='stone',accent=false){
+  if(w<2||h<2)return;
+  const p=palette[variant]||palette.stone;
+  q.fillStyle=p[0];q.fillRect(x,y,w,h);
+  q.fillStyle=p[2];q.fillRect(x+1,y+1,Math.max(1,w-2),Math.max(1,h-2));
+  q.fillStyle=p[3];q.fillRect(x+1,y+1,Math.max(1,w-2),Math.max(1,Math.min(2,Math.floor(h*.12))));
+  if(w>4&&h>4){q.fillStyle=p[4];q.fillRect(x+1,y+1,Math.max(2,Math.min(w-3,Math.floor(w*.55))),1);
+   q.fillStyle=p[1];q.fillRect(x+1,y+h-2,w-2,1);q.fillRect(x+w-2,y+2,1,h-3);
+  }
+  // Fixed, low-frequency pixel clusters. No moving noise or gradients.
+  const patches=Math.max(2,Math.min(16,Math.floor(w*h/52)));
+  for(let i=0;i<patches;i++){
+   const a=Math.floor(hash(seed*97+i*43+1)*Math.max(1,w-3));
+   const b=Math.floor(hash(seed*83+i*61+3)*Math.max(1,h-3));
+   q.fillStyle=p[hash(seed+i*119+5)>.52?3:1];
+   q.fillRect(x+1+a,y+1+b,Math.min(w-2-a,1+Math.floor(hash(seed+i*53)*3)),1+Math.floor(hash(seed+i*17)*2));
+  }
+  if(accent){q.fillStyle='#ff4e55';q.fillRect(x,y,Math.max(1,w),1)}
+ }
+ function floor(c,x,y,w,h,offset=0){
+  if(w<=0||h<=0)return;
+  const block=120,course=64,lower=57;
+  c.save();c.beginPath();c.rect(x,y,w,h);c.clip();
+  c.fillStyle='#142639';c.fillRect(x,y,w,h);
+  const scroll=Math.floor(offset);
+  const left=x-((scroll%block+block)%block)-block;
+  const count=Math.ceil((w+block*2)/block)+1;
+  for(let k=0;k<count;k++){
+   const tileWorld=Math.floor((scroll+left-x+k*block)/block);
+   const sprite=cached('floor-upper-'+tileWorld,30,16,(q)=>{
+    stone(q,0,0,30,16,tileWorld*31,'stone');
+    q.fillStyle='#b6c9d8';q.fillRect(1,0,28,1);
+    q.fillStyle='#8fa6b9';q.fillRect(1,1,28,2);
+    q.fillStyle='#58748b';q.fillRect(1,3,28,1);
+   });
+   blit(c,sprite,left+k*block,y,block,course);
+  }
+  const rowH=lower;
+  for(let row=1;row<Math.max(3,Math.ceil(h/rowH));row++){
+   const yy=y+course+(row-1)*rowH;
+   if(yy>=y+h)break;
+   const tileW=88,phase=row%2?44:0;
+   const start=x-(((scroll+phase)%tileW+tileW)%tileW)-tileW;
+   for(let xx=start,j=0;xx<x+w+tileW;xx+=tileW,j++){
+    const t=Math.floor((scroll+xx-x+phase)/tileW);
+    const bmp=cached('floor-lower-'+row+'-'+t,22,14,(q)=>{
+      stone(q,0,0,22,14,t*19+row*101,'dark');
+    });
+    blit(c,bmp,xx,yy,tileW,rowH);
+   }
+  }
+  c.restore();
+ }
+ function wall(c,x,y,w,h,safe=true,seed=0){
+  if(w<=1||h<=1)return;
+  const cell=5,sw=Math.max(6,Math.round(w/cell)),sh=Math.max(5,Math.round(h/cell));
+  const bmp=cached('wall-'+sw+'-'+sh+'-'+safe+'-'+seed,sw,sh,(q,W,H)=>{
+   const base=safe?'#162b3e':'#8b1927';q.fillStyle=base;q.fillRect(0,0,W,H);
+   const rows=Math.max(1,Math.round(H/11)),rh=H/rows;
+   const cols=Math.max(1,Math.round(W/17)),cw=W/cols;
+   for(let r=0;r<rows;r++){
+    const by=Math.round(r*rh),nextY=Math.round((r+1)*rh);
+    const shift=r%2?Math.round(cw*.5):0;
+    for(let k=-1;k<=cols;k++){
+     const bx=Math.max(0,Math.round(k*cw+shift)+1),right=Math.min(W,Math.round((k+1)*cw+shift));
+     const bh=nextY-by-1,bw=right-bx;
+     if(bw<3||bh<2)continue;
+     stone(q,bx,by+1,bw,bh,seed+97*r+31*k,safe?'stone':'dark');
+     if(!safe){
+      // Red mortar visible between bricks. Faces remain completely uncracked.
+      q.fillStyle='#ec3541';q.fillRect(bx-1,by+1,1,bh);
+      q.fillStyle='#9f1f2b';q.fillRect(bx+1,by+1,1,bh-1);
+     }
+    }
+   }
+   if(safe){q.fillStyle='#9db3c4';q.fillRect(1,0,W-2,1);q.fillStyle='#506d85';q.fillRect(1,1,W-2,1)}
+   else{q.fillStyle='#ff6263';q.fillRect(1,0,W-2,2);q.fillStyle='#9d2636';q.fillRect(1,2,W-2,1);
+    q.fillStyle='#df3442';q.fillRect(0,1,1,H-2);q.fillRect(W-1,1,1,H-2);}
+  });
+  blit(c,bmp,x,y,w,h);
+ }
+ function cube(c,cx,cy,size,number=1,angle=0){
+  const n=((number-1)%4+4)%4+1;
+  const sprite=cached('cube-'+n,28,28,(q,W,H)=>{
+   // Pixel bevel; crisp light stone, recessed numeral, no photorealistic gloss.
+   q.fillStyle='#0e2033';q.fillRect(2,3,25,25);
+   q.fillStyle='#66839d';q.fillRect(2,2,24,24);
+   q.fillStyle='#a2bbcf';q.fillRect(3,2,22,23);
+   q.fillStyle='#e4f0f8';q.fillRect(4,3,20,20);
+   q.fillStyle='#f6fbff';q.fillRect(5,3,17,2);
+   q.fillStyle='#ccddea';q.fillRect(5,5,17,18);
+   q.fillStyle='#dce9f4';q.fillRect(7,7,14,14);
+   q.fillStyle='#829db6';q.fillRect(6,6,15,1);q.fillRect(6,7,1,14);
+   q.fillStyle='#f4fbff';q.fillRect(7,8,13,1);
+   q.fillStyle='#526e8b';q.fillRect(22,5,2,18);q.fillRect(5,22,18,2);
+   q.fillStyle='#a6bace';q.fillRect(3,23,21,2);
+   q.font='bold 17px monospace';q.textAlign='center';q.textBaseline='middle';
+   q.fillStyle='#20364d';q.fillText(String(n),14,14.6);
+  });
+  c.save();c.translate(Math.round(cx),Math.round(cy));c.rotate(angle||0);c.imageSmoothingEnabled=false;
+  c.drawImage(sprite,-size*.50,-size*.50,size,size);c.restore();
+ }
+ function spike(c,x,root,w,h,down=false,seed=0){
+  if(w<=1||h<=1)return;
+  const bmp=cached('spike-'+(down?'d':'u')+'-'+Math.round(w/5)+'-'+Math.round(h/5),20,23,(q,W,H)=>{
+   const tip=down?H-1:1,base=down?0:H-1;
+   const p=down?[[1,1],[10,H-1],[W-2,1]]:[[1,H-2],[10,0],[W-2,H-2]];
+   q.fillStyle='#400d21';q.beginPath();p.forEach(([a,b],i)=>i?q.lineTo(a,b):q.moveTo(a,b));q.closePath();q.fill();
+   const inset=down?[[3,2],[10,H-3],[17,2]]:[[3,H-3],[10,2],[17,H-3]];
+   q.beginPath();inset.forEach(([a,b],i)=>i?q.lineTo(a,b):q.moveTo(a,b));q.closePath();q.fillStyle='#ca2337';q.fill();
+   const side=down?[[3,2],[10,H-3],[10,2]]:[[3,H-3],[10,2],[10,H-3]];
+   q.beginPath();side.forEach(([a,b],i)=>i?q.lineTo(a,b):q.moveTo(a,b));q.closePath();q.fillStyle='#ff5355';q.fill();
+   q.fillStyle='#ffada0';q.fillRect(8,down?2:4,2,2);
+   q.fillStyle='#ff7070';q.fillRect(9,down?6:7,2,Math.max(2,H-14));
+   q.fillStyle='#ff343e';q.fillRect(4,down?1:H-3,12,2);
+  });
+  blit(c,bmp,x,down?root:root-h,w,h);
+ }
+ function slab(c,x,y,w,h,safeTop=true){
+  if(w<=1||h<=1)return;
+  const W=Math.max(10,Math.round(w/5)),H=Math.max(4,Math.round(h/5));
+  const bmp=cached('slab-'+W+'-'+H+'-'+safeTop,W,H,(q,ww,hh)=>{
+   q.fillStyle='#182c40';q.fillRect(0,0,ww,hh);
+   const cols=Math.max(1,Math.round(ww/19));
+   for(let j=0;j<cols;j++){
+    const bx=Math.round(j*ww/cols),rx=Math.round((j+1)*ww/cols);
+    stone(q,bx,0,rx-bx,hh,j*31+7,'stone');
+   }
+   q.fillStyle=safeTop?'#a8c6ce':'#91a8bb';q.fillRect(1,0,ww-2,1);
+   if(safeTop){q.fillStyle='#6db6a8';q.fillRect(2,1,ww-4,1);}
+   q.fillStyle='#ff4952';q.fillRect(2,hh-2,ww-4,1);
+  });blit(c,bmp,x,y,w,h);
+ }
+ function airA(c,x,y,w,h){
+  if(w<=1||h<=1)return;
+  const bmp=cached('airA-'+Math.round(w/4)+'-'+Math.round(h/4),40,40,(q,W,H)=>{
+    // Compact four-point obstacle. Core occupies roughly 40% of footprint.
+    q.fillStyle='#af1e33';
+    function triangle(p,color){q.fillStyle=color;q.beginPath();p.forEach(([a,b],i)=>i?q.lineTo(a,b):q.moveTo(a,b));q.closePath();q.fill();}
+    triangle([[17,13],[20,0],[23,13]],'#ee3a49');
+    triangle([[17,27],[20,39],[23,27]],'#df3546');
+    triangle([[13,17],[0,20],[13,23]],'#e9444f');
+    triangle([[27,17],[39,20],[27,23]],'#d83245');
+    q.fillStyle='#581325';q.fillRect(12,12,16,16);
+    q.fillStyle='#7188a2';q.fillRect(13,13,14,14);
+    q.fillStyle='#334b63';q.fillRect(15,15,12,12);
+    q.fillStyle='#acc1d1';q.fillRect(14,14,11,2);
+    q.fillStyle='#192f49';q.fillRect(16,17,9,8);
+    q.fillStyle='#ff4250';q.fillRect(18,18,5,5);
+    q.fillStyle='#ffa59c';q.fillRect(19,19,2,2);
+    for(const p of [[18,11],[18,28],[11,18],[27,18]]){q.fillStyle='#ff6970';q.fillRect(p[0],p[1],4,2)}
+  });blit(c,bmp,x,y,w,h);
+ }
+ function airB(c,x,y,w,bodyH,spikeH,seed=0){
+  if(w<=1||bodyH<=1)return;
+  const count=4,pitch=w/count;
+  // The upper slab remains fully safe; the bottom and side faces are hazardous.
+  const bmp=cached('airB-'+Math.round(w/5)+'-'+Math.round(bodyH/5),Math.max(12,Math.round(w/5)),Math.max(5,Math.round(bodyH/5)),(q,W,H)=>{
+    q.fillStyle='#1c3145';q.fillRect(0,0,W,H);
+    const cols=Math.max(1,Math.round(W/12));
+    for(let j=0;j<cols;j++){const xx=Math.floor(j*W/cols),rr=Math.floor((j+1)*W/cols);
+      stone(q,xx,1,rr-xx,Math.max(2,H-2),seed+j*17,'stone');}
+    q.fillStyle='#b2c8d8';q.fillRect(1,0,W-2,1);
+    q.fillStyle='#79bba9';q.fillRect(2,1,W-4,1);
+    q.fillStyle='#e84a50';q.fillRect(1,H-2,W-2,1);
+    q.fillStyle='#a52437';q.fillRect(0,2,1,H-2);q.fillRect(W-1,2,1,H-2);
+  });
+  blit(c,bmp,x,y,w,bodyH);
+  for(let k=0;k<count;k++){
+   const bx=x+k*pitch+pitch*.12;
+   spike(c,bx,y+bodyH-1,pitch*.76,spikeH,true,seed+k*17);
+  }
+ }
+ return {floor,wall,cube,spike,slab,airA,airB,palette};
+})();
+
 /* NUMBER ROLL · procedural hazard stone. One shared renderer for real play & preview.
    Art has no sprites, web calls or hitbox changes. Original authored 2D shapes. */
 window.NRSpikeArt=(()=>{
@@ -473,6 +670,7 @@ window.NRSpikeArt=(()=>{
  function poly(c,pts,fill,stroke=null,lw=1){c.beginPath();pts.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();if(fill){c.fillStyle=fill;c.fill()}if(stroke){c.strokeStyle=stroke;c.lineWidth=lw;c.stroke()}}
  function edge(c,pts,color,lw=1){c.beginPath();pts.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.strokeStyle=color;c.lineWidth=lw;c.lineCap='round';c.lineJoin='round';c.stroke()}
  function spike(c,x,root,w,h,down=false,seed=0){
+  if(window.NRRetro)return NRRetro.spike(c,x,root,w,h,down,seed);
   if(w<=1||h<=1)return;
   // Exact collision triangle: base x..x+w, apex at x+w/2.
   const d=down?1:-1, tip=root+d*h,mid=x+w*.5,flank=h*.28;
@@ -500,6 +698,8 @@ window.NRSpikeArt=(()=>{
   c.restore();
  }
  function slab(c,x,y,w,h,safeTop=true){
+  if(window.NRRetro)return NRRetro.slab(c,x,y,w,h,safeTop);
+  if(window.NRRetro)return NRRetro.slab(c,x,y,w,h,safeTop);
   if(w<2||h<2)return;c.save();
   const body=c.createLinearGradient(x,y,x+12,y+h);
   body.addColorStop(0,'#536d81');body.addColorStop(.18,'#3d566d');body.addColorStop(1,'#213549');
@@ -518,6 +718,7 @@ window.NRSpikeArt=(()=>{
   c.restore();
  }
  function diamond(c,x,top,w,h){
+  if(window.NRRetro)return NRRetro.airA(c,x,top,w,h);
   if(w<1||h<1)return;
   const m=x+w*.5,cy=top+h*.5;
   c.save();c.shadowColor='#ca384a';c.shadowBlur=Math.min(5,w*.08);
@@ -731,7 +932,8 @@ window.NRWallArt=(()=>{
   c.restore();
   c.restore();
  }
- function draw(c,x,y,w,h,safe=true,seed=0){if(w<=1||h<=1)return; if(safe)drawSafe(c,x,y,w,h,seed); else drawDanger(c,x,y,w,h,seed)}
+ function draw(c,x,y,w,h,safe=true,seed=0){
+  if(window.NRRetro)return NRRetro.wall(c,x,y,w,h,safe,seed);if(w<=1||h<=1)return; if(safe)drawSafe(c,x,y,w,h,seed); else drawDanger(c,x,y,w,h,seed)}
  return {draw};
 })();;;
 </script>
@@ -778,9 +980,9 @@ const gapEntries=[
 ];
 const airEntries=[
  {n:'A-01',jp:'空中トゲA / 回避練習',en:'AIR SPIKE A · DODGE',face:2,type:'airADodge',tip:'空中トゲの下を通過した後、地上のトゲをジャンプ',desc:'赤い空中トゲは全面危険。飛ぶタイミングを早くしすぎると空中で接触する。トゲの下を通過してから地上トゲを避けよう。',spec:[['上面','接触禁止'],['側面・下面','接触禁止'],['安全なルート','下を通過'],['ジャンプ','地上トゲで使う']]},
- {n:'B-01',jp:'空中トゲB / 着地練習',en:'AIR SPIKE B · LAND',face:2,type:'airBLand',tip:'緑ラインに着地して回復、または接触せず回避',desc:'上の緑ラインだけ安全。側面・下面の赤トゲは危険。上に着地できたら、その時点の数字でジャンプ回数が回復する。',spec:[['上面','着地できる'],['側面・下面','接触禁止'],['着地','回数が回復'],['回避','触れずに進めばOK']]},
+ {n:'B-01',jp:'上トゲ / 着地練習',en:'AIR SPIKE B · LAND',face:2,type:'airBLand',tip:'石の上面に着地して回復、または接触せず回避',desc:'上の緑ラインだけ安全。側面・下面の赤トゲは危険。上に着地できたら、その時点の数字でジャンプ回数が回復する。',spec:[['上面','着地できる'],['側面・下面','接触禁止'],['着地','回数が回復'],['回避','触れずに進めばOK']]},
  {n:'A-02',jp:'空中トゲA / 壁と組み合わせ',en:'AIR SPIKE A · WALL COMBO',face:2,type:'airACombo',tip:'壁を越えて着地後、次のジャンプを急がない',desc:'先に青枠の壁を突破し、その先の赤い空中トゲを回避。多段ジャンプを余計に使うと頭上のトゲに当たる。',spec:[['構成','青枠壁＋空中A'],['上面','接触禁止'],['安全な進み方','高度を下げる'],['難易度','中']]},
- {n:'B-02',jp:'空中トゲB / 大きな穴',en:'AIR SPIKE B · GAP COMBO',face:2,type:'airBCombo',tip:'Bに着地して回復。着地せず渡れればそれもOK',desc:'普通の2段ジャンプだけでは渡りきれない大きな穴。途中のBに着地するとジャンプ回数を回復できる。もし触れずに渡れる別ルートがあれば、それでもクリア。',spec:[['構成','大きな穴＋空中B'],['上面','着地できる'],['着地','回数が回復'],['目標','接触せず対岸へ']]}
+ {n:'B-02',jp:'上トゲ / 大きな穴',en:'AIR SPIKE B · GAP COMBO',face:2,type:'airBCombo',tip:'Bに着地して回復。着地せず渡れればそれもOK',desc:'普通の2段ジャンプだけでは渡りきれない大きな穴。途中のBに着地するとジャンプ回数を回復できる。もし触れずに渡れる別ルートがあれば、それでもクリア。',spec:[['構成','大きな穴＋空中B'],['上面','着地できる'],['着地','回数が回復'],['目標','接触せず対岸へ']]}
 ];
 // A number gate fills the entire screen height. Only the numbered interval is passable.
 // Vertical grid units use the rendered player's visible height (SIZE / ZOOM),
@@ -1167,8 +1369,9 @@ function action(){if(state.status==='running'||state.status==='ready')jump();els
 function groundAt(centerX, feet){
  let h=0;
  for(const o of objs){
-  if(!((o.type==='wall'&&!o.lethal)||o.type==='airB'||o.type==='numberPlatform'||(o.type==='switchPlatform'&&switchEffectActive(o.switchId))))continue;
-  if(centerX+SIZE*.34>o.x&&centerX-SIZE*.34<o.x+o.width&&feet>=o.height-2)h=Math.max(h,o.height);
+  if(!((o.type==='wall'&&!o.lethal)||o.type==='airB'||o.type==='ceiling'||o.type==='numberPlatform'||(o.type==='switchPlatform'&&switchEffectActive(o.switchId))))continue;
+  const top=o.type==='ceiling'?o.base+Math.max(16,Math.min(22,o.spikeH*.28)):o.height;
+  if(centerX+SIZE*.34>o.x&&centerX-SIZE*.34<o.x+o.width&&feet>=top-2)h=Math.max(h,top);
  }
  return h;
 }
@@ -1262,16 +1465,17 @@ function update(dt){if(state.status!=='running')return;const s=state;
   let land=-Infinity,landingObj=null;
   if(!isOverGap(centerX)&&oldY>=0&&s.y<=0)land=0;
   for(const o of objs){
-   if(!((o.type==='wall'&&!o.lethal)||o.type==='airB'||o.type==='numberPlatform'||(o.type==='switchPlatform'&&switchEffectActive(o.switchId))))continue;
+   if(!((o.type==='wall'&&!o.lethal)||o.type==='airB'||o.type==='ceiling'||o.type==='numberPlatform'||(o.type==='switchPlatform'&&switchEffectActive(o.switchId))))continue;
    const overlaps=centerX+SIZE*.34>o.x&&centerX-SIZE*.34<o.x+o.width;
-   const oldTop=o.moving?o.oldHeight:o.height;
-   if(overlaps&&oldY>=oldTop-1&&s.y<=o.height+1){
+   const roof=o.type==='ceiling'?o.base+Math.max(16,Math.min(22,o.spikeH*.28)):o.height;
+   const oldTop=o.moving?o.oldHeight:roof;
+   if(overlaps&&oldY>=oldTop-1&&s.y<=roof+1){
     if(o.type==='switchPlatform'&&s.groundH!==o.height)s.switchPlatformLandings++;
     if(o.type==='numberPlatform'){
       if(s.face!==o.required){fail('数字が不一致！ 数字'+o.required+'の足場には、'+o.required+'で着地しよう。');return;}
       if(s.groundH!==o.height)s.platformLandings++;
     }
-    if(o.height>land){land=o.height;landingObj=o;}
+    if(roof>land){land=roof;landingObj=o;}
     if(o.type==='airB'&&s.groundH!==o.height){s.airBLandings++;}
    }
   }
@@ -1333,9 +1537,9 @@ function update(dt){if(state.status!=='running')return;const s=state;
   if(o.type==='gap'&&hitGapSideWall(o,centerX,s.y)){fail('穴の側壁に衝突！ 対岸の壁に届く前に地面より上へ復帰しよう。');return;}
   if(o.type==='spike'&&hitSpike(o,rc)){fail('トゲに接触！ 高さとタイミングを調整しよう。');return;}
   if(o.type==='ceiling'){
-   if(rc.r>o.x&&rc.l<o.x+o.width){
-    const spike={...o,type:'spike',count:Math.round(o.width/75),height:o.spikeH,down:true};
-    if(hitSpike(spike,rc)){fail('天井のトゲに接触！ 高く飛びすぎないように。');return;}
+   const roof=o.base+Math.max(16,Math.min(22,o.spikeH*.28));
+   if(hitAirB({x:o.x,width:o.width,height:roof,spikeH:o.spikeH},rc,s)){
+    fail('上トゲの側面・下面に接触！ 上面は着地可能。');return;
    }
   }
   if(o.type==='airA'&&hitAirA(o,rc)){
@@ -1429,7 +1633,7 @@ function drawWallHeightReferences(){
   }
   ctx.restore();
 }
-function background(){const g=ctx.createLinearGradient(0,0,0,VH);g.addColorStop(0,'#102239');g.addColorStop(.75,'#1a334d');g.addColorStop(1,'#0e2235');ctx.fillStyle=g;ctx.fillRect(0,0,W,VH);
+function background(){if(window.NRRetro){ctx.fillStyle='#000';ctx.fillRect(0,0,W,VH);return;}const g=ctx.createLinearGradient(0,0,0,VH);g.addColorStop(0,'#102239');g.addColorStop(.75,'#1a334d');g.addColorStop(1,'#0e2235');ctx.fillStyle=g;ctx.fillRect(0,0,W,VH);
  const scroll=state.distance*.31;for(let x=-(scroll%69);x<W;x+=69)stroke(x,0,x,FLOOR,'#91bbd211');for(let y=45;y<FLOOR;y+=69)stroke(0,y,W,y,'#91bbd211');for(let x=-(state.distance*.15%210);x<W;x+=210){ctx.fillStyle='#75a8bf0d';ctx.fillRect(x+27,FLOOR-99,50,99)}
  for(let k=0;k<5;k++){let x=W-((state.distance*(.30+k*.07)+k*W*.24)%(W+50));ctx.fillStyle='#92c7e326';ctx.fillRect(x,FLOOR-115-k*57,42+k*9,2)}
 }
@@ -1553,77 +1757,12 @@ function drawGapGuide(){
  }
 }
 function drawAirA(o){
- const x=screenX(o.x),top=scrY(o.base+o.height),w=o.width,h=o.height*ZOOM;
- const cx=x+w*.5,cy=top+h*.5;
- const coreW=w*.38,coreH=h*.38;
- const left=cx-coreW*.5,right=cx+coreW*.5,coreTop=cy-coreH*.5,coreBottom=cy+coreH*.5;
- ctx.save();
- // Compact icy-stone core.
- ctx.shadowColor='#ff4b57';ctx.shadowBlur=10;
- const coreGrad=ctx.createLinearGradient(left,coreTop,right,coreBottom);
- coreGrad.addColorStop(0,'#7f90a3');coreGrad.addColorStop(.38,'#5d6f83');coreGrad.addColorStop(1,'#324558');
- round(left,coreTop,coreW,coreH,4);ctx.fillStyle=coreGrad;ctx.fill();
- ctx.lineWidth=1.4;ctx.strokeStyle='rgba(215,230,240,.40)';ctx.stroke();
- ctx.shadowBlur=0;
- const bevel=ctx.createLinearGradient(left,coreTop,left,coreTop+coreH*.28);
- bevel.addColorStop(0,'rgba(235,244,249,.34)');bevel.addColorStop(1,'rgba(235,244,249,0)');
- ctx.fillStyle=bevel;round(left+1.2,coreTop+1.2,Math.max(2,coreW-2.4),Math.max(2,coreH*.30),3);ctx.fill();
- // Inner red core.
- ctx.save();ctx.shadowColor='#ff514d';ctx.shadowBlur=14;
- ctx.beginPath();ctx.moveTo(cx,cy-coreH*.22);ctx.lineTo(cx+coreW*.18,cy);ctx.lineTo(cx,cy+coreH*.22);ctx.lineTo(cx-coreW*.18,cy);ctx.closePath();
- const g=ctx.createLinearGradient(cx,cy-coreH*.22,cx,cy+coreH*.22);g.addColorStop(0,'#ffb1a2');g.addColorStop(.45,'#ff5d44');g.addColorStop(1,'#d12d2d');
- ctx.fillStyle=g;ctx.fill();ctx.restore();
- // Four spikes: shorter and tighter than a full huge all-direction hazard.
- const spikeFill=ctx.createLinearGradient(cx,coreTop,cx,coreBottom);
- spikeFill.addColorStop(0,'#dbe7ef');spikeFill.addColorStop(.45,'#a9b8c7');spikeFill.addColorStop(1,'#74869a');
- const drawTri=(pts)=>{ctx.save();ctx.shadowColor='#ff4d57';ctx.shadowBlur=9;ctx.fillStyle=spikeFill;ctx.strokeStyle='rgba(227,238,246,.48)';ctx.lineWidth=1.1;ctx.beginPath();pts.forEach(([px,py],i)=>i?ctx.lineTo(px,py):ctx.moveTo(px,py));ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();};
- drawTri([[cx-coreW*.16,coreTop],[cx,top],[cx+coreW*.16,coreTop]]);
- drawTri([[cx-coreW*.16,coreBottom],[cx,scrY(o.base)],[cx+coreW*.16,coreBottom]]);
- drawTri([[left,cy-coreH*.18],[x,cy],[left,cy+coreH*.18]]);
- drawTri([[right,cy-coreH*.18],[x+w,cy],[right,cy+coreH*.18]]);
- // Red seams at the joints so it reads as dangerous instantly.
- ctx.save();ctx.shadowColor='#ff4e58';ctx.shadowBlur=8;ctx.strokeStyle='#ff564c';ctx.lineWidth=1.6;
- stroke(cx,coreTop-1,cx,coreTop+7,'#ff564c',1.6);
- stroke(cx,coreBottom-7,cx,coreBottom+1,'#ff564c',1.6);
- stroke(left-1,cy,right*0+0,cy,'rgba(0,0,0,0)',0); // no-op keeps helper usage stable
- stroke(left-1,cy,left+7,cy,'#ff564c',1.6);
- stroke(right-7,cy,right+1,cy,'#ff564c',1.6);
- ctx.restore();
+ const x=screenX(o.x),top=scrY(o.base+o.height);
+ NRRetro.airA(ctx,x,top,o.width,o.height*ZOOM);
 }
 function drawAirB(o){
- const x=screenX(o.x),y=scrY(o.height),w=o.width;
- const bodyH=Math.max(16,Math.min(22,o.spikeH*.28))*ZOOM;
- const root=y+bodyH-1;
- ctx.save();
- // Top safe stone platform.
- const body=ctx.createLinearGradient(x,y,x,y+bodyH);
- body.addColorStop(0,'#5a7388');body.addColorStop(.22,'#456078');body.addColorStop(1,'#2a4056');
- round(x,y,w,bodyH,5);ctx.fillStyle=body;ctx.fill();ctx.lineWidth=1.2;ctx.strokeStyle='rgba(220,236,246,.30)';ctx.stroke();
- const topStrip=ctx.createLinearGradient(x,y,x,y+Math.min(7,bodyH*.35));
- topStrip.addColorStop(0,'#c0d1da');topStrip.addColorStop(1,'#849dad');
- round(x+2,y+1,Math.max(4,w-4),Math.max(3,bodyH*.22),4);ctx.fillStyle=topStrip;ctx.fill();
- // Safe landing line.
- ctx.save();ctx.shadowColor='#7fefd0';ctx.shadowBlur=5;stroke(x+6,y+1.5,x+w-6,y+1.5,'#b5f5df',2.2);ctx.restore();
- // Block seams so it feels like normal stone architecture.
- ctx.strokeStyle='rgba(18,34,49,.40)';ctx.lineWidth=1;
- for(let s=1;s<3;s++){const sx=x+w*s/3;stroke(sx,y+3,sx,y+bodyH-3,'rgba(18,34,49,.40)',1);} 
- // Red underside rail.
- ctx.save();ctx.shadowColor='#ff4e57';ctx.shadowBlur=8;stroke(x+8,root-2,x+w-8,root-2,'#ff5a4a',1.6);ctx.restore();
- // Hanging crystal spikes.
- const spikeCount=4,pitch=w/spikeCount;
- for(let j=0;j<spikeCount;j++){
-  const lx=x+j*pitch+pitch*.14,rx=x+j*pitch+pitch*.86,mx=(lx+rx)*.5,tip=root+o.spikeH*ZOOM;
-  ctx.save();ctx.shadowColor='#ff4c57';ctx.shadowBlur=10;
-  const sg=ctx.createLinearGradient(mx,root,mx,tip);
-  sg.addColorStop(0,'#efcfd0');sg.addColorStop(.34,'#c39aa4');sg.addColorStop(.72,'#935c68');sg.addColorStop(1,'#542b35');
-  ctx.beginPath();ctx.moveTo(lx,root);ctx.lineTo(mx,tip);ctx.lineTo(rx,root);ctx.closePath();ctx.fillStyle=sg;ctx.fill();ctx.strokeStyle='rgba(255,239,243,.35)';ctx.lineWidth=1.05;ctx.stroke();
-  ctx.restore();
-  ctx.save();ctx.shadowColor='#ff4d4f';ctx.shadowBlur=8;
-  stroke(mx,root+2,mx,tip-8,'#ff5e50',1.8);
-  stroke(mx,root+bodyH*.03,mx-pitch*.12,root+o.spikeH*ZOOM*.46,'#ff7a66',1.1);
-  ctx.restore();
- }
- ctx.restore();
+ const x=screenX(o.x),y=scrY(o.height),bodyH=Math.max(16,Math.min(22,o.spikeH*.28))*ZOOM;
+ NRRetro.airB(ctx,x,y,o.width,bodyH,o.spikeH*ZOOM,Math.round(o.x));
 }
 function drawEffectGhost(o,label){
  const x=screenX(o.x),w=o.width,y=o.type==='wall'?scrY(o.height):scrY(o.height||80),h=o.type==='wall'?o.height*ZOOM:Math.max(18,(o.height||80)*ZOOM);
@@ -1710,6 +1849,7 @@ function nrGameCubePal37(n){return ({
  4:{front:'#b4aaa4',light:'#d0c6c0',shadow:'#8c7f79',edge:'#6b5e59',ink:'#4b3d3a',trail:'#a2948e'}
  })[n]||({front:'#9aadb7',light:'#bcc9cf',shadow:'#708590',edge:'#4a6170',ink:'#203948',trail:'#7e9bab'})}
 function nrDrawGameStoneFloor37(a,b,offset=0){
+ if(window.NRRetro)return NRRetro.floor(ctx,a,FLOOR,b-a,VH-FLOOR,offset);
  if(b<=a)return;
  const depth=VH-FLOOR;if(depth<=0)return;
  const topDepth=9,slabH=Math.min(54,Math.max(41,depth*.42)),tile=60;
@@ -1801,7 +1941,7 @@ function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);b
  const gaps=objs.filter(o=>o.type==='gap');function floor(a,b){nrDrawGameStoneFloor37(a,b,state.distance*.72)}
  if(!gaps.length)floor(0,W);else{let cursor=0;for(const o of gaps){let l=screenX(o.x),r=l+o.width;floor(cursor,Math.min(W,l));cursor=Math.max(cursor,r);stroke(l,FLOOR,l,VH,'#45627566',2);stroke(r,FLOOR,r,VH,'#45627566',2);}floor(cursor,W)}
  if(uiMode!=='story')drawMovingWallGuide();
- for(const o of objs){if(o.type==='digitSwitch')drawDigitSwitch(o);if(o.type==='switchPlatform')drawSwitchPlatform(o);if(o.type==='wall')drawBlock(o);if(o.type==='spike')drawSpike(o);if(o.type==='airA')drawAirA(o);if(o.type==='airB')drawAirB(o);if(o.type==='numberGate')drawNumberGate(o);if(o.type==='numberPlatform')drawNumberPlatform(o);if(o.type==='ceiling'){const x=screenX(o.x),root=scrY(o.base);NRSpikeArt.slab(ctx,x,root-27,o.width,27,false);drawSpike({type:'spike',x:o.x,width:o.width,count:Math.round(o.width/75),height:o.spikeH,base:o.base,down:true})}}
+ for(const o of objs){if(o.type==='digitSwitch')drawDigitSwitch(o);if(o.type==='switchPlatform')drawSwitchPlatform(o);if(o.type==='wall')drawBlock(o);if(o.type==='spike')drawSpike(o);if(o.type==='airA')drawAirA(o);if(o.type==='airB')drawAirB(o);if(o.type==='numberGate')drawNumberGate(o);if(o.type==='numberPlatform')drawNumberPlatform(o);if(o.type==='ceiling'){const roof=o.base+Math.max(16,Math.min(22,o.spikeH*.28));NRRetro.airB(ctx,screenX(o.x),scrY(roof),o.width,(roof-o.base)*ZOOM,o.spikeH*ZOOM,Math.round(o.x));}}
  drawGoal();
  if(uiMode!=='story'){drawJumpGuide();drawGapGuide();drawNumberGateGuide();drawPlatformGuide();drawSwitchGuide();drawObjectMeasures();drawMeasureBand()}
  drawGapWalls();
@@ -1811,8 +1951,8 @@ function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);b
  ctx.fillStyle='#06111ca0';ctx.beginPath();ctx.ellipse(px,FLOOR+4.85,22*(1-Math.min(.56,state.y/650)),2.8,0,0,Math.PI*2);ctx.fill();
  if(state.lastLanding>0){ctx.strokeStyle=`rgba(155,232,255,${state.lastLanding/.3})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(px,FLOOR+4.3,28+(1-state.lastLanding/.3)*23,4.0,0,0,Math.PI*2);ctx.stroke()}
  for(let k=0;k<4;k++)stroke(px-sq*.68-k*15,py+(k-1.5)*7,px-sq*.68-k*15+8,py+(k-1.5)*7,pal.trail+'4a',1.6);
- nrDrawGameStoneCube37(px,py,sq,state.face,state.angle);
- nrDrawGameDigit37(px,py,state.face,pal);
+ if(window.NRRetro)NRRetro.cube(ctx,px,py,sq,state.face,state.angle);
+ else {nrDrawGameStoneCube37(px,py,sq,state.face,state.angle);nrDrawGameDigit37(px,py,state.face,pal);}
  ctx.textBaseline='alphabetic';ctx.font='800 13px system-ui';ctx.textAlign='center';ctx.fillStyle='#a7c9dd';ctx.fillText('AUTO →',px,FLOOR+90);
 }
 function resize(){const r=canvas.getBoundingClientRect();let width=Math.max(10,r.width),height=Math.max(10,r.height);W=VH*width/height;scale=height/VH;dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.round(width*dpr);canvas.height=Math.round(height*dpr);draw()}
@@ -1946,9 +2086,9 @@ const items=[
  ['ground','地面・石床','RUIN STONE FLOOR','Ver.4.0：明るい床上面と青暗い石壁の区別、床の角度と奥行きはVer.3.9を維持。'],
  ['gap','穴・側壁','GAP / SIDE WALL','穴の位置と危険な側壁を、装飾に埋もれず判別できるように。'],
  ['safe','青壁・安全','LANDABLE WALL','Ver.4.18：床と同じ石目と色・控えめな反射を採用。白い天板の厚さを約半分に調整。上面は着地可能。'],
- ['danger','赤壁・危険','HAZARDOUS WALL','Ver.4.22：Ver.4.21の危険壁をベースに、赤い継ぎ目の明るさと立体感を強化。低い壁でも危険だと分かるよう、両端の赤い発光を追加し、石の周囲にごく弱い赤い反射を入れて走行中の見やすさを改善。上面も側面も危険で、高さは4段階で変化。'],
- ['airA','空中トゲA','AIR SPIKES / DANGER','Ver.4.3：上下左右すべて危険。安全そうな天面を作らず、赤い亀裂のある浮遊石に統一。'],
- ['airB','空中トゲB','AIR SPIKES / LANDABLE TOP','Ver.4.13：青灰色の浮遊石床は上面だけ着地可能。下面の赤トゲと側面は危険。'],
+ ['danger','赤壁・危険','RETRO DANGER WALL','Ver.4.22：Ver.4.21の危険壁をベースに、赤い継ぎ目の明るさと立体感を強化。低い壁でも危険だと分かるよう、両端の赤い発光を追加し、石の周囲にごく弱い赤い反射を入れて走行中の見やすさを改善。上面も側面も危険で、高さは4段階で変化。'],
+ ['airA','空中トゲ','AIR SPIKES / DANGER','Ver.4.3：上下左右すべて危険。安全そうな天面を作らず、赤い亀裂のある浮遊石に統一。'],
+ ['airB','上トゲ（上面安全）','AIR SPIKES / LANDABLE TOP','Ver.4.13：青灰色の浮遊石床は上面だけ着地可能。下面の赤トゲと側面は危険。'],
  ['gate','数字の壁','NUMBER GATE','数字一致で通過。赤い部分は常に危険な認証ゲート。'],
  ['platform','数字足場','NUMBER PLATFORM','指定の数字で上から着地。側面・下面は危険。下抜け可能。'],
  ['switch','数字スイッチ','NUMBER SWITCH','指定数字で触れると対応する仕掛けが作動する。'],
@@ -2363,6 +2503,7 @@ function nrDrawStoneFloor35(x,y,w,h,offset=0){
 }
 
 function nrDrawStoneFloor(x,y,w,h,offset=0){
+ if(window.NRRetro)return NRRetro.floor(g,x,y,w,h,offset);
  if(improved&&!legacy22&&!legacy23&&!legacy24&&!nrFloorCompare31&&(runActive||nrModernStone35())){nrDrawStoneFloor35(x,y,w,h,offset);return;}
  if(nrFloorCompare31)nrDrawStoneFloor31(x,y,w,h,offset);
  else nrDrawStoneFloor32(x,y,w,h,offset);
@@ -2391,10 +2532,10 @@ function nrObstaclePreviewCube(x,ground,size=112){
  dbRoundedCube(x,cy,size,face,0,false);
 }
 function drawCeilingSpikes45(){
- nrDrawStoneFloor(66,357,892,83,0);
+ NRRetro.floor(g,66,357,892,83,0);
  nrObstaclePreviewCube(201,357,110);
- NRSpikeArt.slab(g,401,105,405,25,false);
- for(let j=0;j<4;j++)NRSpikeArt.spike(g,408+j*100,130,88,114,true,j+35);
+ // Upper spikes and landable overhead spikes now use the same visual language.
+ NRRetro.airB(g,401,105,405,25,114,35);
 }
 function drawSpikes(){
  floor(66,335,892,105,!improved);
@@ -2672,6 +2813,7 @@ function nrDrawStoneCube35(cx,cy,size,n,spin=0,small=false){
 }
 
 function dbRoundedCube(cx,cy,size,n,spin=0,small=false){
+ if(window.NRRetro)return NRRetro.cube(g,cx,cy-(runActive&&small?size*.16:size*.10),size,n,spin);
  if(nrModernStone35()){nrDrawStoneCube35(cx,cy,size,n,spin,small);return;}
  const previous=legacy22,prior=legacy22||legacy23,mesh=runActive&&small?dbMeshRun:legacy22?dbMesh22:legacy23?dbMesh23:dbMesh24;
  const quarter=Math.PI/2;
@@ -2777,24 +2919,10 @@ function wall(x,y,w,h,safe,old=false,stoneSeed=0){
 function drawGround(){floor(36,223,952,217,!improved)}
 function drawGap(){floor(66,255,350,185,!improved);floor(672,255,285,185,!improved);if(improved){line(415,260,415,430,'#ff9ba685',5);line(671,260,671,430,'#ff9ba685',5);for(let y=275;y<425;y+=21){line(413,y,421,y+8,'#ffd0bf83',2);line(668,y,660,y+8,'#ffd0bf83',2)}}else{line(417,255,417,440,'#ff7085',3);line(671,255,671,440,'#ff7085',3)}ellipse(544,416,90,13,'#121a37ac');cube(252,137,74,face,!improved);g.setLineDash([9,12]);g.beginPath();g.moveTo(340,180);g.quadraticCurveTo(515,38,733,202);g.strokeStyle='#b6ffe4ad';g.lineWidth=3;g.stroke();g.setLineDash([])}
 function drawAir(safe){
- floor(80,359,870,81,!improved);
- if(!improved){
-  if(!safe){spikeBase(348,132,326,true);for(let j=0;j<3;j++){facetSpike(354+j*106,158,100,107,true,true);facetSpike(354+j*106,132,100,50,true,false);}}
-  else{wall(356,132,312,40,true,true);for(let j=0;j<3;j++)facetSpike(367+j*102,176,94,112,true,true);}
-  return;
- }
+ NRRetro.floor(g,80,359,870,81,0);
  nrObstaclePreviewCube(221,359,112);
- if(safe){
-  const x=420,y=136,w=356,rim=37;
-  NRSpikeArt.slab(g,x,y,w,rim,true);
-  for(let j=0;j<3;j++)NRSpikeArt.spike(g,x+j*w/3,y+rim,w/3,109,true,100+j);
- }else{
-  for(let j=0;j<3;j++){
-   NRSpikeArt.diamond(g,428+j*126,124,109,156);
-   line(482+j*126,152,497+j*126,210,'#ff5c67',2.4);
-   line(498+j*126,170,474+j*126,196,'#d13e4a',1.8);
-  }
- }
+ if(safe)NRRetro.airB(g,420,136,356,37,109,218);
+ else for(let j=0;j<3;j++)NRRetro.airA(g,434+j*118,137,94,110);
 }
 function drawGate(){floor(190,361,655,79,!improved);
  const x=454,y=28,w=135,h=335;g.save();g.shadowBlur=20;g.shadowColor='#a67cff6b';g.fillStyle=improved?'#6e56a78a':'#595fa6a0';rr(x,y,w,h,12);g.fill();g.shadowBlur=0;g.strokeStyle='#bda5fe';g.lineWidth=4;g.stroke();g.restore();
@@ -2982,8 +3110,8 @@ function trialCheck(dt,oldHeight){
  for(const o of trialObjects){
   const p=trialPose(o),horizontal=box.x+box.w>p.x+7&&box.x<p.x+p.w-7;
   if(!horizontal)continue;
-  if(o.kind==='safe'||o.kind==='platform'&&face===o.target||o.kind==='airB'||o.kind==='moving'&&o.safe){
-   const roof=(ground-p.y)/RUN_VISUAL_SCALE;
+  if(o.kind==='safe'||o.kind==='platform'&&face===o.target||o.kind==='airB'||o.kind==='moving'&&o.safe||o.kind==='ceiling'){
+   const roof=(ground-p.y+(o.kind==='ceiling'?23:0))/RUN_VISUAL_SCALE;
    supports.push(roof);
   }
  }
@@ -3009,9 +3137,14 @@ function trialCheck(dt,oldHeight){
     if(trialPolyHit([[x,ground],[x+o.tipW/2,ground-h],[x+o.tipW,ground]],box))collision=true;
    }
   }else if(o.kind==='ceiling'){
-   for(let i=0;i<o.count;i++){
-    const x=p.x+i*o.pitch;
-    if(trialPolyHit([[x,p.y],[x+o.pitch/2,p.y+o.h],[x+o.pitch,p.y]],box))collision=true;
+   const slabTop=p.y-23;
+   const foot=box.y+box.h;
+   const landed=trialOnSurface&&runVelocity<=0&&Math.abs(foot-slabTop)<=2.5;
+   if(trialRects(box,{x:p.x,y:slabTop,w:p.w,h:23})&&!landed)collision=true;
+   const pitch=p.w/4;
+   for(let i=0;i<4;i++){
+    const x=p.x+i*pitch+pitch*.12;
+    if(trialPolyHit([[x,p.y],[x+pitch*.38,p.y+o.h],[x+pitch*.76,p.y]],box))collision=true;
    }
   }else if(o.kind==='gap'){
    // Hitting the far vertical side while below surface is a failure.
@@ -3023,19 +3156,26 @@ function trialCheck(dt,oldHeight){
    // Only the very top is safe. Side and bottom of a blue wall remain harmful.
    if(trialRects(box,rect)&&!(isSafe&&runHeight*RUN_VISUAL_SCALE>=ground-p.y-4&&runVelocity<=0))collision=true;
   }else if(o.kind==='airA'){
-   const cy=p.y+p.h/2;
-   collision=collision||trialPolyHit([[p.x+p.w/2,p.y],[p.x+p.w,cy],[p.x+p.w/2,p.y+p.h],[p.x,cy]],box);
+   const cx=p.x+p.w*.5,cy=p.y+p.h*.5,cw=p.w*.38,ch=p.h*.38;
+   const left=cx-cw*.5,right=cx+cw*.5,top=cy-ch*.5,bottom=cy+ch*.5;
+   if(trialRects(box,{x:left,y:top,w:cw,h:ch}))collision=true;
+   for(const poly of [
+    [[cx-cw*.16,top],[cx,p.y],[cx+cw*.16,top]],
+    [[cx-cw*.16,bottom],[cx,p.y+p.h],[cx+cw*.16,bottom]],
+    [[left,cy-ch*.18],[p.x,cy],[left,cy+ch*.18]],
+    [[right,cy-ch*.18],[p.x+p.w,cy],[right,cy+ch*.18]]
+   ])if(trialPolyHit(poly,box))collision=true;
   }else if(o.kind==='airB'){
-   const slab={x:p.x,y:p.y,w:p.w,h:o.slab};
-   // A top landing is safe; sides, underside and hanging spikes are deadly.
-   // Use the actual visual foot position after the landing snap.
+   const slabHeight=Math.max(16,Math.min(22,(o.h-o.slab)*.28));
+   const slab={x:p.x,y:p.y,w:p.w,h:slabHeight};
    const foot=box.y+box.h;
-   const topLanding=trialOnSurface&&runVelocity<=0&&
-     Math.abs(foot-p.y)<=2.5&&trialSurface*RUN_VISUAL_SCALE>=ground-p.y-2.5;
+   const topLanding=trialOnSurface&&runVelocity<=0&&Math.abs(foot-p.y)<=2.5&&
+     trialSurface*RUN_VISUAL_SCALE>=ground-p.y-2.5;
    if(trialRects(box,slab)&&!topLanding)collision=true;
-   for(let i=0;i<3;i++){
-    const x=p.x+i*p.w/3;
-    if(trialPolyHit([[x,p.y+o.slab],[x+p.w/6,p.y+o.slab+o.h-o.slab],[x+p.w/3,p.y+o.slab]],box))collision=true;
+   const pitch=p.w/4,root=p.y+slabHeight-1,tip=root+o.h-o.slab;
+   for(let i=0;i<4;i++){
+    const lx=p.x+i*pitch+pitch*.12;
+    if(trialPolyHit([[lx,root],[lx+pitch*.38,tip],[lx+pitch*.76,root]],box))collision=true;
    }
   }else if(o.kind==='gate'){
    const openings=trialGateOpening(o,ground);
@@ -3068,39 +3208,16 @@ function trialDrawObjects(){
   if(o.kind==='spike'){
    for(let i=0;i<o.count;i++)NRSpikeArt.spike(g,x+i*o.pitch,ground,o.tipW,o.heights[i],false,o.id*13+i);
   }else if(o.kind==='ceiling'){
-   NRSpikeArt.slab(g,x,y-23,w,23,false);
-   for(let i=0;i<o.count;i++)NRSpikeArt.spike(g,x+i*o.pitch,y,o.pitch,o.h,true,o.id*17+i);
+   NRRetro.airB(g,x,y-23,w,23,o.h,o.id);
   }else if(o.kind==='gap'){
    // Only the opening is rendered by the split floor, below.
    line(x,ground+4,x,440,'#ba596351',1.6);
    line(x+w,ground+4,x+w,440,'#ba596351',1.6);
   }else if(o.kind==='safe'||o.kind==='danger'||o.kind==='moving'){
    wall(x,y,w,Math.max(6,ground-y),o.kind==='safe'||o.safe===true,false,o.id);
-  }else if(o.kind==='airA'){
-   const cx=x+w*.5,cy=y+o.h*.5,coreW=w*.38,coreH=o.h*.38;
-   const left=cx-coreW*.5,right=cx+coreW*.5,top=cy-coreH*.5,bottom=cy+coreH*.5;
-   const cg=g.createLinearGradient(left,top,right,bottom);
-   cg.addColorStop(0,'#8191a3');cg.addColorStop(.4,'#5a6c80');cg.addColorStop(1,'#334659');
-   g.fillStyle=cg;g.strokeStyle='rgba(215,230,240,.38)';g.lineWidth=1.1;g.beginPath();g.roundRect(left,top,coreW,coreH,4);g.fill();g.stroke();
-   const tri=(pts)=>{g.save();g.shadowColor='#ff4e58';g.shadowBlur=7;g.fillStyle='#c0ccd8';g.strokeStyle='rgba(235,243,248,.35)';g.beginPath();pts.forEach(([px,py],i)=>i?g.lineTo(px,py):g.moveTo(px,py));g.closePath();g.fill();g.stroke();g.restore();};
-   tri([[cx-coreW*.16,top],[cx,y],[cx+coreW*.16,top]]);
-   tri([[cx-coreW*.16,bottom],[cx,y+o.h],[cx+coreW*.16,bottom]]);
-   tri([[left,cy-coreH*.18],[x,cy],[left,cy+coreH*.18]]);
-   tri([[right,cy-coreH*.18],[x+w,cy],[right,cy+coreH*.18]]);
-   g.save();g.shadowColor='#ff4e58';g.shadowBlur=8;line(cx,top-1,cx,top+7,'#ff5c4f',1.5);line(cx,bottom-7,cx,bottom+1,'#ff5c4f',1.5);line(left-1,cy,left+7,cy,'#ff5c4f',1.5);line(right-7,cy,right+1,cy,'#ff5c4f',1.5);g.restore();
-  }else if(o.kind==='airB'){
-   const bodyH=Math.max(16,Math.min(22,(o.h-o.slab)*.28));
-   const root=y+bodyH-1;
-   const bg=g.createLinearGradient(x,y,x,y+bodyH);bg.addColorStop(0,'#5a7388');bg.addColorStop(.24,'#456078');bg.addColorStop(1,'#2a4056');
-   g.fillStyle=bg;g.strokeStyle='rgba(220,236,246,.26)';g.lineWidth=1;g.beginPath();g.roundRect(x,y,w,bodyH,4);g.fill();g.stroke();
-   line(x+5,y+1.5,x+w-5,y+1.5,'#b5f5df',2);
-   line(x+8,root-2,x+w-8,root-2,'#ff5a4a',1.5);
-   const spikeCount=4,pitch=w/spikeCount;
-   for(let j=0;j<spikeCount;j++){
-    const lx=x+j*pitch+pitch*.14,rx=x+j*pitch+pitch*.86,mx=(lx+rx)*.5,tip=root+(o.h-o.slab);
-    g.save();g.shadowColor='#ff4b57';g.shadowBlur=7;g.fillStyle='#b9a8b1';g.beginPath();g.moveTo(lx,root);g.lineTo(mx,tip);g.lineTo(rx,root);g.closePath();g.fill();g.restore();
-    line(mx,root+1,mx,tip-8,'#ff5f51',1.6);
-   }
+  }else if(o.kind==='airA')NRRetro.airA(g,x,y,w,o.h);
+  else if(o.kind==='airB'){
+   NRRetro.airB(g,x,y,w,Math.max(16,Math.min(22,(o.h-o.slab)*.28)),o.h-o.slab,o.id);
   }else if(o.kind==='gate'){
    const op=trialGateOpening(o,ground);
    g.save();g.fillStyle='#61468e';g.fillRect(x,ground-223,w,226);
@@ -3178,7 +3295,7 @@ function draw(){
 function refresh(){const i=items[pos];const player=i[0]==='player';$('dbName').textContent=i[1];$('dbEnglish').textContent=i[2];$('dbDescription').textContent=i[3];$('dbCounter').textContent=String(pos+1).padStart(2,'0')+' / '+items.length;
  for(const [k,b] of [...$('dbCategories').children].entries()){b.classList.toggle('active',k===pos);b.setAttribute('aria-current',String(k===pos))}
  $('dbNew').classList.toggle('active',improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31));$('dbV24').classList.toggle('active',improved&&legacy24);$('dbV23').classList.toggle('active',improved&&legacy23);$('dbV22').classList.toggle('active',improved&&legacy22);$('dbOld').classList.toggle('active',!improved);$('dbNew').setAttribute('aria-pressed',String(improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31)));$('dbV24').setAttribute('aria-pressed',String(improved&&legacy24));$('dbV23').setAttribute('aria-pressed',String(improved&&legacy23));$('dbV22').setAttribute('aria-pressed',String(improved&&legacy22));$('dbOld').setAttribute('aria-pressed',String(!improved));$('dbV22').hidden=items[pos][0]!=='player';$('dbV23').hidden=items[pos][0]!=='player';$('dbV24').hidden=items[pos][0]!=='player';$('dbGroundBefore').hidden=items[pos][0]!=='ground'||!improved;$('dbGroundBefore').classList.toggle('active',nrFloorCompare31);$('dbGroundBefore').setAttribute('aria-pressed',String(nrFloorCompare31));$('dbGroundBefore').textContent=nrFloorCompare31?'✓ Ver.3.1 石床':'◈ Ver.3.1と比較';
- $('designBookScreen').classList.toggle('db-running',runActive);$('dbRunExit').hidden=!runActive;$('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=false;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.4.2 / 石材と接地面は維持'):'Ver.4.22 / 赤ライン強化'):'旧デザイン風（比較用）';
+ $('designBookScreen').classList.toggle('db-running',runActive);$('dbRunExit').hidden=!runActive;$('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=false;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.4.2 / 石材と接地面は維持'):'Ver.4.24 / レトロピクセル'):'旧デザイン風（比較用）';
  try{$('dbMemo').value=localStorage.getItem(memoKey(pos))||''}catch{$('dbMemo').value=''};
  for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
  $('dbExtras').hidden=false;$('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=true;$('dbRun').textContent='▶ 無限走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'選択した障害物がランダムに続きます':'黒背景 / 選択した障害物を無限に練習';$('dbInstruction').textContent=runActive?'画面タップでジャンプ。回転後の向き・接地・横滑りを確認。':player?'背景を消した状態で、数字・回転・接地の見た目を確認できます。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['真正面','正面＋少し奥行き','正面＋奥行き'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
