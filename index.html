@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.4.24 · Retro Pixel Art</title>
+<title>NUMBER ROLL — Ver.4.27 · Square Retro Air Spike</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -432,7 +432,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
 <section id="designBookScreen" class="front-screen db-screen" hidden aria-label="仮設デザイン確認ブック">
   <div class="db-titlebar">
     <button type="button" id="dbBack" class="front-button db-back">‹ HOME</button>
-    <div class="db-head"><div class="db-kicker">NUMBER ROLL · PIXEL VER.4.24</div><h2>デザイン確認ブック</h2></div>
+    <div class="db-head"><div class="db-kicker">NUMBER ROLL · PIXEL VER.4.25</div><h2>デザイン確認ブック</h2></div>
     <div class="db-temporary" aria-hidden="true"></div>
   </div>
   <div class="db-shell">
@@ -446,7 +446,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
       </div>
       <div class="db-toolbar" id="dbToolbar">
-        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.24 レトロ統一</button>
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.27 空中トゲ</button>
         <button id="dbV24" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.4 と比較</button>
         <button id="dbV23" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.3 と比較</button>
         <button id="dbV22" type="button" class="db-tool" aria-pressed="false">Ver.2.2</button>
@@ -568,26 +568,67 @@ window.NRRetro=(()=>{
   });
   blit(c,bmp,x,y,w,h);
  }
- function cube(c,cx,cy,size,number=1,angle=0){
+ function cube(c,cx,cy,size,number=1,angle=0,roll=null){
+  // Ver.4.26: 4 distinct retro faces. During a roll the outgoing numeral turns away,
+  // then the new number turns in; the final numeral is always upright.
   const n=((number-1)%4+4)%4+1;
-  const sprite=cached('cube-'+n,28,28,(q,W,H)=>{
-   // Pixel bevel; crisp light stone, recessed numeral, no photorealistic gloss.
-   q.fillStyle='#0e2033';q.fillRect(2,3,25,25);
-   q.fillStyle='#66839d';q.fillRect(2,2,24,24);
-   q.fillStyle='#a2bbcf';q.fillRect(3,2,22,23);
-   q.fillStyle='#e4f0f8';q.fillRect(4,3,20,20);
-   q.fillStyle='#f6fbff';q.fillRect(5,3,17,2);
-   q.fillStyle='#ccddea';q.fillRect(5,5,17,18);
-   q.fillStyle='#dce9f4';q.fillRect(7,7,14,14);
-   q.fillStyle='#829db6';q.fillRect(6,6,15,1);q.fillRect(6,7,1,14);
-   q.fillStyle='#f4fbff';q.fillRect(7,8,13,1);
-   q.fillStyle='#526e8b';q.fillRect(22,5,2,18);q.fillRect(5,22,18,2);
-   q.fillStyle='#a6bace';q.fillRect(3,23,21,2);
-   q.font='bold 17px monospace';q.textAlign='center';q.textBaseline='middle';
-   q.fillStyle='#20364d';q.fillText(String(n),14,14.6);
-  });
-  c.save();c.translate(Math.round(cx),Math.round(cy));c.rotate(angle||0);c.imageSmoothingEnabled=false;
-  c.drawImage(sprite,-size*.50,-size*.50,size,size);c.restore();
+  const colors={
+   1:['#536f8e','#8faecb','#c2d8e8','#e5f1fb','#183d6c'],
+   2:['#42796e','#80b9a9','#b9e4d5','#e0f9ed','#145647'],
+   3:['#665c90','#a99bd3','#d9cef1','#f0eafa','#4b3c77'],
+   4:['#92665d','#d4a28c','#f0d0bd','#fff0df','#80483d']
+  };
+  const numberBits={
+   1:['00100','01100','00100','00100','00100','00100','01110'],
+   2:['01110','10001','00001','00010','00100','01000','11111'],
+   3:['11110','00001','00001','01110','00001','00001','11110'],
+   4:['10010','10010','10010','11111','00010','00010','00010']
+  };
+  function bg(face){return cached('cube-bg-425-'+face,28,28,(q)=>{
+    const pal=colors[face];
+    q.fillStyle='#091a2b';q.fillRect(2,3,25,25);
+    q.fillStyle=pal[0];q.fillRect(2,2,24,24);
+    q.fillStyle=pal[1];q.fillRect(3,2,22,23);
+    q.fillStyle=pal[2];q.fillRect(4,3,20,20);
+    q.fillStyle=pal[3];q.fillRect(5,3,17,2);
+    q.fillStyle=pal[2];q.fillRect(5,5,17,18);
+    q.fillStyle=pal[3];q.fillRect(7,7,14,14);
+    q.fillStyle=pal[1];q.fillRect(6,6,15,1);q.fillRect(6,7,1,14);
+    q.fillStyle=pal[3];q.fillRect(7,8,13,1);
+    q.fillStyle=pal[0];q.fillRect(22,5,2,18);q.fillRect(5,22,18,2);
+    q.fillStyle=pal[1];q.fillRect(3,23,21,2);
+   });}
+  function glyph(face){return cached('cube-digit-425-'+face,7,9,(q)=>{
+    q.fillStyle=colors[face][4];
+    for(let iy=0;iy<7;iy++)for(let ix=0;ix<5;ix++){
+      if(numberBits[face][iy][ix]==='1')q.fillRect(ix+1,iy+1,1,1);
+    }
+   });}
+  const active=!!(roll&&roll.from&&roll.to&&roll.progress!==undefined);
+  const t=active?Math.max(0,Math.min(1,roll.progress)):0;
+  const from=active?roll.from:n,to=active?roll.to:n;
+  const phase=active?t*Math.PI/2:0;
+  // Sprite artwork has transparent bottom pixels; settle its visible rim on the floor.
+  // When rotating on a flat surface, raise the center just enough for the corner
+  // to roll across the floor instead of cutting through the upper stone plane.
+  const cornerLift=active?size*.5*(Math.abs(Math.cos(phase))+Math.abs(Math.sin(phase))-1):0;
+  c.save();c.translate(Math.round(cx),Math.round(cy+size*.071-cornerLift));c.rotate(phase);
+  c.imageSmoothingEnabled=false;
+  const drawBg=(face,alpha)=>{c.save();c.globalAlpha=alpha;c.drawImage(bg(face),-size/2,-size/2,size,size);c.restore();};
+  drawBg(from,1);
+  if(active)drawBg(to,t*t*(3-2*t));
+  const drawGlyph=(face,localAngle,alpha)=>{
+    if(alpha<=0)return;
+    c.save();c.globalAlpha=alpha;c.rotate(localAngle);c.imageSmoothingEnabled=false;
+    c.drawImage(glyph(face),-size*.235,-size*.30,size*.47,size*.60);
+    c.restore();
+  };
+  if(active){
+    // The old digit leaves during the first half; the new digit enters in the second.
+    drawGlyph(from,0,Math.max(0,1-2*t));
+    drawGlyph(to,-Math.PI/2,Math.max(0,2*t-1));
+  }else drawGlyph(n,0,1);
+  c.restore();
  }
  function spike(c,x,root,w,h,down=false,seed=0){
   if(w<=1||h<=1)return;
@@ -620,31 +661,56 @@ window.NRRetro=(()=>{
    q.fillStyle='#ff4952';q.fillRect(2,hh-2,ww-4,1);
   });blit(c,bmp,x,y,w,h);
  }
+ function airShape(x,y,w,h){
+  // Single definition shared by the retro art and both sets of collision logic.
+  // Total bounding box is square in screen space; the small central stone is 28% of it.
+  const cx=x+w*.5,cy=y+h*.5,cw=w*.28,ch=h*.28;
+  const left=cx-cw*.5,right=cx+cw*.5,top=cy-ch*.5,bottom=cy+ch*.5;
+  return {core:{x:left,y:top,w:cw,h:ch},spikes:[
+   [[cx-cw*.47,top],[cx,y],[cx+cw*.47,top]],
+   [[cx-cw*.47,bottom],[cx,y+h],[cx+cw*.47,bottom]],
+   [[left,cy-ch*.47],[x,cy],[left,cy+ch*.47]],
+   [[right,cy-ch*.47],[x+w,cy],[right,cy+ch*.47]]
+  ]};
+ }
  function airA(c,x,y,w,h){
   if(w<=1||h<=1)return;
-  const bmp=cached('airA-'+Math.round(w/4)+'-'+Math.round(h/4),40,40,(q,W,H)=>{
-    // Compact four-point obstacle. Core occupies roughly 40% of footprint.
-    q.fillStyle='#af1e33';
-    function triangle(p,color){q.fillStyle=color;q.beginPath();p.forEach(([a,b],i)=>i?q.lineTo(a,b):q.moveTo(a,b));q.closePath();q.fill();}
-    triangle([[17,13],[20,0],[23,13]],'#ee3a49');
-    triangle([[17,27],[20,39],[23,27]],'#df3546');
-    triangle([[13,17],[0,20],[13,23]],'#e9444f');
-    triangle([[27,17],[39,20],[27,23]],'#d83245');
-    q.fillStyle='#581325';q.fillRect(12,12,16,16);
-    q.fillStyle='#7188a2';q.fillRect(13,13,14,14);
-    q.fillStyle='#334b63';q.fillRect(15,15,12,12);
-    q.fillStyle='#acc1d1';q.fillRect(14,14,11,2);
-    q.fillStyle='#192f49';q.fillRect(16,17,9,8);
-    q.fillStyle='#ff4250';q.fillRect(18,18,5,5);
-    q.fillStyle='#ffa59c';q.fillRect(19,19,2,2);
-    for(const p of [[18,11],[18,28],[11,18],[27,18]]){q.fillStyle='#ff6970';q.fillRect(p[0],p[1],4,2)}
-  });blit(c,bmp,x,y,w,h);
+  // Ver.4.27: four equally short red pixel spikes and a small blue-gray core.
+  // Render at a fixed low resolution; no blurred photo sprites or costly textures.
+  const bmp=cached('airA-427-'+Math.round(w/3)+'-'+Math.round(h/3),48,48,(q)=>{
+   q.imageSmoothingEnabled=false;
+   const sh=airShape(0,0,48,48);
+   function polygon(points,color){q.fillStyle=color;q.beginPath();points.forEach(([a,b],i)=>i?q.lineTo(a,b):q.moveTo(a,b));q.closePath();q.fill();}
+   for(const tri of sh.spikes){
+    // Dark outer contour gives the hazards a thick, readable silhouette.
+    polygon(tri,'#430d20');
+    const center=[24,24],inner=tri.map(([tx,ty])=>[center[0]+(tx-center[0])*.91,center[1]+(ty-center[1])*.91]);
+    polygon(inner,'#dd2037');
+    const lighter=tri.map(([tx,ty])=>[center[0]+(tx-center[0])*.71,center[1]+(ty-center[1])*.71]);
+    polygon([inner[0],lighter[1],inner[2]],'#ff4450');
+    // Deliberately chunky pixel glints, not a neon line crack.
+    q.fillStyle='#ffb0a0';
+    const [tipX,tipY]=tri[1];
+    const px=Math.round(center[0]+(tipX-center[0])*.71),py=Math.round(center[1]+(tipY-center[1])*.71);
+    q.fillRect(px-1,py-1,2,2);
+   }
+   const cx=24,cy=24;
+   q.fillStyle='#112436';q.fillRect(17,17,14,14);
+   q.fillStyle='#607a94';q.fillRect(18,18,12,12);
+   q.fillStyle='#86a0b9';q.fillRect(19,19,10,2);
+   q.fillStyle='#334b63';q.fillRect(20,21,9,8);
+   q.fillStyle='#263b50';q.fillRect(22,22,6,6);
+   q.fillStyle='#c0d1dd';q.fillRect(19,19,6,1);
+   q.fillStyle='#152b42';q.fillRect(29,19,1,11);q.fillRect(19,29,11,1);
+  });
+  blit(c,bmp,x,y,w,h);
  }
- function airB(c,x,y,w,bodyH,spikeH,seed=0){
+ function airB(c,x,y,w,bodyH,spikeH,seed=0,heights=null){
   if(w<=1||bodyH<=1)return;
-  const count=4,pitch=w/count;
-  // The upper slab remains fully safe; the bottom and side faces are hazardous.
-  const bmp=cached('airB-'+Math.round(w/5)+'-'+Math.round(bodyH/5),Math.max(12,Math.round(w/5)),Math.max(5,Math.round(bodyH/5)),(q,W,H)=>{
+  const count=Math.max(1,Math.min(6,Math.round(w/76)));
+  const pitch=w/count;
+  // The upper surface is the single safe upper-spike obstacle; no separate B style.
+  const bmp=cached('airB-425-'+Math.round(w/5)+'-'+Math.round(bodyH/5)+'-'+seed,Math.max(12,Math.round(w/5)),Math.max(5,Math.round(bodyH/5)),(q,W,H)=>{
     q.fillStyle='#1c3145';q.fillRect(0,0,W,H);
     const cols=Math.max(1,Math.round(W/12));
     for(let j=0;j<cols;j++){const xx=Math.floor(j*W/cols),rr=Math.floor((j+1)*W/cols);
@@ -656,11 +722,12 @@ window.NRRetro=(()=>{
   });
   blit(c,bmp,x,y,w,bodyH);
   for(let k=0;k<count;k++){
+   const height=heights?.[k] ?? Math.round(spikeH*(.72+.28*hash(seed*31+k*109+17)));
    const bx=x+k*pitch+pitch*.12;
-   spike(c,bx,y+bodyH-1,pitch*.76,spikeH,true,seed+k*17);
+   spike(c,bx,y+bodyH-1,pitch*.76,height,true,seed+k*17);
   }
  }
- return {floor,wall,cube,spike,slab,airA,airB,palette};
+ return {floor,wall,cube,spike,slab,airA,airB,airShape,palette};
 })();
 
 /* NUMBER ROLL · procedural hazard stone. One shared renderer for real play & preview.
@@ -950,8 +1017,6 @@ const calibrationEntries=[
 // (n-1)段では届かずn段で余裕を残せる中間値を採用する。
 const WALL_PRESETS=[65,154,275,402];
 const wallEntries=[
- {n:'B-01',jp:'青枠の壁 / 1ジャンプ用',en:'BLUE LANDING WALL · 1 JUMP',face:1,type:'wallCalibration',lethal:false,target:1,initialHeight:65,initialWidth:128,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を調整し、必要ジャンプ回数と操作の余裕を確認しよう。',spec:[['目標','1段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','1.02マス'],['初期の幅','2マス']]},
- {n:'B-02',jp:'青枠の壁 / 2ジャンプ用',en:'BLUE LANDING WALL · 2 JUMPS',face:2,type:'wallCalibration',lethal:false,target:2,initialHeight:154,initialWidth:128,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を調整し、必要ジャンプ回数と操作の余裕を確認しよう。',spec:[['目標','2段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','2.41マス'],['初期の幅','2マス']]},
  {n:'B-03',jp:'青枠の壁 / 3ジャンプ用',en:'BLUE LANDING WALL · 3 JUMPS',face:3,type:'wallCalibration',lethal:false,target:3,initialHeight:275,initialWidth:128,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を調整し、必要ジャンプ回数と操作の余裕を確認しよう。',spec:[['目標','3段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','4.30マス'],['初期の幅','2マス']]},
  {n:'B-04',jp:'青枠の壁 / 4ジャンプ用',en:'BLUE LANDING WALL · 4 JUMPS',face:4,type:'wallCalibration',lethal:false,target:4,initialHeight:402,initialWidth:128,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を調整し、必要ジャンプ回数と操作の余裕を確認しよう。',spec:[['目標','4段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','6.28マス'],['初期の幅','2マス']]},
  {n:'R-01',jp:'赤枠の壁 / 1ジャンプ用',en:'RED DANGER WALL · 1 JUMP',face:1,type:'wallCalibration',lethal:true,target:1,initialHeight:65,initialWidth:48,tip:'壁の上を通過中も高さを保つ',desc:'上面も側面も接触禁止。完全に上を飛び越えよう。 高さと横幅を調整し、必要ジャンプ回数と操作の余裕を確認しよう。',spec:[['目標','1段ジャンプ'],['タイプ','赤枠の壁'],['初期の高さ','1.02マス'],['初期の幅','0.75マス']]},
@@ -1249,7 +1314,7 @@ function createLevel(){
  if(type==='gapCalibration'){const v=gapSettings[idx-calibrationEntries.length-wallEntries.length-baseEntries.length];objs=[{type:'gap',x:X,width:v}];goal=X+v+300;return;}
  if(type==='airADodge'){
    // First pass under red suspended hazard, THEN jump over short floor spikes.
-   objs=[airA(X,100,162,82),spikeObj(X+245,112,2,65)];goal=X+620;return;
+   objs=[airA(X,52,162,106),spikeObj(X+245,112,2,65)];goal=X+620;return;
  }
  if(type==='airBLand'){
    // Two jumps reach platform H154; crossing its top from above refills jumps.
@@ -1257,7 +1322,7 @@ function createLevel(){
  }
  if(type==='airACombo'){
    // Blue wall must be climbed before passing the red air hazard.
-   objs=[rectObj(X,128,154),airA(X+175,125,330,66)];goal=X+665;return;
+   objs=[rectObj(X,128,154),airA(X+175,52,295,106)];goal=X+665;return;
  }
  if(type==='airBCombo'){
    // Gap is too wide for 2 jumps; landing on B is necessary to bridge it.
@@ -1404,16 +1469,10 @@ function hitSpike(o,rect){for(let k=0;k<o.count;k++){
  if(triangleHit(tri,rect))return true;
  }return false;}
 function hitAirA(o,rc){
- // Ver.4.23: compact core + four short spikes. The dangerous area stays readable and tighter than a full all-around halo.
- const cx=o.x+o.width/2,cy=o.base+o.height/2;
- const coreW=o.width*.38,coreH=o.height*.38;
- const left=cx-coreW*.5,right=cx+coreW*.5,top=cy-coreH*.5,bottom=cy+coreH*.5;
- if(rc.r>left&&rc.l<right&&rc.t<bottom&&rc.b>top)return true;
- const leftTri=[[left,cy-coreH*.24],[o.x,cy],[left,cy+coreH*.24]];
- const rightTri=[[right,cy-coreH*.24],[o.x+o.width,cy],[right,cy+coreH*.24]];
- const topTri=[[cx-coreW*.22,top],[cx,o.base+o.height],[cx+coreW*.22,top]];
- const bottomTri=[[cx-coreW*.22,bottom],[cx,o.base],[cx+coreW*.22,bottom]];
- return triangleHit(leftTri,rc)||triangleHit(rightTri,rc)||triangleHit(topTri,rc)||triangleHit(bottomTri,rc);
+ const geom=NRRetro.airShape(o.x,o.base,o.width,o.height);
+ const core=geom.core;
+ if(rc.r>core.x&&rc.l<core.x+core.w&&rc.t>core.y&&rc.b<core.y+core.h)return true;
+ return geom.spikes.some(poly=>triangleHit(poly,rc));
 }
 function hitAirB(o,rc,s){
  if(rc.r<=o.x||rc.l>=o.x+o.width)return false;
@@ -1946,12 +2005,16 @@ function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);b
  if(uiMode!=='story'){drawJumpGuide();drawGapGuide();drawNumberGateGuide();drawPlatformGuide();drawSwitchGuide();drawObjectMeasures();drawMeasureBand()}
  drawGapWalls();
  // Ver.4.0: shift the sprite and its shadow 3.5 render units toward the viewer; physics unchanged.
- let sq=SIZE*.875,px=cameraPlayerX(),py=scrY(state.y)-sq/2-.15+3.5,pal=nrGameCubePal37(state.face);
+ let sq=SIZE*.875,px=cameraPlayerX(),py=scrY(state.y)-sq/2-.8,pal=nrGameCubePal37(state.face);
  // Shadow is kept tight to the top plane so the contact point reads clearly.
- ctx.fillStyle='#06111ca0';ctx.beginPath();ctx.ellipse(px,FLOOR+4.85,22*(1-Math.min(.56,state.y/650)),2.8,0,0,Math.PI*2);ctx.fill();
- if(state.lastLanding>0){ctx.strokeStyle=`rgba(155,232,255,${state.lastLanding/.3})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(px,FLOOR+4.3,28+(1-state.lastLanding/.3)*23,4.0,0,0,Math.PI*2);ctx.stroke()}
+ ctx.fillStyle='#06111ca0';ctx.beginPath();ctx.ellipse(px,FLOOR+1.8,22*(1-Math.min(.56,state.y/650)),2.8,0,0,Math.PI*2);ctx.fill();
+ if(state.lastLanding>0){ctx.strokeStyle=`rgba(155,232,255,${state.lastLanding/.3})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(px,FLOOR+2,28+(1-state.lastLanding/.3)*23,4.0,0,0,Math.PI*2);ctx.stroke()}
  for(let k=0;k<4;k++)stroke(px-sq*.68-k*15,py+(k-1.5)*7,px-sq*.68-k*15+8,py+(k-1.5)*7,pal.trail+'4a',1.6);
- if(window.NRRetro)NRRetro.cube(ctx,px,py,sq,state.face,state.angle);
+ if(window.NRRetro){
+   const progress=Math.max(0,Math.min(1,(state.angle-state.turnFrom)/(Math.PI/2)));
+   const roll=(state.turn<.20&&progress<1)?{from:state.face===1?4:state.face-1,to:state.face,progress}:null;
+   NRRetro.cube(ctx,px,py,sq,state.face,state.angle,roll);
+  }
  else {nrDrawGameStoneCube37(px,py,sq,state.face,state.angle);nrDrawGameDigit37(px,py,state.face,pal);}
  ctx.textBaseline='alphabetic';ctx.font='800 13px system-ui';ctx.textAlign='center';ctx.fillStyle='#a7c9dd';ctx.fillText('AUTO →',px,FLOOR+90);
 }
@@ -2080,15 +2143,14 @@ new ResizeObserver(resize).observe(stage);progress();setPage(window.location.has
 (()=>{
 'use strict';
 const items=[
- ['player','プレイヤー','PLAYER CUBE','Ver.4.2：石の質感と接地位置は維持しつつ、走行粉じんを見やすくし、プレイヤーを少しだけ小さく調整。'],
+ ['player','プレイヤー','PLAYER CUBE','Ver.4.26：数字1〜4ごとに色が切り替わるレトロキューブ。回転中の数字の変化、床接地、単独走行の着地判定を修正。'],
  ['spike','地上トゲ','RED RUIN SPIKES','Ver.4.10：地上トゲに隙間を作り、後ろのトゲを少し高く調整。1〜4本の無限走行で難易度を確認。'],
- ['ceiling','上トゲ','CEILING SPIKES','赤い亀裂のある石のトゲが天井から下を向く。ジャンプの高さやタイミングを確認。'],
+ ['ceiling','上トゲ（上面安全）','PIXEL CEILING / SAFE TOP','幅に応じてトゲの数が増減する石足場。上面は着地可能。下向きトゲの高さと床からの距離が大きく変わり、低くて立ったままでは当たるものも出現。'],
  ['ground','地面・石床','RUIN STONE FLOOR','Ver.4.0：明るい床上面と青暗い石壁の区別、床の角度と奥行きはVer.3.9を維持。'],
  ['gap','穴・側壁','GAP / SIDE WALL','穴の位置と危険な側壁を、装飾に埋もれず判別できるように。'],
  ['safe','青壁・安全','LANDABLE WALL','Ver.4.18：床と同じ石目と色・控えめな反射を採用。白い天板の厚さを約半分に調整。上面は着地可能。'],
  ['danger','赤壁・危険','RETRO DANGER WALL','Ver.4.22：Ver.4.21の危険壁をベースに、赤い継ぎ目の明るさと立体感を強化。低い壁でも危険だと分かるよう、両端の赤い発光を追加し、石の周囲にごく弱い赤い反射を入れて走行中の見やすさを改善。上面も側面も危険で、高さは4段階で変化。'],
- ['airA','空中トゲ','AIR SPIKES / DANGER','Ver.4.3：上下左右すべて危険。安全そうな天面を作らず、赤い亀裂のある浮遊石に統一。'],
- ['airB','上トゲ（上面安全）','AIR SPIKES / LANDABLE TOP','Ver.4.13：青灰色の浮遊石床は上面だけ着地可能。下面の赤トゲと側面は危険。'],
+ ['airA','空中トゲ','FOUR-WAY PIXEL SPIKES','Ver.4.27：中心の石を小さく、上下左右の赤トゲを同じ長さにして正方形へ。プレイヤーと同じか少し小さめ。全面接触禁止。'],
  ['gate','数字の壁','NUMBER GATE','数字一致で通過。赤い部分は常に危険な認証ゲート。'],
  ['platform','数字足場','NUMBER PLATFORM','指定の数字で上から着地。側面・下面は危険。下抜け可能。'],
  ['switch','数字スイッチ','NUMBER SWITCH','指定数字で触れると対応する仕掛けが作動する。'],
@@ -2527,7 +2589,7 @@ function facetSpike(x,bottom,w,h,old=false,down=false){
 }
 function spikeBase(x,y,w,old=false){stoneTile(x,y,w,26,old);if(!old){for(let a=0;a<w-12;a+=16)line(x+a+5,y+21,x+a+10,y+21,'#ffb69b78',1)}}
 function nrObstaclePreviewCube(x,ground,size=112){
- const cy=playerCenterYForGround(ground+9.1+NR_FRONT_OFFSET40,size,0,false);
+ const cy=ground-size*.5-.7;
  nrPlayerContactShadow38(x,ground,size,0,16);
  dbRoundedCube(x,cy,size,face,0,false);
 }
@@ -2535,7 +2597,8 @@ function drawCeilingSpikes45(){
  NRRetro.floor(g,66,357,892,83,0);
  nrObstaclePreviewCube(201,357,110);
  // Upper spikes and landable overhead spikes now use the same visual language.
- NRRetro.airB(g,401,105,405,25,114,35);
+ // A low group with deliberately uneven tip lengths illustrates the new height variation.
+ NRRetro.airB(g,401,180,405,25,105,35,[39,105,61,91,28]);
 }
 function drawSpikes(){
  floor(66,335,892,105,!improved);
@@ -2813,7 +2876,7 @@ function nrDrawStoneCube35(cx,cy,size,n,spin=0,small=false){
 }
 
 function dbRoundedCube(cx,cy,size,n,spin=0,small=false){
- if(window.NRRetro)return NRRetro.cube(g,cx,cy-(runActive&&small?size*.16:size*.10),size,n,spin);
+ if(window.NRRetro)return NRRetro.cube(g,cx,cy,size,n,spin,cubeRoll);
  if(nrModernStone35()){nrDrawStoneCube35(cx,cy,size,n,spin,small);return;}
  const previous=legacy22,prior=legacy22||legacy23,mesh=runActive&&small?dbMeshRun:legacy22?dbMesh22:legacy23?dbMesh23:dbMesh24;
  const quarter=Math.PI/2;
@@ -2922,7 +2985,7 @@ function drawAir(safe){
  NRRetro.floor(g,80,359,870,81,0);
  nrObstaclePreviewCube(221,359,112);
  if(safe)NRRetro.airB(g,420,136,356,37,109,218);
- else for(let j=0;j<3;j++)NRRetro.airA(g,434+j*118,137,94,110);
+ else NRRetro.airA(g,513,170,101,101);
 }
 function drawGate(){floor(190,361,655,79,!improved);
  const x=454,y=28,w=135,h=335;g.save();g.shadowBlur=20;g.shadowColor='#a67cff6b';g.fillStyle=improved?'#6e56a78a':'#595fa6a0';rr(x,y,w,h,12);g.fill();g.shadowBlur=0;g.strokeStyle='#bda5fe';g.lineWidth=4;g.stroke();g.restore();
@@ -2943,17 +3006,23 @@ function drawMoving(){floor(72,360,877,80,!improved);g.setLineDash([15,10]);line
 // Ver.4.0: keep the shadow aligned to the cube, a few pixels nearer the front of the stone plane.
 // It fades and broadens with height but never alters the player's collision rectangle.
 function nrPlayerContactShadow38(cx,groundY,size,flight=0,cap=18){
+ // Ver.4.26: the old shadow sat 9–13px down the front face of the floor.
+ // Align the contact shadow with the top plane and sprite's actual bottom edge.
+ // This prevents a second, detached dark oval from reading as a floating cube.
  const f=dbClamp(flight,0,1);
- const y=groundY+cap*.51+NR_FRONT_OFFSET40;
- const wide=size*(.37-.11*f);
- g.save();g.beginPath();g.rect(0,groundY,1024,Math.max(1,cap));g.clip();
- const haze=g.createRadialGradient(cx,y,1,cx,y,size*.53);
- haze.addColorStop(0,`rgba(6,17,26,${.26-.17*f})`);
- haze.addColorStop(.55,`rgba(6,17,26,${.11-.075*f})`);
- haze.addColorStop(1,'rgba(6,17,26,0)');
- g.fillStyle=haze;g.fillRect(cx-size*.53,groundY,size*1.06,cap+1);
- ellipse(cx,y,wide,Math.max(2.1,4.0-f*1.1),`rgba(2,11,18,${.68-.36*f})`);
- if(f<.45)ellipse(cx,y-1,size*.22,1.9,`rgba(4,13,21,${.38*(1-f/.45)})`);
+ const yy=Math.round(groundY)+1.5;
+ const halfWidth=size*(.30-.10*f);
+ g.save();g.beginPath();g.rect(0,groundY-1,1024,Math.min(9,Math.max(5,cap*.6)));g.clip();
+ // A narrow, muted pixel-art contact line, deliberately not a blurred drop shadow.
+ if(f<.78){
+  g.fillStyle=`rgba(5,14,23,${.30*(1-f)})`;
+  g.fillRect(Math.round(cx-halfWidth*.95),Math.round(groundY+1),Math.round(halfWidth*1.9),3);
+ }
+ ellipse(cx,yy,halfWidth,Math.max(.9,1.75-.55*f),`rgba(2,11,19,${.58-.43*f})`);
+ if(f<.28){
+  g.fillStyle=`rgba(4,12,19,${.44*(1-f/.28)})`;
+  g.fillRect(Math.round(cx-size*.17),Math.round(groundY),Math.round(size*.34),2);
+ }
  g.restore();
 }
 function playerCenterYForGround(groundY,size,spin=0,small=false){
@@ -3044,11 +3113,31 @@ function trialFill(){
    o.heights=NR49_RUN_SPIKE_STEPS_PX[o.count].map(h=>h+offset);
    o.h=Math.max(...o.heights); // Compatibility with broad-phase positioning.
   }
-  else if(kind==='ceiling'){o.count=trialInt(1,3);o.pitch=trialInt(42,50);o.w=o.count*o.pitch;o.h=trialInt(54,75);o.bottom=trialInt(91,144);}
+  else if(kind==='ceiling'){
+   // Ver.4.26: block width determines count. Vary individual tips much more aggressively.
+   o.w=trialInt(76,340);
+   o.count=Math.max(1,Math.min(6,Math.round(o.w/76)));
+   o.pitch=o.w/o.count;
+   const dangerRoll=trialRand();
+   if(dangerRoll<.31){
+    // Low-hanging hazard: its longest tip enters the running cube's head space.
+    // Keep the *top* reachable with one jump, so it is a challenge rather than a dead end.
+    o.bottom=trialInt(23,45);
+    const maxTip=Math.max(23,Math.min(46,97-o.bottom-23));
+    o.heights=Array.from({length:o.count},()=>trialInt(17,maxTip));
+    o.heights[trialInt(0,o.count-1)]=maxTip;
+   }else{
+    o.bottom=dangerRoll<.72?trialInt(73,127):trialInt(135,188);
+    const hMax=trialInt(89,137);
+    o.heights=Array.from({length:o.count},()=>trialInt(29,hMax));
+    o.heights[trialInt(0,o.count-1)]=hMax;
+   }
+   o.h=Math.max(...o.heights);
+  }
   else if(kind==='gap'){o.w=trialInt(95,150);}
   else if(kind==='safe'){const tiers=[[43,60],[83,109],[126,154],[169,198]];o.tier=trialInt(0,3);o.w=trialInt(68,116);o.h=trialInt(...tiers[o.tier]);}
   else if(kind==='danger'){const tiers=[[41,57],[79,104],[121,149],[165,194]];o.tier=trialInt(0,3);o.w=trialInt(52,91);o.h=trialInt(...tiers[o.tier]);}
-  else if(kind==='airA'){o.w=trialInt(70,94);o.h=trialInt(70,105);o.bottom=trialInt(38,96);}
+  else if(kind==='airA'){const d=trialInt(57,68);o.w=d;o.h=d;o.bottom=trialInt(38,96);}
   else if(kind==='airB'){o.w=trialInt(100,142);o.h=trialInt(53,89);o.slab=22;o.bottom=trialInt(46,72);}
   else if(kind==='gate'){o.w=trialInt(42,61);o.target=trialInt(1,4);o.variant=trialInt(0,2);o.h=230;}
   else if(kind==='platform'){o.w=trialInt(96,135);o.h=trialInt(61,94);o.target=trialInt(1,4);}
@@ -3063,7 +3152,7 @@ function trialFill(){
  trialObjects=trialObjects.filter(o=>o.x+Math.max(o.w,o.barrierX?o.barrierX-o.x+o.barrierW:0)>view-260);
 }
 function trialScreenX(o){return 252+o.x-runDistance*NR45_SCALE}
-function trialGroundY(){return 341+runCameraLift+8.15+NR_FRONT_OFFSET40}
+function trialGroundY(){return 341+runCameraLift}
 function trialRects(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
 function trialPolyHit(points,box){
  // SAT: avoid punishing a player who clears the sloping corners of a spike.
@@ -3141,10 +3230,11 @@ function trialCheck(dt,oldHeight){
    const foot=box.y+box.h;
    const landed=trialOnSurface&&runVelocity<=0&&Math.abs(foot-slabTop)<=2.5;
    if(trialRects(box,{x:p.x,y:slabTop,w:p.w,h:23})&&!landed)collision=true;
-   const pitch=p.w/4;
-   for(let i=0;i<4;i++){
+   const pitch=p.w/o.count;
+   for(let i=0;i<o.count;i++){
     const x=p.x+i*pitch+pitch*.12;
-    if(trialPolyHit([[x,p.y],[x+pitch*.38,p.y+o.h],[x+pitch*.76,p.y]],box))collision=true;
+    const h=o.heights?.[i]??o.h;
+    if(trialPolyHit([[x,p.y],[x+pitch*.38,p.y+h],[x+pitch*.76,p.y]],box))collision=true;
    }
   }else if(o.kind==='gap'){
    // Hitting the far vertical side while below surface is a failure.
@@ -3156,15 +3246,8 @@ function trialCheck(dt,oldHeight){
    // Only the very top is safe. Side and bottom of a blue wall remain harmful.
    if(trialRects(box,rect)&&!(isSafe&&runHeight*RUN_VISUAL_SCALE>=ground-p.y-4&&runVelocity<=0))collision=true;
   }else if(o.kind==='airA'){
-   const cx=p.x+p.w*.5,cy=p.y+p.h*.5,cw=p.w*.38,ch=p.h*.38;
-   const left=cx-cw*.5,right=cx+cw*.5,top=cy-ch*.5,bottom=cy+ch*.5;
-   if(trialRects(box,{x:left,y:top,w:cw,h:ch}))collision=true;
-   for(const poly of [
-    [[cx-cw*.16,top],[cx,p.y],[cx+cw*.16,top]],
-    [[cx-cw*.16,bottom],[cx,p.y+p.h],[cx+cw*.16,bottom]],
-    [[left,cy-ch*.18],[p.x,cy],[left,cy+ch*.18]],
-    [[right,cy-ch*.18],[p.x+p.w,cy],[right,cy+ch*.18]]
-   ])if(trialPolyHit(poly,box))collision=true;
+   const geom=NRRetro.airShape(p.x,p.y,p.w,p.h);
+   if(trialRects(box,geom.core)||geom.spikes.some(poly=>trialPolyHit(poly,box)))collision=true;
   }else if(o.kind==='airB'){
    const slabHeight=Math.max(16,Math.min(22,(o.h-o.slab)*.28));
    const slab={x:p.x,y:p.y,w:p.w,h:slabHeight};
@@ -3197,6 +3280,14 @@ function trialGateOpening(o,ground){
 }
 function trialUpdate(dt,oldHeight){
  if(trialRetry>0){trialRetry=Math.max(0,trialRetry-dt);if(trialRetry===0)trialReset();return;}
+ if(trialKind()==='player'||trialKind()==='ground'){
+  // Even with no obstacles, keep the landing solver active.
+  if(runVelocity<=0&&oldHeight>=-.5&&runHeight<=0){
+    if(!trialOnSurface||Math.abs(runHeight)>.001)trialLandAt(0);
+    else{runHeight=0;runVelocity=0;}
+  }
+  return;
+ }
  trialFill();trialCheck(dt,oldHeight);
 }
 function trialDrawObjects(){
@@ -3208,7 +3299,7 @@ function trialDrawObjects(){
   if(o.kind==='spike'){
    for(let i=0;i<o.count;i++)NRSpikeArt.spike(g,x+i*o.pitch,ground,o.tipW,o.heights[i],false,o.id*13+i);
   }else if(o.kind==='ceiling'){
-   NRRetro.airB(g,x,y-23,w,23,o.h,o.id);
+   NRRetro.airB(g,x,y-23,w,23,o.h,o.id,o.heights);
   }else if(o.kind==='gap'){
    // Only the opening is rendered by the split floor, below.
    line(x,ground+4,x,440,'#ba596351',1.6);
@@ -3257,16 +3348,17 @@ function drawRunning(){
  const groundY=baseGroundY+runCameraLift;
  trialDrawFloor(runDistance*playerSize/RUN_PLAYER_WORLD_SIZE,groundY);
  const phase=((cubeSpin%(Math.PI/2))+(Math.PI/2))%(Math.PI/2);
- // Bottom of the visible cube rests near the center of the 16px top plane (not on the wall).
- const centerY=playerCenterYForGround(groundY+8.15+NR_FRONT_OFFSET40,playerSize,phase,true)-visualJump;
- const sx=playerShadowX(px,playerSize,phase,true);
+ // Ver.4.26: keep the sprite's visible bottom on the same top-plane edge as its contact shadow.
+ // Body movement is subpixel-only; depth illusion is corrected primarily via the shadow.
+ const centerY=groundY-playerSize*.5+0.15-visualJump;
+ const sx=px; // pixel cube is front-facing: its contact point is directly beneath its center.
  const flight=dbClamp(visualJump/160,0,1);
  nrPlayerContactShadow38(sx,groundY,playerSize,flight,16);
  nrDrawRunDust41();
  trialDrawObjects();
  if(runLandFx>0){
   const t=1-runLandFx/.19;
-  g.beginPath();g.ellipse(sx,groundY+8+NR_FRONT_OFFSET40,20+t*31,3.8+t*.8,0,0,Math.PI*2);
+  g.beginPath();g.ellipse(sx,groundY+2.5,20+t*31,1.8+t*.5,0,0,Math.PI*2);
   g.strokeStyle=`rgba(162,181,186,${(1-t)*.15})`;g.lineWidth=1.5;g.stroke();
  }
  dbRoundedCube(px,centerY,playerSize,face,phase,true);
@@ -3282,7 +3374,7 @@ function draw(){
     if(improved){
       const previewSize=167; // Ver.4.6: cube ~3% smaller in static design preview.
       nrPlayerContactShadow38(playerShadowX(mainX,previewSize,phase),mainGround,previewSize,0,20);
-      dbRoundedCube(mainX,playerCenterYForGround(mainGround+10.2+NR_FRONT_OFFSET40,previewSize,phase),previewSize,face,phase);
+      dbRoundedCube(mainX,mainGround-previewSize*.5-.7,previewSize,face,phase);
     }else {
       shadow(515,331,140);oldCube(411,75,198,face)
     }
