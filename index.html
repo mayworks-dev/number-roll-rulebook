@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.4.18 · Floor-Matched Safe Walls</title>
+<title>NUMBER ROLL — Ver.4.23 · Air Spike A/B Design Update</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -446,7 +446,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
       </div>
       <div class="db-toolbar" id="dbToolbar">
-        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.18 床との質感統一</button>
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.22 赤ライン強化</button>
         <button id="dbV24" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.4 と比較</button>
         <button id="dbV23" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.3 と比較</button>
         <button id="dbV22" type="button" class="db-tool" aria-pressed="false">Ver.2.2</button>
@@ -533,7 +533,7 @@ window.NRSpikeArt=(()=>{
  }
  return {spike,slab,diamond};
 })();
-/* Ver.4.18 - Refined code-drawn stone walls inspired by the simplified concept images. */
+/* Ver.4.23 - Safe wall retained; Air Spike A/B visual design updated. */
 window.NRWallArt=(()=>{
  function hash(i){let n=(i|0)^0x728c4b9d;n=Math.imul(n^(n>>>16),0x7feb352d);n=Math.imul(n^(n>>>15),0x846ca68b);return ((n^(n>>>16))>>>0)/4294967295}
  function stroke(c,pts,color,width=1){c.beginPath();pts.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.strokeStyle=color;c.lineWidth=width;c.lineJoin='round';c.lineCap='round';c.stroke()}
@@ -608,43 +608,125 @@ window.NRWallArt=(()=>{
   c.restore();
  }
  function drawDanger(c,x,y,w,h,seed){
-  const rows=Math.max(2,Math.ceil(h/54));
-  const rowH=h/rows;
-  c.save();
-  c.shadowColor='rgba(255,61,83,.10)';c.shadowBlur=14;
-  const outline=grad(c,x,y,x,y+h,[[0,'#584953'],[.5,'#332d37'],[1,'#1c1b22']]);
-  rr(c,x,y,w,h,4,outline,'#7b59644d',1);
-  c.shadowBlur=0;
-  c.save();c.beginPath();c.rect(x+1,y+1,w-2,h-2);c.clip();
-  for(let r=0;r<rows;r++){
-   const ry=y+r*rowH;
-   if(r>0){stroke(c,[[x+2,ry],[x+w-2,ry]],'#140f14b8',2.2);stroke(c,[[x+2,ry+1],[x+w-2,ry+1]],'#b46c7a14',.9)}
-   const brickW=Math.max(36,Math.min(92,w*(.31+.10*hash(seed+r*17))));
-   const offset=(r%2)*brickW*.50;
-   for(let bx=x-brickW+offset;bx<x+w+brickW;bx+=brickW){
-    const left=Math.max(x,bx), right=Math.min(x+w,bx+brickW);
-    if(right-left<8)continue;
-    const gradBrick=grad(c,left,ry,left,ry+rowH,[[0,'#4b3f49'],[.5,'#2c2831'],[1,'#17171d']]);
-    c.fillStyle=gradBrick;c.fillRect(left+.8,ry+.8,right-left-1.6,rowH-1.6);
-    stroke(c,[[bx,ry+3],[bx,Math.min(y+h-3,ry+rowH-3)]],'#1a1318c8',1.9);
-    const s=seed+r*41+Math.floor(bx);
-    const cx=left+(right-left)*(.2+.55*hash(s));
-    const cy=ry+rowH*(.18+.16*hash(s+1));
-    const crack=[ [cx-(right-left)*.18,cy], [cx-(right-left)*.02,cy+rowH*.16], [cx+(right-left)*.10,cy+rowH*.34], [cx+(right-left)*.22,cy+rowH*(.58+.10*hash(s+2))] ];
-    c.shadowColor='#ff314a';c.shadowBlur=9;
-    stroke(c,crack,'#ff5364',Math.max(1.3,(right-left)*.018));
-    if(hash(s+3)>.35)stroke(c,[crack[1],[crack[1][0]+(right-left)*.12,crack[1][1]-(rowH)*.14]],'#d93f50',1.05);
-    if(hash(s+4)>.45)stroke(c,[crack[2],[crack[2][0]-(right-left)*.10,crack[2][1]+(rowH)*.14]],'#d93f50',1.0);
+  // Ver.4.22: same concept as Ver.4.21, but brighter seams, more depth, and clearer low-wall danger cues.
+  const capH=Math.max(2.6,Math.min(4.1,h*.024));
+  const bodyY=y+capH, bodyH=Math.max(1,h-capH);
+  const stoneGrain=window.NR_SHARED_STONE_GRAIN35;
+  function grain(px,py,pw,ph,key,alpha){
+    if(typeof stoneGrain!=='function'||pw<2||ph<2)return;
+    c.save();c.globalCompositeOperation='soft-light';c.globalAlpha=alpha;
+    c.drawImage(stoneGrain(key),px,py,pw,ph);c.restore();
+  }
+  function glowLine(x1,y1,x2,y2,outer='rgba(255,84,62,.42)',inner='#ff875f',core='rgba(255,231,176,.90)',lw=1.2,blur=8){
+    c.save();
+    c.lineCap='round';c.lineJoin='round';
+    c.shadowColor=outer;c.shadowBlur=blur;
+    stroke(c,[[x1,y1],[x2,y2]],outer,lw+3.1);
+    c.shadowBlur=Math.max(0,blur-3);
+    stroke(c,[[x1,y1],[x2,y2]],inner,lw+1.45);
     c.shadowBlur=0;
-   }
+    stroke(c,[[x1,y1],[x2,y2]],core,Math.max(.58,lw*.42));
+    c.restore();
+  }
+  function seamGlowRect(px,py,pw,ph,a=.16){
+    const g=c.createRadialGradient(px+pw*.5,py+ph*.5,0,px+pw*.5,py+ph*.5,Math.max(pw,ph)*.9);
+    g.addColorStop(0,`rgba(255,92,72,${Math.min(.22,a+.07)})`);
+    g.addColorStop(.45,`rgba(255,72,54,${a})`);
+    g.addColorStop(1,'rgba(0,0,0,0)');
+    c.fillStyle=g;c.fillRect(px-4,py-4,pw+8,ph+8);
+  }
+  function ember(cx,cy,r,a=.18){
+    const g=c.createRadialGradient(cx,cy,0,cx,cy,r);
+    g.addColorStop(0,`rgba(255,220,160,${Math.min(.38,a+.12)})`);
+    g.addColorStop(.34,`rgba(255,102,72,${Math.min(.3,a+.06)})`);
+    g.addColorStop(1,'rgba(0,0,0,0)');
+    c.fillStyle=g;c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.fill();
+  }
+  c.save();
+  const lowWall=bodyH<58;
+
+  const baseShadow=grad(c,x,y+h-12,x,y+h+2,[[0,'rgba(12,12,16,0)'],[.55,'rgba(12,12,16,.14)'],[1,'rgba(12,12,16,.28)']]);
+  c.fillStyle=baseShadow;c.fillRect(x+2,y+h-12,w-4,14);
+
+  // dark hot mortar layer under the bricks
+  const mortar=grad(c,x,bodyY,x,bodyY+bodyH,[[0,'#5a1b1d'],[.45,'#300d12'],[1,'#16070b']]);
+  c.fillStyle=mortar;c.fillRect(x,bodyY,w,bodyH);
+  c.save();c.globalAlpha=.17;
+  c.fillStyle='rgba(255,92,66,1)';
+  c.fillRect(x+1,bodyY+1,w-2,Math.max(2,bodyH*.17));
+  c.restore();
+
+  c.save();c.beginPath();c.rect(x,bodyY,w,bodyH);c.clip();
+  const rows=Math.max(1,Math.round(bodyH/73));
+  const rowH=bodyH/rows;
+  const targetCols=w<88?1:w<192?2:Math.max(2,Math.round(w/94));
+  const brickW=w/targetCols;
+  const gapX=Math.max(1.5,Math.min(3.2,w*.0082));
+  const gapY=Math.max(1.15,Math.min(2.5,bodyH*.014));
+
+  // faint red reflection behind the whole wall to improve visibility while running
+  c.save();c.globalAlpha=.12;
+  seamGlowRect(x+2,bodyY+2,w-4,bodyH-4,.10);
+  c.restore();
+
+  for(let r=0;r<rows;r++){
+    const ry=bodyY+r*rowH;
+    const shift=(r%2)*brickW*.47;
+    if(r>0){
+      seamGlowRect(x+2,ry-1.2,w-4,2.6,.12);
+      glowLine(x+2,ry,x+w-2,ry,'rgba(255,76,56,.28)','rgba(255,98,74,.64)','rgba(255,232,174,.56)',.9,9);
+    }
+    for(let col=-1;col<=targetCols+1;col++){
+      const rawX=x+col*brickW+shift;
+      const bx=Math.max(x,rawX+gapX), right=Math.min(x+w,rawX+brickW-gapX);
+      if(right-bx<5)continue;
+      const by=ry+gapY,bh=Math.max(2,rowH-gapY*2),bw=right-bx;
+      const s=seed+r*131+col*23;
+      const face=grad(c,bx,by,bx+10,by+bh,[[0,'#4e565f'],[.18,'#3d4650'],[.70,'#273039'],[1,'#1b232c']]);
+      rr(c,bx,by,bw,bh,1.8,face,'#7d889218',.6);
+      c.save();c.beginPath();c.rect(bx+1,by+1,Math.max(1,bw-2),Math.max(1,bh-2));c.clip();
+      grain(bx+1,by+1,bw-2,bh-2,s,.34);
+      const satin=grad(c,bx,by,bx,by+bh*.44,[[0,'rgba(214,228,235,.052)'],[.58,'rgba(214,228,235,.014)'],[1,'rgba(214,228,235,0)']]);
+      c.fillStyle=satin;c.fillRect(bx+1,by+1,bw-2,bh*.44);
+      c.restore();
+      c.strokeStyle='rgba(198,208,216,.13)';c.lineWidth=.62;
+      c.beginPath();c.moveTo(bx+2.4,by+1.25);c.lineTo(bx+bw-2.8,by+1.25);c.stroke();
+      c.strokeStyle='rgba(8,15,23,.24)';c.lineWidth=.78;
+      c.beginPath();c.moveTo(bx+1.5,by+bh-.8);c.lineTo(bx+bw-1.8,by+bh-.8);c.stroke();
+      if(hash(s+40)>.76){ ember(bx+bw*(.35+.28*hash(s+41)), by+bh*(.34+.22*hash(s+42)), Math.max(5,bw*.11), .06); }
+    }
+    for(let col=0;col<targetCols;col++){
+      const seamX=x+(col+1)*brickW+shift;
+      if(seamX<=x+2 || seamX>=x+w-2)continue;
+      seamGlowRect(seamX-1.6,ry+1.2,3.2,rowH-2.4,.12);
+      glowLine(seamX,ry+1.2,seamX,ry+rowH-1.2,'rgba(255,76,56,.24)','rgba(255,100,76,.54)','rgba(255,232,174,.42)',.82,8);
+    }
   }
   c.restore();
-  stroke(c,[[x+4,y+2],[x+w-4,y+2]],'#ff6b79',2.2);
-  c.save();c.strokeStyle='rgba(255,92,104,.18)';c.lineWidth=1.15;
-  const smokeN=Math.max(2,Math.round(w/54));
+
+  // extra cue for short walls: red edge pillars so they don't read as ordinary stone while running
+  if(lowWall){
+    seamGlowRect(x+1.5,bodyY+2,3.4,bodyH-4,.15);
+    seamGlowRect(x+w-4.9,bodyY+2,3.4,bodyH-4,.15);
+    glowLine(x+3.2,bodyY+2,x+3.2,bodyY+bodyH-2,'rgba(255,88,66,.32)','rgba(255,108,80,.70)','rgba(255,235,184,.58)',.98,10);
+    glowLine(x+w-3.2,bodyY+2,x+w-3.2,bodyY+bodyH-2,'rgba(255,88,66,.32)','rgba(255,108,80,.70)','rgba(255,235,184,.58)',.98,10);
+  }
+
+  const cap=grad(c,x,y,x+4,y+capH,[[0,'#646e76'],[.55,'#4f5a63'],[1,'#313a43']]);
+  c.fillStyle=cap;c.fillRect(x+1,y,w-2,capH);
+  c.save();c.beginPath();c.rect(x+2,y+.35,Math.max(1,w-4),Math.max(1,capH-.7));c.clip();
+  grain(x+2,y+.35,w-4,capH-.7,seed+2,.22);
+  c.restore();
+  glowLine(x+4,y+1.0,x+w-4,y+1.0,'rgba(255,82,60,.34)','rgba(255,108,82,.70)','rgba(255,234,180,.54)',.96,9);
+  glowLine(x+2,y+capH-.55,x+w-2,y+capH-.55,'rgba(255,62,48,.26)','rgba(255,92,70,.54)','rgba(255,220,160,.34)',.72,7);
+  stroke(c,[[x+5,y+1.55],[x+w-6,y+1.55]],'rgba(255,255,255,.08)',.42);
+
+  c.save();
+  c.strokeStyle='rgba(255,100,78,.13)';c.lineWidth=.9;
+  const smokeN=Math.max(2,Math.round(w/62));
   for(let i=0;i<smokeN;i++){
-   const sx=x+12+i*(w-24)/Math.max(1,smokeN-1); const sy=y-6-(i%2)*2;
-   c.beginPath();c.moveTo(sx,sy+9);c.quadraticCurveTo(sx+3,sy+1,sx,sy-7);c.stroke();
+    const sx=x+14+i*(w-28)/Math.max(1,smokeN-1), sy=y-4.2-(i%2)*1.4;
+    c.beginPath();c.moveTo(sx,sy+6.5);c.quadraticCurveTo(sx+2.0,sy+1.0,sx,sy-4.8);c.stroke();
   }
   c.restore();
   c.restore();
@@ -1119,26 +1201,34 @@ function hitSpike(o,rect){for(let k=0;k<o.count;k++){
  if(triangleHit(tri,rect))return true;
  }return false;}
 function hitAirA(o,rc){
- // A is a hazardous floating diamond. Exact polygon versus player rectangle.
+ // Ver.4.23: compact core + four short spikes. The dangerous area stays readable and tighter than a full all-around halo.
  const cx=o.x+o.width/2,cy=o.base+o.height/2;
- return triangleHit([[cx,o.base+o.height],[o.x+o.width,cy],[cx,o.base]],rc) ||
-        triangleHit([[cx,o.base+o.height],[cx,o.base],[o.x,cy]],rc);
+ const coreW=o.width*.38,coreH=o.height*.38;
+ const left=cx-coreW*.5,right=cx+coreW*.5,top=cy-coreH*.5,bottom=cy+coreH*.5;
+ if(rc.r>left&&rc.l<right&&rc.t<bottom&&rc.b>top)return true;
+ const leftTri=[[left,cy-coreH*.24],[o.x,cy],[left,cy+coreH*.24]];
+ const rightTri=[[right,cy-coreH*.24],[o.x+o.width,cy],[right,cy+coreH*.24]];
+ const topTri=[[cx-coreW*.22,top],[cx,o.base+o.height],[cx+coreW*.22,top]];
+ const bottomTri=[[cx-coreW*.22,bottom],[cx,o.base],[cx+coreW*.22,bottom]];
+ return triangleHit(leftTri,rc)||triangleHit(rightTri,rc)||triangleHit(topTri,rc)||triangleHit(bottomTri,rc);
 }
 function hitAirB(o,rc,s){
  if(rc.r<=o.x||rc.l>=o.x+o.width)return false;
  const topSafe = s.groundH===o.height && !s.air && rc.b>=o.height-2 && rc.l<o.x+o.width-2 && rc.r>o.x+2;
  if(topSafe)return false;
- // Ignore the very top slab if the player is clearly above it; only the underside rim is dangerous.
- if(rc.t<o.height-5 && rc.b>o.height-22)return true;
- const pitch=o.width/3;
- for(let j=0;j<3;j++){
-  const lx=o.x+j*pitch;
-  const poly=[[lx,o.height-15],[lx+pitch/2,o.height-15-o.spikeH],[lx+pitch,o.height-15]];
-  if(triangleHit(poly,rc))return true;
+ const bodyH=Math.max(16,Math.min(22,o.spikeH*.28));
+ const root=o.height-bodyH+1;
+ // Stone body underside / side contact is dangerous unless the player is already standing on top.
+ if(rc.t<o.height-3 && rc.b>o.height-bodyH && rc.r>o.x+2 && rc.l<o.x+o.width-2)return true;
+ const spikeCount=4,pitch=o.width/spikeCount;
+ for(let j=0;j<spikeCount;j++){
+  const lx=o.x+j*pitch+pitch*.14;
+  const tri=[[lx,root],[lx+pitch*.72,root],[lx+pitch*.36,root-o.spikeH]];
+  if(triangleHit(tri,rc))return true;
  }
- const sideBand=10;
+ const sideBand=Math.max(10,o.width*.06);
  const nearSide=(rc.r>o.x&&rc.l<o.x+sideBand)||(rc.r>o.x+o.width-sideBand&&rc.l<o.x+o.width);
- if(nearSide&&rc.t<o.height-2&&rc.b>o.height-16-o.spikeH)return true;
+ if(nearSide&&rc.t<o.height-2&&rc.b>root-o.spikeH)return true;
  return false;
 }
 function update(dt){if(state.status!=='running')return;const s=state;
@@ -1463,21 +1553,77 @@ function drawGapGuide(){
  }
 }
 function drawAirA(o){
- const x=screenX(o.x),top=scrY(o.base+o.height),h=o.height*ZOOM;
+ const x=screenX(o.x),top=scrY(o.base+o.height),w=o.width,h=o.height*ZOOM;
+ const cx=x+w*.5,cy=top+h*.5;
+ const coreW=w*.38,coreH=h*.38;
+ const left=cx-coreW*.5,right=cx+coreW*.5,coreTop=cy-coreH*.5,coreBottom=cy+coreH*.5;
  ctx.save();
- ctx.shadowColor='#ff4258';ctx.shadowBlur=12;
- NRSpikeArt.diamond(ctx,x,top,o.width,h);
+ // Compact icy-stone core.
+ ctx.shadowColor='#ff4b57';ctx.shadowBlur=10;
+ const coreGrad=ctx.createLinearGradient(left,coreTop,right,coreBottom);
+ coreGrad.addColorStop(0,'#7f90a3');coreGrad.addColorStop(.38,'#5d6f83');coreGrad.addColorStop(1,'#324558');
+ round(left,coreTop,coreW,coreH,4);ctx.fillStyle=coreGrad;ctx.fill();
+ ctx.lineWidth=1.4;ctx.strokeStyle='rgba(215,230,240,.40)';ctx.stroke();
  ctx.shadowBlur=0;
- const mid=x+o.width*.5;
- stroke(mid-o.width*.16,top+h*.18,mid+o.width*.12,top+h*.68,'#ff5564',2.1);
- stroke(mid+o.width*.07,top+h*.30,mid-o.width*.10,top+h*.55,'#d93c49',1.5);
+ const bevel=ctx.createLinearGradient(left,coreTop,left,coreTop+coreH*.28);
+ bevel.addColorStop(0,'rgba(235,244,249,.34)');bevel.addColorStop(1,'rgba(235,244,249,0)');
+ ctx.fillStyle=bevel;round(left+1.2,coreTop+1.2,Math.max(2,coreW-2.4),Math.max(2,coreH*.30),3);ctx.fill();
+ // Inner red core.
+ ctx.save();ctx.shadowColor='#ff514d';ctx.shadowBlur=14;
+ ctx.beginPath();ctx.moveTo(cx,cy-coreH*.22);ctx.lineTo(cx+coreW*.18,cy);ctx.lineTo(cx,cy+coreH*.22);ctx.lineTo(cx-coreW*.18,cy);ctx.closePath();
+ const g=ctx.createLinearGradient(cx,cy-coreH*.22,cx,cy+coreH*.22);g.addColorStop(0,'#ffb1a2');g.addColorStop(.45,'#ff5d44');g.addColorStop(1,'#d12d2d');
+ ctx.fillStyle=g;ctx.fill();ctx.restore();
+ // Four spikes: shorter and tighter than a full huge all-direction hazard.
+ const spikeFill=ctx.createLinearGradient(cx,coreTop,cx,coreBottom);
+ spikeFill.addColorStop(0,'#dbe7ef');spikeFill.addColorStop(.45,'#a9b8c7');spikeFill.addColorStop(1,'#74869a');
+ const drawTri=(pts)=>{ctx.save();ctx.shadowColor='#ff4d57';ctx.shadowBlur=9;ctx.fillStyle=spikeFill;ctx.strokeStyle='rgba(227,238,246,.48)';ctx.lineWidth=1.1;ctx.beginPath();pts.forEach(([px,py],i)=>i?ctx.lineTo(px,py):ctx.moveTo(px,py));ctx.closePath();ctx.fill();ctx.stroke();ctx.restore();};
+ drawTri([[cx-coreW*.16,coreTop],[cx,top],[cx+coreW*.16,coreTop]]);
+ drawTri([[cx-coreW*.16,coreBottom],[cx,scrY(o.base)],[cx+coreW*.16,coreBottom]]);
+ drawTri([[left,cy-coreH*.18],[x,cy],[left,cy+coreH*.18]]);
+ drawTri([[right,cy-coreH*.18],[x+w,cy],[right,cy+coreH*.18]]);
+ // Red seams at the joints so it reads as dangerous instantly.
+ ctx.save();ctx.shadowColor='#ff4e58';ctx.shadowBlur=8;ctx.strokeStyle='#ff564c';ctx.lineWidth=1.6;
+ stroke(cx,coreTop-1,cx,coreTop+7,'#ff564c',1.6);
+ stroke(cx,coreBottom-7,cx,coreBottom+1,'#ff564c',1.6);
+ stroke(left-1,cy,right*0+0,cy,'rgba(0,0,0,0)',0); // no-op keeps helper usage stable
+ stroke(left-1,cy,left+7,cy,'#ff564c',1.6);
+ stroke(right-7,cy,right+1,cy,'#ff564c',1.6);
  ctx.restore();
 }
 function drawAirB(o){
  const x=screenX(o.x),y=scrY(o.height),w=o.width;
- const rim=15*ZOOM,tip=o.spikeH*ZOOM;
- NRSpikeArt.slab(ctx,x,y,w,rim,true);
- for(let j=0;j<3;j++)NRSpikeArt.spike(ctx,x+j*w/3,y+rim,w/3,tip,true,j+50);
+ const bodyH=Math.max(16,Math.min(22,o.spikeH*.28))*ZOOM;
+ const root=y+bodyH-1;
+ ctx.save();
+ // Top safe stone platform.
+ const body=ctx.createLinearGradient(x,y,x,y+bodyH);
+ body.addColorStop(0,'#5a7388');body.addColorStop(.22,'#456078');body.addColorStop(1,'#2a4056');
+ round(x,y,w,bodyH,5);ctx.fillStyle=body;ctx.fill();ctx.lineWidth=1.2;ctx.strokeStyle='rgba(220,236,246,.30)';ctx.stroke();
+ const topStrip=ctx.createLinearGradient(x,y,x,y+Math.min(7,bodyH*.35));
+ topStrip.addColorStop(0,'#c0d1da');topStrip.addColorStop(1,'#849dad');
+ round(x+2,y+1,Math.max(4,w-4),Math.max(3,bodyH*.22),4);ctx.fillStyle=topStrip;ctx.fill();
+ // Safe landing line.
+ ctx.save();ctx.shadowColor='#7fefd0';ctx.shadowBlur=5;stroke(x+6,y+1.5,x+w-6,y+1.5,'#b5f5df',2.2);ctx.restore();
+ // Block seams so it feels like normal stone architecture.
+ ctx.strokeStyle='rgba(18,34,49,.40)';ctx.lineWidth=1;
+ for(let s=1;s<3;s++){const sx=x+w*s/3;stroke(sx,y+3,sx,y+bodyH-3,'rgba(18,34,49,.40)',1);} 
+ // Red underside rail.
+ ctx.save();ctx.shadowColor='#ff4e57';ctx.shadowBlur=8;stroke(x+8,root-2,x+w-8,root-2,'#ff5a4a',1.6);ctx.restore();
+ // Hanging crystal spikes.
+ const spikeCount=4,pitch=w/spikeCount;
+ for(let j=0;j<spikeCount;j++){
+  const lx=x+j*pitch+pitch*.14,rx=x+j*pitch+pitch*.86,mx=(lx+rx)*.5,tip=root+o.spikeH*ZOOM;
+  ctx.save();ctx.shadowColor='#ff4c57';ctx.shadowBlur=10;
+  const sg=ctx.createLinearGradient(mx,root,mx,tip);
+  sg.addColorStop(0,'#efcfd0');sg.addColorStop(.34,'#c39aa4');sg.addColorStop(.72,'#935c68');sg.addColorStop(1,'#542b35');
+  ctx.beginPath();ctx.moveTo(lx,root);ctx.lineTo(mx,tip);ctx.lineTo(rx,root);ctx.closePath();ctx.fillStyle=sg;ctx.fill();ctx.strokeStyle='rgba(255,239,243,.35)';ctx.lineWidth=1.05;ctx.stroke();
+  ctx.restore();
+  ctx.save();ctx.shadowColor='#ff4d4f';ctx.shadowBlur=8;
+  stroke(mx,root+2,mx,tip-8,'#ff5e50',1.8);
+  stroke(mx,root+bodyH*.03,mx-pitch*.12,root+o.spikeH*ZOOM*.46,'#ff7a66',1.1);
+  ctx.restore();
+ }
+ ctx.restore();
 }
 function drawEffectGhost(o,label){
  const x=screenX(o.x),w=o.width,y=o.type==='wall'?scrY(o.height):scrY(o.height||80),h=o.type==='wall'?o.height*ZOOM:Math.max(18,(o.height||80)*ZOOM);
@@ -1800,7 +1946,7 @@ const items=[
  ['ground','地面・石床','RUIN STONE FLOOR','Ver.4.0：明るい床上面と青暗い石壁の区別、床の角度と奥行きはVer.3.9を維持。'],
  ['gap','穴・側壁','GAP / SIDE WALL','穴の位置と危険な側壁を、装飾に埋もれず判別できるように。'],
  ['safe','青壁・安全','LANDABLE WALL','Ver.4.18：床と同じ石目と色・控えめな反射を採用。白い天板の厚さを約半分に調整。上面は着地可能。'],
- ['danger','赤壁・危険','HAZARDOUS WALL','Ver.4.18：暗い石ブロックに赤い溶岩亀裂。上面も側面も危険で、高さは4段階で変化。'],
+ ['danger','赤壁・危険','HAZARDOUS WALL','Ver.4.22：Ver.4.21の危険壁をベースに、赤い継ぎ目の明るさと立体感を強化。低い壁でも危険だと分かるよう、両端の赤い発光を追加し、石の周囲にごく弱い赤い反射を入れて走行中の見やすさを改善。上面も側面も危険で、高さは4段階で変化。'],
  ['airA','空中トゲA','AIR SPIKES / DANGER','Ver.4.3：上下左右すべて危険。安全そうな天面を作らず、赤い亀裂のある浮遊石に統一。'],
  ['airB','空中トゲB','AIR SPIKES / LANDABLE TOP','Ver.4.13：青灰色の浮遊石床は上面だけ着地可能。下面の赤トゲと側面は危険。'],
  ['gate','数字の壁','NUMBER GATE','数字一致で通過。赤い部分は常に危険な認証ゲート。'],
@@ -2930,10 +3076,31 @@ function trialDrawObjects(){
    line(x+w,ground+4,x+w,440,'#ba596351',1.6);
   }else if(o.kind==='safe'||o.kind==='danger'||o.kind==='moving'){
    wall(x,y,w,Math.max(6,ground-y),o.kind==='safe'||o.safe===true,false,o.id);
-  }else if(o.kind==='airA')NRSpikeArt.diamond(g,x,y,w,o.h);
-  else if(o.kind==='airB'){
-   NRSpikeArt.slab(g,x,y,w,o.slab,true);
-   for(let j=0;j<3;j++)NRSpikeArt.spike(g,x+j*w/3,y+o.slab,w/3,o.h-o.slab,true,o.id*3+j);
+  }else if(o.kind==='airA'){
+   const cx=x+w*.5,cy=y+o.h*.5,coreW=w*.38,coreH=o.h*.38;
+   const left=cx-coreW*.5,right=cx+coreW*.5,top=cy-coreH*.5,bottom=cy+coreH*.5;
+   const cg=g.createLinearGradient(left,top,right,bottom);
+   cg.addColorStop(0,'#8191a3');cg.addColorStop(.4,'#5a6c80');cg.addColorStop(1,'#334659');
+   g.fillStyle=cg;g.strokeStyle='rgba(215,230,240,.38)';g.lineWidth=1.1;g.beginPath();g.roundRect(left,top,coreW,coreH,4);g.fill();g.stroke();
+   const tri=(pts)=>{g.save();g.shadowColor='#ff4e58';g.shadowBlur=7;g.fillStyle='#c0ccd8';g.strokeStyle='rgba(235,243,248,.35)';g.beginPath();pts.forEach(([px,py],i)=>i?g.lineTo(px,py):g.moveTo(px,py));g.closePath();g.fill();g.stroke();g.restore();};
+   tri([[cx-coreW*.16,top],[cx,y],[cx+coreW*.16,top]]);
+   tri([[cx-coreW*.16,bottom],[cx,y+o.h],[cx+coreW*.16,bottom]]);
+   tri([[left,cy-coreH*.18],[x,cy],[left,cy+coreH*.18]]);
+   tri([[right,cy-coreH*.18],[x+w,cy],[right,cy+coreH*.18]]);
+   g.save();g.shadowColor='#ff4e58';g.shadowBlur=8;line(cx,top-1,cx,top+7,'#ff5c4f',1.5);line(cx,bottom-7,cx,bottom+1,'#ff5c4f',1.5);line(left-1,cy,left+7,cy,'#ff5c4f',1.5);line(right-7,cy,right+1,cy,'#ff5c4f',1.5);g.restore();
+  }else if(o.kind==='airB'){
+   const bodyH=Math.max(16,Math.min(22,(o.h-o.slab)*.28));
+   const root=y+bodyH-1;
+   const bg=g.createLinearGradient(x,y,x,y+bodyH);bg.addColorStop(0,'#5a7388');bg.addColorStop(.24,'#456078');bg.addColorStop(1,'#2a4056');
+   g.fillStyle=bg;g.strokeStyle='rgba(220,236,246,.26)';g.lineWidth=1;g.beginPath();g.roundRect(x,y,w,bodyH,4);g.fill();g.stroke();
+   line(x+5,y+1.5,x+w-5,y+1.5,'#b5f5df',2);
+   line(x+8,root-2,x+w-8,root-2,'#ff5a4a',1.5);
+   const spikeCount=4,pitch=w/spikeCount;
+   for(let j=0;j<spikeCount;j++){
+    const lx=x+j*pitch+pitch*.14,rx=x+j*pitch+pitch*.86,mx=(lx+rx)*.5,tip=root+(o.h-o.slab);
+    g.save();g.shadowColor='#ff4b57';g.shadowBlur=7;g.fillStyle='#b9a8b1';g.beginPath();g.moveTo(lx,root);g.lineTo(mx,tip);g.lineTo(rx,root);g.closePath();g.fill();g.restore();
+    line(mx,root+1,mx,tip-8,'#ff5f51',1.6);
+   }
   }else if(o.kind==='gate'){
    const op=trialGateOpening(o,ground);
    g.save();g.fillStyle='#61468e';g.fillRect(x,ground-223,w,226);
@@ -3011,7 +3178,7 @@ function draw(){
 function refresh(){const i=items[pos];const player=i[0]==='player';$('dbName').textContent=i[1];$('dbEnglish').textContent=i[2];$('dbDescription').textContent=i[3];$('dbCounter').textContent=String(pos+1).padStart(2,'0')+' / '+items.length;
  for(const [k,b] of [...$('dbCategories').children].entries()){b.classList.toggle('active',k===pos);b.setAttribute('aria-current',String(k===pos))}
  $('dbNew').classList.toggle('active',improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31));$('dbV24').classList.toggle('active',improved&&legacy24);$('dbV23').classList.toggle('active',improved&&legacy23);$('dbV22').classList.toggle('active',improved&&legacy22);$('dbOld').classList.toggle('active',!improved);$('dbNew').setAttribute('aria-pressed',String(improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31)));$('dbV24').setAttribute('aria-pressed',String(improved&&legacy24));$('dbV23').setAttribute('aria-pressed',String(improved&&legacy23));$('dbV22').setAttribute('aria-pressed',String(improved&&legacy22));$('dbOld').setAttribute('aria-pressed',String(!improved));$('dbV22').hidden=items[pos][0]!=='player';$('dbV23').hidden=items[pos][0]!=='player';$('dbV24').hidden=items[pos][0]!=='player';$('dbGroundBefore').hidden=items[pos][0]!=='ground'||!improved;$('dbGroundBefore').classList.toggle('active',nrFloorCompare31);$('dbGroundBefore').setAttribute('aria-pressed',String(nrFloorCompare31));$('dbGroundBefore').textContent=nrFloorCompare31?'✓ Ver.3.1 石床':'◈ Ver.3.1と比較';
- $('designBookScreen').classList.toggle('db-running',runActive);$('dbRunExit').hidden=!runActive;$('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=false;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.4.2 / 石材と接地面は維持'):'Ver.4.18 / 普通壁の床質感合わせ'):'旧デザイン風（比較用）';
+ $('designBookScreen').classList.toggle('db-running',runActive);$('dbRunExit').hidden=!runActive;$('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=false;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.4.2 / 石材と接地面は維持'):'Ver.4.22 / 赤ライン強化'):'旧デザイン風（比較用）';
  try{$('dbMemo').value=localStorage.getItem(memoKey(pos))||''}catch{$('dbMemo').value=''};
  for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
  $('dbExtras').hidden=false;$('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=true;$('dbRun').textContent='▶ 無限走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'選択した障害物がランダムに続きます':'黒背景 / 選択した障害物を無限に練習';$('dbInstruction').textContent=runActive?'画面タップでジャンプ。回転後の向き・接地・横滑りを確認。':player?'背景を消した状態で、数字・回転・接地の見た目を確認できます。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['真正面','正面＋少し奥行き','正面＋奥行き'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
