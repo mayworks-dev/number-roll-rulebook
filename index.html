@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.4.27 · Square Retro Air Spike</title>
+<title>NUMBER ROLL — Ver.4.28 · Retro Polish Pass</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -432,7 +432,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
 <section id="designBookScreen" class="front-screen db-screen" hidden aria-label="仮設デザイン確認ブック">
   <div class="db-titlebar">
     <button type="button" id="dbBack" class="front-button db-back">‹ HOME</button>
-    <div class="db-head"><div class="db-kicker">NUMBER ROLL · PIXEL VER.4.25</div><h2>デザイン確認ブック</h2></div>
+    <div class="db-head"><div class="db-kicker">NUMBER ROLL · PIXEL VER.4.28</div><h2>デザイン確認ブック</h2></div>
     <div class="db-temporary" aria-hidden="true"></div>
   </div>
   <div class="db-shell">
@@ -446,7 +446,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
       </div>
       <div class="db-toolbar" id="dbToolbar">
-        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.27 空中トゲ</button>
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.28 微調整</button>
         <button id="dbV24" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.4 と比較</button>
         <button id="dbV23" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.3 と比較</button>
         <button id="dbV22" type="button" class="db-tool" aria-pressed="false">Ver.2.2</button>
@@ -607,11 +607,14 @@ window.NRRetro=(()=>{
   const active=!!(roll&&roll.from&&roll.to&&roll.progress!==undefined);
   const t=active?Math.max(0,Math.min(1,roll.progress)):0;
   const from=active?roll.from:n,to=active?roll.to:n;
+  // Keep the visible face front-facing between jumps. Rotation is drawn within
+  // its own quarter-turn; the caller's cumulative physics angle must NOT leave
+  // digits sideways after a completed roll (90, 180, 270 degrees).
   const phase=active?t*Math.PI/2:0;
-  // Sprite artwork has transparent bottom pixels; settle its visible rim on the floor.
-  // When rotating on a flat surface, raise the center just enough for the corner
-  // to roll across the floor instead of cutting through the upper stone plane.
-  const cornerLift=active?size*.5*(Math.abs(Math.cos(phase))+Math.abs(Math.sin(phase))-1):0;
+  // The visible base of the 28px sprite is inset by 2px. Pivot around that
+  // *visible* rim; lifting by half the square introduced a tiny airborne gap.
+  const visibleHalf=size*(.5-2/28);
+  const cornerLift=active?visibleHalf*(Math.abs(Math.cos(phase))+Math.abs(Math.sin(phase))-1):0;
   c.save();c.translate(Math.round(cx),Math.round(cy+size*.071-cornerLift));c.rotate(phase);
   c.imageSmoothingEnabled=false;
   const drawBg=(face,alpha)=>{c.save();c.globalAlpha=alpha;c.drawImage(bg(face),-size/2,-size/2,size,size);c.restore();};
@@ -624,9 +627,11 @@ window.NRRetro=(()=>{
     c.restore();
   };
   if(active){
-    // The old digit leaves during the first half; the new digit enters in the second.
-    drawGlyph(from,0,Math.max(0,1-2*t));
-    drawGlyph(to,-Math.PI/2,Math.max(0,2*t-1));
+    // A number belongs to its *face*: outgoing number turns offscreen,
+    // incoming number rotates in counter-clockwise relative to the cube.
+    // Fade around the edge-on moment to avoid mirrored/sideways glyphs.
+    drawGlyph(from,0,Math.max(0,Math.min(1,(.58-t)/.40)));
+    drawGlyph(to,-Math.PI/2,Math.max(0,Math.min(1,(t-.42)/.40)));
   }else drawGlyph(n,0,1);
   c.restore();
  }
@@ -684,12 +689,12 @@ window.NRRetro=(()=>{
    for(const tri of sh.spikes){
     // Dark outer contour gives the hazards a thick, readable silhouette.
     polygon(tri,'#430d20');
-    const center=[24,24],inner=tri.map(([tx,ty])=>[center[0]+(tx-center[0])*.91,center[1]+(ty-center[1])*.91]);
-    polygon(inner,'#dd2037');
+    const center=[24,24],inner=tri.map(([tx,ty])=>[center[0]+(tx-center[0])*.94,center[1]+(ty-center[1])*.94]);
+    polygon(inner,'#f03545');
     const lighter=tri.map(([tx,ty])=>[center[0]+(tx-center[0])*.71,center[1]+(ty-center[1])*.71]);
-    polygon([inner[0],lighter[1],inner[2]],'#ff4450');
+    polygon([inner[0],lighter[1],inner[2]],'#ff5360');
     // Deliberately chunky pixel glints, not a neon line crack.
-    q.fillStyle='#ffb0a0';
+    q.fillStyle='#ffd2b7';
     const [tipX,tipY]=tri[1];
     const px=Math.round(center[0]+(tipX-center[0])*.71),py=Math.round(center[1]+(tipY-center[1])*.71);
     q.fillRect(px-1,py-1,2,2);
@@ -2006,13 +2011,22 @@ function draw(){if(!state)return;ctx.setTransform(dpr*scale,0,0,dpr*scale,0,0);b
  drawGapWalls();
  // Ver.4.0: shift the sprite and its shadow 3.5 render units toward the viewer; physics unchanged.
  let sq=SIZE*.875,px=cameraPlayerX(),py=scrY(state.y)-sq/2-.8,pal=nrGameCubePal37(state.face);
- // Shadow is kept tight to the top plane so the contact point reads clearly.
- ctx.fillStyle='#06111ca0';ctx.beginPath();ctx.ellipse(px,FLOOR+1.8,22*(1-Math.min(.56,state.y/650)),2.8,0,0,Math.PI*2);ctx.fill();
- if(state.lastLanding>0){ctx.strokeStyle=`rgba(155,232,255,${state.lastLanding/.3})`;ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(px,FLOOR+2,28+(1-state.lastLanding/.3)*23,4.0,0,0,Math.PI*2);ctx.stroke()}
+ // Use the current *support surface*, not always FLOOR: grounded cubes may
+ // be running atop a safe wall or the landable overhead stone platform.
+ const surfaceY=state.air?FLOOR:scrY(state.y);
+ const shadowFade=state.air?Math.max(.08,1-Math.max(0,state.y-state.groundH)/270):1;
+ const shadowW=state.air?Math.max(8,sq*.28*(1-Math.min(.65,state.y/520))):sq*.29;
+ ctx.save();ctx.beginPath();ctx.rect(0,surfaceY-1,W,VH);ctx.clip();
+ ctx.fillStyle=`rgba(4,12,22,${.72*shadowFade})`;
+ ctx.fillRect(Math.round(px-shadowW),Math.round(surfaceY),Math.round(shadowW*2),2);
+ ctx.fillStyle=`rgba(4,12,22,${.23*shadowFade})`;
+ ctx.fillRect(Math.round(px-shadowW*.84),Math.round(surfaceY+2),Math.round(shadowW*1.68),1);
+ ctx.restore();
+ if(state.lastLanding>0){ctx.strokeStyle=`rgba(155,232,255,${state.lastLanding/.3})`;ctx.lineWidth=1.2;ctx.beginPath();ctx.ellipse(px,surfaceY+1,20+(1-state.lastLanding/.3)*15,1.4,0,0,Math.PI*2);ctx.stroke()}
  for(let k=0;k<4;k++)stroke(px-sq*.68-k*15,py+(k-1.5)*7,px-sq*.68-k*15+8,py+(k-1.5)*7,pal.trail+'4a',1.6);
  if(window.NRRetro){
-   const progress=Math.max(0,Math.min(1,(state.angle-state.turnFrom)/(Math.PI/2)));
-   const roll=(state.turn<.20&&progress<1)?{from:state.face===1?4:state.face-1,to:state.face,progress}:null;
+   const progress=Math.max(0,Math.min(1,state.turn/.20));
+   const roll=(state.turn<.20)?{from:state.face===1?4:state.face-1,to:state.face,progress}:null;
    NRRetro.cube(ctx,px,py,sq,state.face,state.angle,roll);
   }
  else {nrDrawGameStoneCube37(px,py,sq,state.face,state.angle);nrDrawGameDigit37(px,py,state.face,pal);}
@@ -2143,14 +2157,14 @@ new ResizeObserver(resize).observe(stage);progress();setPage(window.location.has
 (()=>{
 'use strict';
 const items=[
- ['player','プレイヤー','PLAYER CUBE','Ver.4.26：数字1〜4ごとに色が切り替わるレトロキューブ。回転中の数字の変化、床接地、単独走行の着地判定を修正。'],
+ ['player','プレイヤー','PLAYER CUBE','Ver.4.28：レトロキューブの数字を回転後も正立表示にし、接地位置と影を微調整。ジャンプ・着地の基本動作は維持。'],
  ['spike','地上トゲ','RED RUIN SPIKES','Ver.4.10：地上トゲに隙間を作り、後ろのトゲを少し高く調整。1〜4本の無限走行で難易度を確認。'],
- ['ceiling','上トゲ（上面安全）','PIXEL CEILING / SAFE TOP','幅に応じてトゲの数が増減する石足場。上面は着地可能。下向きトゲの高さと床からの距離が大きく変わり、低くて立ったままでは当たるものも出現。'],
+ ['ceiling','上トゲ（上面安全）','PIXEL CEILING / SAFE TOP','幅に応じてトゲの数が変わる上面安全の石足場。短すぎる先端を減らし、高さのランダム性と低い危険配置は維持。'],
  ['ground','地面・石床','RUIN STONE FLOOR','Ver.4.0：明るい床上面と青暗い石壁の区別、床の角度と奥行きはVer.3.9を維持。'],
  ['gap','穴・側壁','GAP / SIDE WALL','穴の位置と危険な側壁を、装飾に埋もれず判別できるように。'],
  ['safe','青壁・安全','LANDABLE WALL','Ver.4.18：床と同じ石目と色・控えめな反射を採用。白い天板の厚さを約半分に調整。上面は着地可能。'],
  ['danger','赤壁・危険','RETRO DANGER WALL','Ver.4.22：Ver.4.21の危険壁をベースに、赤い継ぎ目の明るさと立体感を強化。低い壁でも危険だと分かるよう、両端の赤い発光を追加し、石の周囲にごく弱い赤い反射を入れて走行中の見やすさを改善。上面も側面も危険で、高さは4段階で変化。'],
- ['airA','空中トゲ','FOUR-WAY PIXEL SPIKES','Ver.4.27：中心の石を小さく、上下左右の赤トゲを同じ長さにして正方形へ。プレイヤーと同じか少し小さめ。全面接触禁止。'],
+ ['airA','空中トゲ','FOUR-WAY PIXEL SPIKES','Ver.4.28：正方形と小さな石コアは維持。トゲの赤い輪郭を明瞭化し、全体サイズ・当たり判定は変更なし。全面接触禁止。'],
  ['gate','数字の壁','NUMBER GATE','数字一致で通過。赤い部分は常に危険な認証ゲート。'],
  ['platform','数字足場','NUMBER PLATFORM','指定の数字で上から着地。側面・下面は危険。下抜け可能。'],
  ['switch','数字スイッチ','NUMBER SWITCH','指定数字で触れると対応する仕掛けが作動する。'],
@@ -2598,7 +2612,7 @@ function drawCeilingSpikes45(){
  nrObstaclePreviewCube(201,357,110);
  // Upper spikes and landable overhead spikes now use the same visual language.
  // A low group with deliberately uneven tip lengths illustrates the new height variation.
- NRRetro.airB(g,401,180,405,25,105,35,[39,105,61,91,28]);
+ NRRetro.airB(g,401,180,405,25,105,35,[53,105,68,91,46]);
 }
 function drawSpikes(){
  floor(66,335,892,105,!improved);
@@ -3124,12 +3138,12 @@ function trialFill(){
     // Keep the *top* reachable with one jump, so it is a challenge rather than a dead end.
     o.bottom=trialInt(23,45);
     const maxTip=Math.max(23,Math.min(46,97-o.bottom-23));
-    o.heights=Array.from({length:o.count},()=>trialInt(17,maxTip));
+    o.heights=Array.from({length:o.count},()=>trialInt(Math.min(24,maxTip),maxTip));
     o.heights[trialInt(0,o.count-1)]=maxTip;
    }else{
     o.bottom=dangerRoll<.72?trialInt(73,127):trialInt(135,188);
     const hMax=trialInt(89,137);
-    o.heights=Array.from({length:o.count},()=>trialInt(29,hMax));
+    o.heights=Array.from({length:o.count},()=>trialInt(42,hMax));
     o.heights[trialInt(0,o.count-1)]=hMax;
    }
    o.h=Math.max(...o.heights);
