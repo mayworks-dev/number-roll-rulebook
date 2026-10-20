@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.4.29 · Upper Spike Collision Alignment</title>
+<title>NUMBER ROLL — Ver.4.34 · Basic Gimmick Integration</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -432,7 +432,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
 <section id="designBookScreen" class="front-screen db-screen" hidden aria-label="仮設デザイン確認ブック">
   <div class="db-titlebar">
     <button type="button" id="dbBack" class="front-button db-back">‹ HOME</button>
-    <div class="db-head"><div class="db-kicker">NUMBER ROLL · PIXEL VER.4.29</div><h2>デザイン確認ブック</h2></div>
+    <div class="db-head"><div class="db-kicker">NUMBER ROLL · PIXEL VER.4.30</div><h2>デザイン確認ブック</h2></div>
     <div class="db-temporary" aria-hidden="true"></div>
   </div>
   <div class="db-shell">
@@ -446,7 +446,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
       </div>
       <div class="db-toolbar" id="dbToolbar">
-        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.29 微調整</button>
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.34 基本ギミック統合</button>
         <button id="dbV24" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.4 と比較</button>
         <button id="dbV23" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.3 と比較</button>
         <button id="dbV22" type="button" class="db-tool" aria-pressed="false">Ver.2.2</button>
@@ -635,6 +635,16 @@ window.NRRetro=(()=>{
   }else drawGlyph(n,0,1);
   c.restore();
  }
+ // A pixel sprite occupies only part of its rectangular tile. The triangle
+ // below follows the *visible* outline instead of its full bounding box.
+ // screenCoordinates=true means downwards is positive Y (Canvas); otherwise
+ // upwards is positive Y (the gameplay world). Use for every spike hit test.
+ function spikeHitTriangle(x,root,w,h,down=false,screenCoordinates=false){
+  const direction=screenCoordinates?(down?1:-1):(down?-1:1);
+  const baseY=root+direction*h/23;
+  const tipY=root+direction*h*(down?22/23:1);
+  return [[x+w*.05,baseY],[x+w*.5,tipY],[x+w*.90,baseY]];
+ }
  function spike(c,x,root,w,h,down=false,seed=0){
   if(w<=1||h<=1)return;
   const bmp=cached('spike-'+(down?'d':'u')+'-'+Math.round(w/5)+'-'+Math.round(h/5),20,23,(q,W,H)=>{
@@ -737,7 +747,7 @@ window.NRRetro=(()=>{
    spike(c,bx,y+bodyH-1,pitch*.76,tips[k],true,seed+k*17);
   }
  }
- return {floor,wall,cube,spike,slab,airA,airB,airBProfile,airShape,palette};
+ return {floor,wall,cube,spike,spikeHitTriangle,slab,airA,airB,airBProfile,airShape,palette};
 })();
 
 /* NUMBER ROLL · procedural hazard stone. One shared renderer for real play & preview.
@@ -1023,8 +1033,9 @@ const calibrationEntries=[
  {n:'T-03',jp:'トゲ / 3ジャンプ用',en:'SPIKE TEST · 3 JUMPS',face:3,type:'calibration',target:3,initialCount:3,tip:'3回で3トゲを越えよう',desc:'3トゲを3回のジャンプで安全に越え、4トゲはタイミング次第で挑戦できるバランスを確認する。',spec:[['目標','3段ジャンプ'],['初期トゲ','3個'],['調整','±1個'],['基準','1マス=64']]},
  {n:'T-04',jp:'トゲ / 4ジャンプ用',en:'SPIKE TEST · 4 JUMPS',face:4,type:'calibration',target:4,initialCount:4,tip:'4回で4トゲを越えよう',desc:'4トゲを4回のジャンプで越える。5トゲは通常ステージでは使用しない想定。',spec:[['目標','4段ジャンプ'],['初期トゲ','4個'],['調整','±1個'],['基準','1マス=64']]}
 ];
-// 各段の理論最高高度 = 700² / (2×1850) × 段数 = 約132.4 × 段数 (world units)
-// (n-1)段では届かずn段で余裕を残せる中間値を採用する。
+// Wall tiers are authored independently of jump physics.
+// Ver.4.33 verified 1–4 jump trajectories using the current JUMP=810, AIR_JUMP=740, GRAVITY=1850.
+// Keep obstacle heights unchanged until real-device difficulty testing.
 const WALL_PRESETS=[65,154,275,402];
 const wallEntries=[
  {n:'B-03',jp:'青枠の壁 / 3ジャンプ用',en:'BLUE LANDING WALL · 3 JUMPS',face:3,type:'wallCalibration',lethal:false,target:3,initialHeight:275,initialWidth:128,tip:'上面に着地しても安全',desc:'壁の上面は安全。上に着地するとジャンプ回数が回復する。 高さと横幅を調整し、必要ジャンプ回数と操作の余裕を確認しよう。',spec:[['目標','3段ジャンプ'],['タイプ','青枠の壁'],['初期の高さ','4.30マス'],['初期の幅','2マス']]},
@@ -1055,9 +1066,9 @@ const gapEntries=[
 ];
 const airEntries=[
  {n:'A-01',jp:'空中トゲA / 回避練習',en:'AIR SPIKE A · DODGE',face:2,type:'airADodge',tip:'空中トゲの下を通過した後、地上のトゲをジャンプ',desc:'赤い空中トゲは全面危険。飛ぶタイミングを早くしすぎると空中で接触する。トゲの下を通過してから地上トゲを避けよう。',spec:[['上面','接触禁止'],['側面・下面','接触禁止'],['安全なルート','下を通過'],['ジャンプ','地上トゲで使う']]},
- {n:'B-01',jp:'上トゲ / 着地練習',en:'AIR SPIKE B · LAND',face:2,type:'airBLand',tip:'石の上面に着地して回復、または接触せず回避',desc:'上の緑ラインだけ安全。側面・下面の赤トゲは危険。上に着地できたら、その時点の数字でジャンプ回数が回復する。',spec:[['上面','着地できる'],['側面・下面','接触禁止'],['着地','回数が回復'],['回避','触れずに進めばOK']]},
+ {n:'B-01',jp:'上トゲ / 着地練習',en:'CEILING SPIKES · LAND',face:2,type:'airBLand',tip:'石の上面に着地して回復、または接触せず回避',desc:'上の緑ラインだけ安全。側面・下面の赤トゲは危険。上に着地できたら、その時点の数字でジャンプ回数が回復する。',spec:[['上面','着地できる'],['側面・下面','接触禁止'],['着地','回数が回復'],['回避','触れずに進めばOK']]},
  {n:'A-02',jp:'空中トゲA / 壁と組み合わせ',en:'AIR SPIKE A · WALL COMBO',face:2,type:'airACombo',tip:'壁を越えて着地後、次のジャンプを急がない',desc:'先に青枠の壁を突破し、その先の赤い空中トゲを回避。多段ジャンプを余計に使うと頭上のトゲに当たる。',spec:[['構成','青枠壁＋空中A'],['上面','接触禁止'],['安全な進み方','高度を下げる'],['難易度','中']]},
- {n:'B-02',jp:'上トゲ / 大きな穴',en:'AIR SPIKE B · GAP COMBO',face:2,type:'airBCombo',tip:'Bに着地して回復。着地せず渡れればそれもOK',desc:'普通の2段ジャンプだけでは渡りきれない大きな穴。途中のBに着地するとジャンプ回数を回復できる。もし触れずに渡れる別ルートがあれば、それでもクリア。',spec:[['構成','大きな穴＋空中B'],['上面','着地できる'],['着地','回数が回復'],['目標','接触せず対岸へ']]}
+ {n:'B-02',jp:'上トゲ / 大きな穴',en:'CEILING SPIKES · GAP COMBO',face:2,type:'airBCombo',tip:'上トゲの石面に着地して回復。触れずに渡れればそれもOK',desc:'普通の2段ジャンプだけでは渡りきれない大きな穴。途中の上トゲの安全な石面に着地するとジャンプ回数を回復できる。もし触れずに渡れる別ルートがあれば、それでもクリア。',spec:[['構成','大きな穴＋上トゲ'],['上面','着地できる'],['着地','回数が回復'],['目標','接触せず対岸へ']]}
 ];
 // A number gate fills the entire screen height. Only the numbered interval is passable.
 // Vertical grid units use the rendered player's visible height (SIZE / ZOOM),
@@ -1095,11 +1106,11 @@ const motionEntries=[
 // Ver.1.6: multiple basic and number-based hazards in a single practical course.
 // All six courses follow the free-route rule: finish safely, no mandatory switch or platform flags.
 const comboEntries=[
- {n:'C-01',jp:'複合① 青枠の壁＋地上トゲ',en:'COMBO · BLUE WALL + SPIKES',type:'combo',combo:'wallSpike',face:2,tip:'青枠の上に着地して回復しても、飛び越えてもOK',desc:'青い壁のあとに地上トゲがある。上面に着地するとジャンプ回数が回復。続くトゲは接触せず飛び越えればOK。',spec:[['構成','青枠壁＋地上トゲ'],['開始数字','2'],['着地','回復可能'],['自由な攻略','着地は必須ではない']]},
- {n:'C-02',jp:'複合② 穴＋数字足場',en:'COMBO · GAP + NUMBER PLATFORM',type:'combo',combo:'gapPlatform',face:2,tip:'数字3で足場に着地すると回復。渡れれば別ルートもOK',desc:'長い穴の途中に数字3の足場が浮かぶ。足場の上に数字3で着地すればジャンプ回数を補給できる。横・下面には触れないように。',spec:[['構成','穴＋数字足場3'],['開始数字','2'],['上面','数字3でのみ安全'],['クリア','対岸まで無事に渡る']]},
+ {n:'C-01',jp:'複合① 青枠の壁＋地上トゲ',en:'COMBO · BLUE WALL + SPIKES',type:'combo',combo:'wallSpike',face:2,tip:'青い壁で着地してジャンプ回数を回復 → 次の地上トゲを越えよう',desc:'青い壁のあとに地上トゲがある。上面に着地するとジャンプ回数が回復。続くトゲは接触せず飛び越えればOK。',spec:[['構成','青枠壁＋地上トゲ'],['開始数字','2'],['着地','回復可能'],['自由な攻略','着地は必須ではない']]},
+ {n:'C-02',jp:'複合② 穴＋数字足場',en:'COMBO · GAP + NUMBER PLATFORM',type:'combo',combo:'gapPlatform',face:2,tip:'数字3の足場で着地・回復。別ルートで渡れてもOK',desc:'長い穴の途中に数字3の足場が浮かぶ。足場の上に数字3で着地すればジャンプ回数を補給できる。横・下面には触れないように。',spec:[['構成','穴＋数字足場3'],['開始数字','2'],['上面','数字3でのみ安全'],['クリア','対岸まで無事に渡る']]},
  {n:'C-03',jp:'複合③ 数字の壁＋地上トゲ',en:'COMBO · NUMBER GATE + SPIKES',type:'combo',combo:'gateSpike',face:1,tip:'まず数字2で壁を通過し、着地してからトゲを越える',desc:'通過数字2の全面数字壁の先に地上トゲ。数字壁は指定数字でしか通れないが、トゲはジャンプで避ければいい。',spec:[['構成','数字壁2＋トゲ'],['開始数字','1'],['数字壁','数字2で通過'],['トゲ','触れずに回避']]},
  {n:'C-04',jp:'複合④ 数字スイッチ＋トゲ列',en:'COMBO · SWITCH + SPIKE ROW',type:'combo',combo:'switchSpike',face:2,tip:'数字3のスイッチでトゲを収納。飛び越えられるなら未起動でもOK',desc:'数字3で触れると対応するトゲ列だけが一時的に引っ込む。スイッチを使う方法と、ジャンプで安全に飛び越える方法のどちらも有効。',spec:[['構成','数字スイッチ3＋地上トゲ'],['効果','トゲが4.0秒収納'],['スイッチ','起動は任意'],['クリア','接触せずにGOAL']]},
- {n:'C-05',jp:'複合⑤ 移動する青枠壁＋穴',en:'COMBO · MOVING BLUE + GAP',type:'combo',combo:'motionGap',face:3,tip:'上下に動く青枠に乗っても、そのまま跳び越えてもOK',desc:'上下に移動する青枠壁と、すぐ先の穴を連続で突破する。壁上への着地は回復と持ち上げに使えるが、必須ではない。',spec:[['構成','上下移動の青枠壁＋穴'],['開始数字','3'],['移動壁','上面のみ安全'],['ゴール','穴の対岸']]},
+ {n:'C-05',jp:'複合⑤ 移動する青枠壁＋穴',en:'COMBO · MOVING BLUE + GAP',type:'combo',combo:'motionGap',face:3,tip:'安全な壁に着地して回復 → 穴へ。飛び越えてもOK',desc:'上下に移動する青枠壁と、すぐ先の穴を連続で突破する。壁上への着地は回復と持ち上げに使えるが、必須ではない。',spec:[['構成','上下移動の青枠壁＋穴'],['開始数字','3'],['移動壁','上面のみ安全'],['ゴール','穴の対岸']]},
  {n:'C-06',jp:'複合⑥ 天井トゲ＋中央数字壁',en:'COMBO · CEILING + MIDDLE GATE',type:'combo',combo:'ceilingGate',face:2,tip:'天井トゲの下を抜けてから2回ジャンプし、数字4の窓を通る',desc:'天井のトゲがある間は高くジャンプしすぎない。その先にある数字4の中央通路へ、高さと数字を合わせて進む。',spec:[['構成','天井トゲ＋数字壁4'],['開始数字','2'],['前半','天井トゲを回避'],['後半','高さと数字4を合わせる']]}
 ];
 const entries=[...calibrationEntries,...wallEntries,...baseEntries,...gapEntries,...airEntries,...numberEntries,...platformEntries,...switchEntries,...motionEntries,...comboEntries];
@@ -1216,9 +1227,14 @@ function spikeObj(x,width,count,height,base=0,down=false){
   height:steps?Math.max(...steps):Math.round(height*1.08),
   ...(steps?{spikeHeights:steps}:{}),base,down};
 }
-// A: all sides hazardous. B: green safe platform top and hazardous undersurface/sides.
+// Four-way airA is fully hazardous; one unified ceiling obstacle has a safe stone top and hazardous red underside.
 function airA(x,width,base,height){return {type:'airA',x,width,base,height}}
-function airB(x,width,height,spikeH=74){return {type:'airB',x,width,height,spikeH,landings:0}}
+// Ver.4.34: The former air-B training prop is the SAME landable overhead spike as 'ceiling'.
+// Its roof, red underside, and collision all use the unified ceiling path.
+function airB(x,width,height,spikeH=74){
+ const slabH=Math.max(16,Math.min(22,spikeH*.28));
+ return {type:'ceiling',x,width,base:height-slabH,spikeH,landingPractice:true};
+}
 function numberInfo(p=entries[idx]){
  if(p.type!=='numberGate')return null;
  return numberSettings[numberEntries.indexOf(p)];
@@ -1353,7 +1369,7 @@ function createLevel(){
  };
  objs=levels[type];let end=Math.max(...objs.map(o=>o.x+o.width));goal=end+300;
 }
-function newState(){let face=entries[idx].face;state={status:'ready',distance:0,y:0,vy:0,air:false,face,limit:face,used:0,angle:0,turnFrom:0,turnTo:0,turn:1,groundH:0,cause:'',lastLanding:0,totalJumps:0,airBLandings:0,numberLocks:{},numberPasses:0,platformLandings:0,effectTimers:{},switchTriggered:{},switchActivations:0,switchPlatformLandings:0,switchSolved:false,elapsed:0,groundObject:null,motionLandings:0,motionCarryX:0,motionCarryY:0};last=0;ui();}
+function newState(){let face=entries[idx].face;state={status:'ready',distance:0,y:0,vy:0,air:false,face,limit:face,used:0,angle:0,turnFrom:0,turnTo:0,turn:1,groundH:0,cause:'',lastLanding:0,jumpBuffer:0,totalJumps:0,airBLandings:0,numberLocks:{},numberPasses:0,platformLandings:0,effectTimers:{},switchTriggered:{},switchActivations:0,switchPlatformLandings:0,switchSolved:false,elapsed:0,groundObject:null,motionLandings:0,motionCarryX:0,motionCarryY:0};last=0;ui();}
 function refreshCalibrationBar(){
  const active=idx<calibrationEntries.length;const el=$('calibrationTools');el.hidden=!active;
  if(!active)return;
@@ -1416,7 +1432,7 @@ function restoreGap(){
 function setPage(n){idx=Math.max(0,Math.min(entries.length-1,n));const p=entries[idx];$('number').textContent=p.n;$('jp').textContent=p.jp;$('en').textContent=p.en;$('tip').textContent=p.tip;$('description').textContent=p.desc;$('specs').innerHTML=p.spec.map(([k,v])=>`<div class="spec"><span>${k}</span><b>${v}</b></div>`).join('');$('prev').disabled=idx===0;$('next').disabled=idx===entries.length-1;refreshCalibrationBar();refreshWallBar();refreshGapBar();refreshNumberBar();refreshPlatformBar();refreshSwitchBar();refreshMotionBar();$('comboBanner').hidden=p.type!=='combo';createLevel();newState();showResult('ready');draw();}
 function start(){newState();state.status='running';hideResult();ui();}
 function retry(){start()}
-function showResult(kind){const box=$('result');box.classList.add('show');$('resultNext').hidden=(kind!=='win'||idx===entries.length-1);$('retry').textContent=kind==='ready'?'▶ スタート':'↻ リトライ';$('resultTitle').className='result-title '+(kind==='win'?'win':kind==='lose'?'lose':'');if(kind==='ready'){$('resultTitle').textContent='練習 '+entries[idx].n;$('resultCaption').textContent='障害物を避けてGOALへ！ '+entries[idx].tip+'。';}else if(kind==='win'){$('resultTitle').textContent='✓ CLEAR!';$('resultCaption').textContent=entries[idx].type==='calibration'?`トゲ${spikeCounts[idx]}個（${(spikeCounts[idx]*SPIKE_PITCH/GRID_UNIT).toFixed(2)}マス）を突破！ 今回のジャンプ操作：${state.totalJumps}回。長さを変更して再挑戦できます。`:entries[idx].type==='wallCalibration'?`高さ ${(wallSettings[idx-calibrationEntries.length].height/GRID_UNIT).toFixed(2)}マス / 幅 ${(wallSettings[idx-calibrationEntries.length].width/GRID_UNIT).toFixed(1)}マスを${state.totalJumps}回のジャンプで突破！ 調整して再挑戦できます。`:entries[idx].type==='gapCalibration'?`幅 ${(gapSettings[idx-calibrationEntries.length-wallEntries.length-baseEntries.length]/GRID_UNIT).toFixed(2)}マスの穴を${state.totalJumps}回のジャンプで突破！ 穴の幅を調整して再挑戦できます。`:entries[idx].type==='combo'?`複数の障害物を突破！ ジャンプ${state.totalJumps}回、数字の変化や着地も確認しよう。`:entries[idx].type==='motionWall'?state.motionLandings>0?`動く青枠に${state.motionLandings}回着地してクリア！ 足場と一緒に運ばれた移動も確認しよう。`:`動く壁を接触せずに突破！ 上を飛び越える攻略もOK。`:entries[idx].type==='digitSwitch'?state.switchActivations>0?`数字${entries[idx].required}のスイッチを起動し、仕掛けを突破！ 効果時間も調整できます。`:`スイッチを使わず、障害物を安全に突破！ 回避ルートでもクリアです。`:entries[idx].type==='numberPlatform'?state.platformLandings>0?`数字${entries[idx].required}の足場に着地してクリア！ ジャンプ回数が回復しました。`:`数字${entries[idx].required}の足場の下を、触れずに通過してクリア！` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の壁を突破！ 数字の一致と赤い部分への接触を確認しよう。`:entries[idx].type.startsWith('airB')?state.airBLandings>0?`Bの上面に${state.airBLandings}回着地してクリア！ 着地するとジャンプ回数が回復します。`:`Bに着地せず、接触を避けてクリア！ 回避ルートもOKです。`:'障害物「'+entries[idx].jp+'」を突破！ 同じコースを再挑戦することもできます。';}else if(kind==='paused'){$('resultTitle').textContent='Ⅱ 一時停止';$('resultCaption').textContent='再開すると同じ位置からプレイできます。';$('retry').textContent='▶ 再開';}else{$('resultTitle').textContent='GAME OVER';$('resultCaption').textContent=state.cause||'もう一度ジャンプのタイミングを試してみよう。';};storyResult(kind);}
+function showResult(kind){const box=$('result');box.classList.add('show');$('resultNext').hidden=(kind!=='win'||idx===entries.length-1);$('retry').textContent=kind==='ready'?'▶ スタート':'↻ リトライ';$('resultTitle').className='result-title '+(kind==='win'?'win':kind==='lose'?'lose':'');if(kind==='ready'){$('resultTitle').textContent='練習 '+entries[idx].n;$('resultCaption').textContent='障害物を避けてGOALへ！ '+entries[idx].tip+'。';}else if(kind==='win'){$('resultTitle').textContent='✓ CLEAR!';$('resultCaption').textContent=entries[idx].type==='calibration'?`トゲ${spikeCounts[idx]}個（${(spikeCounts[idx]*SPIKE_PITCH/GRID_UNIT).toFixed(2)}マス）を突破！ 今回のジャンプ操作：${state.totalJumps}回。長さを変更して再挑戦できます。`:entries[idx].type==='wallCalibration'?`高さ ${(wallSettings[idx-calibrationEntries.length].height/GRID_UNIT).toFixed(2)}マス / 幅 ${(wallSettings[idx-calibrationEntries.length].width/GRID_UNIT).toFixed(1)}マスを${state.totalJumps}回のジャンプで突破！ 調整して再挑戦できます。`:entries[idx].type==='gapCalibration'?`幅 ${(gapSettings[idx-calibrationEntries.length-wallEntries.length-baseEntries.length]/GRID_UNIT).toFixed(2)}マスの穴を${state.totalJumps}回のジャンプで突破！ 穴の幅を調整して再挑戦できます。`:entries[idx].type==='combo'?`複数の障害物を突破！ ジャンプ${state.totalJumps}回、数字の変化や着地も確認しよう。`:entries[idx].type==='motionWall'?state.motionLandings>0?`動く青枠に${state.motionLandings}回着地してクリア！ 足場と一緒に運ばれた移動も確認しよう。`:`動く壁を接触せずに突破！ 上を飛び越える攻略もOK。`:entries[idx].type==='digitSwitch'?state.switchActivations>0?`数字${entries[idx].required}のスイッチを起動し、仕掛けを突破！ 効果時間も調整できます。`:`スイッチを使わず、障害物を安全に突破！ 回避ルートでもクリアです。`:entries[idx].type==='numberPlatform'?state.platformLandings>0?`数字${entries[idx].required}の足場に着地してクリア！ ジャンプ回数が回復しました。`:`数字${entries[idx].required}の足場の下を、触れずに通過してクリア！` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の壁を突破！ 数字の一致と赤い部分への接触を確認しよう。`:entries[idx].type.startsWith('airB')?state.airBLandings>0?`上トゲの安全面に${state.airBLandings}回着地してクリア！ ジャンプ回数が回復します。`:`上トゲに着地せず、接触を避けてクリア！ 回避ルートもOKです。`:'障害物「'+entries[idx].jp+'」を突破！ 同じコースを再挑戦することもできます。';}else if(kind==='paused'){$('resultTitle').textContent='Ⅱ 一時停止';$('resultCaption').textContent='再開すると同じ位置からプレイできます。';$('retry').textContent='▶ 再開';}else{$('resultTitle').textContent='GAME OVER';$('resultCaption').textContent=state.cause||'もう一度ジャンプのタイミングを試してみよう。';};storyResult(kind);}
 function storyResult(kind){
  if(uiMode!=='story')return;
  $('resultHome').style.display='inline-flex';
@@ -1430,7 +1446,24 @@ function storyResult(kind){
 function hideResult(){$('result').classList.remove('show')}
 function fail(reason){if(state.status!=='running')return;state.status='lost';state.cause=reason;showResult('lose');sfx('fail');haptic(35);ui()}
 function win(){if(state.status!=='running')return;state.status='won';if(!cleared.includes(idx)){cleared.push(idx);save();progress();}if(uiMode==='story')onStoryClear();showResult('win');sfx('clear');haptic(28);ui();}
-function jump(){if(state.status==='ready'){start();return;}if(state.status!=='running')return;const s=state;if(s.air&&s.used>=s.limit)return;if(!s.air){s.limit=s.face;s.used=0;}s.air=true;s.used++;s.totalJumps++;s.vy=s.used===1?JUMP:AIR_JUMP;s.groundH=0;s.turnFrom=s.angle;s.turnTo+=Math.PI/2;s.turn=0;s.face=s.face%4+1;s.groundObject=null;sfx('jump');ui();}
+// Ver.4.32: A short pre-landing input buffer avoids losing a tap just before touchdown.
+// No extra midair jumps are granted: a queued input fires only after legal landing.
+const NR_JUMP_BUFFER_TIME=.095;
+function jump(){
+ if(state.status==='ready'){start();return;}
+ if(state.status!=='running')return;
+ const s=state;
+ if(s.air&&s.used>=s.limit){
+  if(s.vy<0)s.jumpBuffer=NR_JUMP_BUFFER_TIME;
+  return;
+ }
+ s.jumpBuffer=0;
+ if(!s.air){s.limit=s.face;s.used=0;}
+ s.air=true;s.used++;s.totalJumps++;
+ s.vy=s.used===1?JUMP:AIR_JUMP;s.groundH=0;
+ s.turnFrom=s.angle;s.turnTo+=Math.PI/2;s.turn=0;
+ s.face=s.face%4+1;s.groundObject=null;sfx('jump');ui();
+}
 function togglePause(){if(state.status==='running'){state.status='paused';showResult('paused')}else if(state.status==='paused'){state.status='running';hideResult()}last=0;ui()}
 function ui(){const s=state;if(!s)return;let left=s.air?Math.max(0,s.limit-s.used):s.face,total=s.air?s.limit:s.face;$('face').textContent=s.face;$('face').style.color=COLORS[s.face][0];$('jumps').textContent=`${left} / ${total}`;$('distance').textContent=Math.round(Math.min(1,s.distance/(goal-240))*100)+'%';
  if(entries[idx].type==='digitSwitch'||entries[idx].type==='combo'&&entries[idx].combo==='switchSpike'){
@@ -1438,7 +1471,21 @@ function ui(){const s=state;if(!s)return;let left=s.air?Math.max(0,s.limit-s.use
   const rem=s.effectTimers[timerId]||0;
   $('switchTimer').textContent=rem>0?rem.toFixed(1)+'秒':s.switchTriggered[timerId]?'終了':'未起動';
   $('switchTimer').style.color=rem>0?'#8dffd4':'#ffc1d6';
- }$('actionHint').textContent=s.status==='running'?(s.y<0&&objs.some(o=>o.type==='gap')?'落下中！ ↑ ジャンプで復帰':entries[idx].type.startsWith('airB')?`B着地 ${s.airBLandings}回 / 避けてもOK`:entries[idx].type==='motionWall'?`壁が${entries[idx].axis==='y'?'上下':'左右'}に移動中！ 青枠なら上に着地OK`:entries[idx].type==='digitSwitch'?`数字${entries[idx].required}で起動／回避できれば起動不要`:entries[idx].type==='numberPlatform'?`数字${entries[idx].required}で着地／下を避けて通過もOK` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の部分を通り抜けよう`:'画面タップでジャンプ'):s.status==='paused'?'一時停止中':s.status==='won'?'クリア！':s.status==='lost'?'もう一度挑戦': 'まずはスタート';$('jump').textContent=s.status==='ready'?'▶ スタート':s.status==='running'?'↑ ジャンプ':s.status==='paused'?'▶ 再開':s.status==='lost'?'↻ リトライ':'次の障害物 ▶';$('jump').disabled=s.status==='running'&&left===0;$('pause').textContent=s.status==='paused'?'▶':'Ⅱ';}
+ }$('actionHint').textContent=s.status==='running'?(s.y<0&&objs.some(o=>o.type==='gap')?'落下中！ ↑ ジャンプで復帰':entries[idx].type.startsWith('airB')?`上トゲ着地 ${s.airBLandings}回 / 回避もOK`:entries[idx].type==='motionWall'?`壁が${entries[idx].axis==='y'?'上下':'左右'}に移動中！ 青枠なら上に着地OK`:entries[idx].type==='digitSwitch'?`数字${entries[idx].required}で起動／回避できれば起動不要`:entries[idx].type==='numberPlatform'?`数字${entries[idx].required}で着地／下を避けて通過もOK` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の部分を通り抜けよう`:'画面タップでジャンプ'):s.status==='paused'?'一時停止中':s.status==='won'?'クリア！':s.status==='lost'?'もう一度挑戦': 'まずはスタート';// Ver.4.33: in chained obstacle training, briefly explain the remaining budget and its refill.
+ // Only the existing hint line changes; gameplay timing, jump height, collision and HUD layout do not.
+ if(s.status==='running'){
+  const chainPractice=entries[idx].type==='combo'||entries[idx].type==='wallCalibration'||entries[idx].type==='calibration';
+  if(chainPractice){
+   if(!s.air&&s.lastLanding>.015){
+    $('actionHint').textContent=`着地で回復！ 数字${s.face} → ${s.face}回ジャンプ可能`;
+   }else if(s.air){
+    const rem=Math.max(0,s.limit-s.used);
+    $('actionHint').textContent=rem>0?`空中ジャンプ残り${rem}回 / 着地で回復`:'空中ジャンプ残り0回 / 着地で回復';
+   }
+  }
+ }
+ $('jump').textContent=s.status==='ready'?'▶ スタート':s.status==='running'?'↑ ジャンプ':s.status==='paused'?'▶ 再開':s.status==='lost'?'↻ リトライ':'次の障害物 ▶';// Keep touch control enabled so taps near landing can enter the short buffer.
+ $('jump').disabled=false;$('pause').textContent=s.status==='paused'?'▶':'Ⅱ';}
 function action(){if(state.status==='running'||state.status==='ready')jump();else if(state.status==='paused')togglePause();else if(state.status==='won'){if(uiMode==='story')storyNumber<STORY_INDEX.length?playStory(storyNumber+1):showScreen('doors');else setPage(Math.min(idx+1,entries.length-1));}else retry();}
 // 接触中の足場の高さ。着地の横断判定とは分けて、前フレームと現在の足元を比較する。
 function groundAt(centerX, feet){
@@ -1450,13 +1497,15 @@ function groundAt(centerX, feet){
  }
  return h;
 }
-function isOverGap(centerX){return objs.some(o=>o.type==='gap'&&centerX+SIZE*.24>o.x&&centerX-SIZE*.24<o.x+o.width)}
+// Ver.4.31: the cube loses ground support when its center passes the lip, not while its front edge still rests on the floor.
+function isOverGap(centerX){return objs.some(o=>o.type==='gap'&&centerX>=o.x&&centerX<o.x+o.width)}
 // Ver.1.1: 歩いて穴へ落ちてもジャンプできる。穴の幅と従来の踏み切り判定は維持する。
 // 自動走行は右向きだけなので、左縁からの踏み外しは側壁衝突として扱わない。
 // 向こう岸の垂直な壁は、地面の下でプレイヤーの当たり判定が触れた瞬間アウト。
 function hitGapSideWall(o,centerX,feet){
  if(feet>=0)return false;
- const half=SIZE/2,farEdge=o.x+o.width;
+ // The pit wall uses the same horizontal footprint as the player collision rectangle.
+ const half=SIZE*.36,farEdge=o.x+o.width;
  return centerX>o.x && centerX-half<farEdge && centerX+half>=farEdge;
 }
 // 描画しているプレイヤーは64px四方。上端が画面の下端より下に出たら完全に見えない。
@@ -1475,7 +1524,8 @@ function triangleHit(points, rect){ // SAT for a triangle against a rectangular 
 function hitSpike(o,rect){for(let k=0;k<o.count;k++){
  const {x:a,width}=nr410StorySpikeShape(o,k),b=a+width,h=o.spikeHeights?.[k]??o.height;
  if(b<rect.l||a>rect.r)continue;
- const tri=o.down?[[a,o.base],[b,o.base],[a+width/2,o.base-h]]:[[a,o.base],[b,o.base],[a+width/2,o.base+h]];
+ // Shared pixel-sprite triangle; gaps, tips and visible body now match rendering.
+ const tri=NRRetro.spikeHitTriangle(a,o.base,width,h,!!o.down,false);
  if(triangleHit(tri,rect))return true;
  }return false;}
 function hitAirA(o,rc){
@@ -1502,7 +1552,15 @@ function hitAirB(o,rc,s){
  }
  return false;
 }
+// Ver.4.31: wall collision uses the same visible rectangle for both wall types.
+// Safe wall: only the top can be stood on; hazard wall: top and side are lethal.
+function nrWallCollision431(o,rect,feet){
+ if(rect.r<=o.x||rect.l>=o.x+o.width||rect.t<=(o.base||0))return null;
+ if(o.lethal)return feet<=o.height?'danger':null;
+ return feet<o.height-2?'side':null;
+}
 function update(dt){if(state.status!=='running')return;const s=state;
+ s.jumpBuffer=Math.max(0,s.jumpBuffer-dt);
  const oldY=s.y;
  s.elapsed+=dt;
  // Animate all walls before collision. Capture the preceding position for landing and carrying.
@@ -1544,7 +1602,7 @@ function update(dt){if(state.status!=='running')return;const s=state;
       if(s.groundH!==o.height)s.platformLandings++;
     }
     if(roof>land){land=roof;landingObj=o;}
-    if(o.type==='airB'&&s.groundH!==o.height){s.airBLandings++;}
+    if((o.type==='airB'||o.type==='ceiling'&&o.landingPractice)&&s.groundH!==roof){s.airBLandings++;}
    }
   }
   if(land!==-Infinity){
@@ -1616,17 +1674,14 @@ function update(dt){if(state.status!=='running')return;const s=state;
   if(o.type==='airB'&&hitAirB(o,rc,s)){
    fail('空中トゲBの赤い側面・下面に接触！ 緑ラインに上から着地しよう。');return;
   }
-  if(o.type==='wall'&&rc.r>o.x&&rc.l<o.x+o.width){
-   if(o.lethal){
-    // 赤枠：上面・側面とも接触不可。水平接触時に足元が天端以下なら衝突。
-    if(s.y<=o.height&&rc.t>(o.base||0)){fail('赤枠の危険壁に接触！ 上も側面も危険。');return;}
-   }else{
-    // 青枠：上面に着地すればセーフ、下から側面に進入したらアウト。
-    // 着地はこの判定より前に確定させているので、落下時のすり抜けが起きない。
-    if(s.y<o.height-2&&rc.t>(o.base||0)){fail('青枠の壁の側面に衝突！ 緑色の上面ラインに上から着地しよう。');return;}
-   }
+  if(o.type==='wall'){
+   const hit=nrWallCollision431(o,rc,s.y);
+   if(hit==='danger'){fail('赤枠の危険壁に接触！ 上も側面も危険。');return;}
+   if(hit==='side'){fail('青枠の壁の側面に衝突！ 上面に向かってジャンプしよう。');return;}
   }
  }
+ // A buffered tap is consumed after resolving the landing and all collision checks.
+ if(!s.air&&s.jumpBuffer>0){s.jumpBuffer=0;jump();}
  if(centerX>=goal){
    // Gameplay-wide rule: successful physical traversal is a clear.
    // Switch activation, landing on floating spikes or platforms are optional,
@@ -2163,7 +2218,7 @@ new ResizeObserver(resize).observe(stage);progress();setPage(window.location.has
 const items=[
  ['player','プレイヤー','PLAYER CUBE','Ver.4.28：レトロキューブの数字を回転後も正立表示にし、接地位置と影を微調整。ジャンプ・着地の基本動作は維持。'],
  ['spike','地上トゲ','RED RUIN SPIKES','Ver.4.10：地上トゲに隙間を作り、後ろのトゲを少し高く調整。1〜4本の無限走行で難易度を確認。'],
- ['ceiling','上トゲ（上面安全）','PIXEL CEILING / SAFE TOP','Ver.4.29：幅で変わる本数と高さに当たり判定を統一。上面安全・側面と下面危険、ランダムな高さは維持。'],
+ ['ceiling','上トゲ（上面安全）','PIXEL CEILING / SAFE TOP','Ver.4.30：幅で変わる本数と高さに加え、トゲの輪郭と当たり判定を統一。上面安全・側面と下面危険、ランダムな高さは維持。'],
  ['ground','地面・石床','RUIN STONE FLOOR','Ver.4.0：明るい床上面と青暗い石壁の区別、床の角度と奥行きはVer.3.9を維持。'],
  ['gap','穴・側壁','GAP / SIDE WALL','穴の位置と危険な側壁を、装飾に埋もれず判別できるように。'],
  ['safe','青壁・安全','LANDABLE WALL','Ver.4.18：床と同じ石目と色・控えめな反射を採用。白い天板の厚さを約半分に調整。上面は着地可能。'],
@@ -3097,18 +3152,20 @@ const NR49_RUN_SPIKE_STEPS_PX=[[],[56],[56,94],[56,88,120],[56,85,113,145]];
 /* Ver.4.10: spaced ascending ground-spike rows in endless/category-isolated trials.
    Everything below is separate from the 51-level physics/collision engine. */
 const NR45_SCALE=RUN_PLAYER_SIZE/RUN_PLAYER_WORLD_SIZE;
-let trialObjects=[],trialNextX=0,trialSerial=0,trialRetry=0,trialDeaths=0,trialPassed=0,trialSurface=0,trialOnSurface=true,trialSeed=0,trialInitialFace=1;
+// Same short input window as the playable game (separate script scope).
+const NR_TRIAL_JUMP_BUFFER_TIME=.095;
+let trialObjects=[],trialNextX=0,trialSerial=0,trialRetry=0,trialDeaths=0,trialPassed=0,trialSurface=0,trialOnSurface=true,trialSeed=0,trialInitialFace=1,trialJumpBuffer=0;
 function trialRand(){trialSeed=(Math.imul(1664525,trialSeed)+1013904223)>>>0;return trialSeed/4294967296}
 function trialInt(a,b){return a+Math.floor(trialRand()*(b-a+1))}
 function trialKind(){return items[pos][0]}
 function trialStart(){
- trialObjects=[];trialSerial=0;trialRetry=0;trialPassed=0;trialDeaths=0;
+ trialObjects=[];trialSerial=0;trialRetry=0;trialPassed=0;trialDeaths=0;trialJumpBuffer=0;
  trialSurface=0;trialOnSurface=true;trialInitialFace=face;
  trialSeed=((Date.now()&0xfffffff)^(pos*0x9e3779b9))>>>0;
  trialNextX=850;trialFill();
 }
 function trialReset(){
- trialRetry=0;runDistance=0;runHeight=0;runVelocity=0;runUsed=0;
+ trialRetry=0;trialJumpBuffer=0;runDistance=0;runHeight=0;runVelocity=0;runUsed=0;
  runLimit=trialInitialFace;face=trialInitialFace;runStartFace=face;
  cubeSpin=0;cubeRoll=null;cubeTurns=0;runTurnTarget=0;trialSurface=0;trialOnSurface=true;
  runLandFx=0;runLaunchFx=0;runCameraLift=0;runDust41.length=0;
@@ -3241,7 +3298,7 @@ function trialCheck(dt,oldHeight){
   if(o.kind==='spike'){
    for(let i=0;i<o.count;i++){
     const x=p.x+i*o.pitch,h=o.heights[i];
-    if(trialPolyHit([[x,ground],[x+o.tipW/2,ground-h],[x+o.tipW,ground]],box))collision=true;
+    if(trialPolyHit(NRRetro.spikeHitTriangle(x,ground,o.tipW,h,false,true),box))collision=true;
    }
   }else if(o.kind==='ceiling'){
    const slabTop=p.y-23;
@@ -3252,17 +3309,21 @@ function trialCheck(dt,oldHeight){
    for(let i=0;i<o.count;i++){
     const x=p.x+i*pitch+pitch*.12;
     const h=o.heights?.[i]??o.h;
-    if(trialPolyHit([[x,p.y],[x+pitch*.38,p.y+h],[x+pitch*.76,p.y]],box))collision=true;
+    if(trialPolyHit(NRRetro.spikeHitTriangle(x,p.y,pitch*.76,h,true,true),box))collision=true;
    }
   }else if(o.kind==='gap'){
-   // Hitting the far vertical side while below surface is a failure.
-   if(p.x+p.w>box.x&&p.x+p.w<box.x+box.w+7&&runHeight< -7)collision=true;
+   // Ver.4.31: only the visible player body touching the far wall while below the floor is lethal.
+   const farEdge=p.x+p.w;
+   if(runHeight<0&&farEdge>box.x&&farEdge<box.x+box.w)collision=true;
   }else if(o.kind==='safe'||o.kind==='danger'||o.kind==='platform'||o.kind==='moving'){
    const rect={x:p.x,y:p.y,w:p.w,h:Math.max(1,ground-p.y)};
    if(o.kind==='platform')rect.h=23;
    const isSafe=o.kind==='safe'||o.kind==='moving'&&o.safe||o.kind==='platform'&&face===o.target;
-   // Only the very top is safe. Side and bottom of a blue wall remain harmful.
-   if(trialRects(box,rect)&&!(isSafe&&runHeight*RUN_VISUAL_SCALE>=ground-p.y-4&&runVelocity<=0))collision=true;
+   // Ver.4.31: being near the top is not the same as successfully landing.
+   // Accept only grounded contact on the actual stone roof. Side/bottom remain harmful.
+   const roofWorld=(ground-p.y)/RUN_VISUAL_SCALE;
+   const landedTop=isSafe&&trialOnSurface&&runVelocity<=0&&Math.abs(trialSurface-roofWorld)<=2.5/RUN_VISUAL_SCALE;
+   if(trialRects(box,rect)&&!landedTop)collision=true;
   }else if(o.kind==='airA'){
    const geom=NRRetro.airShape(p.x,p.y,p.w,p.h);
    if(trialRects(box,geom.core)||geom.spikes.some(poly=>trialPolyHit(poly,box)))collision=true;
@@ -3413,20 +3474,25 @@ function refresh(){const i=items[pos];const player=i[0]==='player';$('dbName').t
 function select(n){stopRun(false);pos=(n+items.length)%items.length;if(items[pos][0]!=='ground')nrFloorCompare31=false;refresh()}
 function stopRun(redraw=true){
  if(!runActive)return;
- runActive=false;runLast=0;runHeight=0;runVelocity=0;cubeRoll=null;cubeSpin=0;cubeTurns=0;runTurnTarget=0;runCameraLift=0;runLandFx=0;runLaunchFx=0;runDust41.length=0;runDustTimer41=0;runDustSerial41=0;trialObjects=[];trialRetry=0;
+ trialJumpBuffer=0;runActive=false;runLast=0;runHeight=0;runVelocity=0;cubeRoll=null;cubeSpin=0;cubeTurns=0;runTurnTarget=0;runCameraLift=0;runLandFx=0;runLaunchFx=0;runDust41.length=0;runDustTimer41=0;runDustSerial41=0;trialObjects=[];trialRetry=0;
  cancelAnimationFrame(runFrame);
  if(redraw)refresh();
 }
 function startRun(){
  if(runActive)return;
- runActive=true;runDistance=0;runHeight=0;runVelocity=0;runUsed=0;runLimit=face;runStartFace=face;
+ runActive=true;trialJumpBuffer=0;runDistance=0;runHeight=0;runVelocity=0;runUsed=0;runLimit=face;runStartFace=face;
  runDust41.length=0;runDustTimer41=0;runDustSerial41=0;
  cubeRoll=null;cubeSpin=0;cubeTurns=0;runTurnTarget=0;runLast=0;runStamp=0;runCameraLift=0;runLandFx=0;runLaunchFx=0;runElapsed=0;trialStart();
  refresh();runFrame=requestAnimationFrame(runTick);
 }
 function runJump(){
- if(!runActive)return;
- if(trialRetry>0||runUsed>=runLimit)return;
+ if(!runActive||trialRetry>0)return;
+ if(runUsed>=runLimit){
+  // Only the final part of a descent may buffer; expiration prevents an unwanted late jump.
+  if(!trialOnSurface&&runVelocity<0)trialJumpBuffer=NR_TRIAL_JUMP_BUFFER_TIME;
+  return;
+ }
+ trialJumpBuffer=0;
  if(trialOnSurface&&runUsed===0)runLimit=face;
  runUsed++;trialOnSurface=false;
  if(Math.abs(runHeight-trialSurface)<.5)nrEmitRunDust41('jump');
@@ -3440,7 +3506,7 @@ function runTick(now){
  if($('designBookScreen').hidden||document.hidden){runLast=now;runFrame=requestAnimationFrame(runTick);return}
  if(!runLast)runLast=now;
  const dt=Math.min(.033,Math.max(0,(now-runLast)/1000));runLast=now;
- runElapsed+=dt;if(trialRetry<=0)runDistance+=RUN_SPEED*dt;
+ runElapsed+=dt;trialJumpBuffer=Math.max(0,trialJumpBuffer-dt);if(trialRetry<=0)runDistance+=RUN_SPEED*dt;
  runLandFx=Math.max(0,runLandFx-dt);runLaunchFx=Math.max(0,runLaunchFx-dt);
  // Ver.4.2: clearer trail of muted stone dust for more perceived speed.
  if(trialOnSurface&&trialRetry<=0&&runVelocity<=0){
@@ -3454,6 +3520,7 @@ function runTick(now){
   runVelocity-=RUN_GRAVITY*dt;
  }
  trialUpdate(dt,oldHeight);
+ if(trialJumpBuffer>0&&trialOnSurface&&trialRetry<=0){trialJumpBuffer=0;runJump();}
  // Match the playable game's ~0.20s quarter-turns, but show each turn inside
  // one stable presentation angle. The cube lands upright instead of ending on
  // four unrelated static viewpoints.
