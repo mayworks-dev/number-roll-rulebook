@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.4.28 · Retro Polish Pass</title>
+<title>NUMBER ROLL — Ver.4.29 · Upper Spike Collision Alignment</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -432,7 +432,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
 <section id="designBookScreen" class="front-screen db-screen" hidden aria-label="仮設デザイン確認ブック">
   <div class="db-titlebar">
     <button type="button" id="dbBack" class="front-button db-back">‹ HOME</button>
-    <div class="db-head"><div class="db-kicker">NUMBER ROLL · PIXEL VER.4.28</div><h2>デザイン確認ブック</h2></div>
+    <div class="db-head"><div class="db-kicker">NUMBER ROLL · PIXEL VER.4.29</div><h2>デザイン確認ブック</h2></div>
     <div class="db-temporary" aria-hidden="true"></div>
   </div>
   <div class="db-shell">
@@ -446,7 +446,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
       </div>
       <div class="db-toolbar" id="dbToolbar">
-        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.28 微調整</button>
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.29 微調整</button>
         <button id="dbV24" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.4 と比較</button>
         <button id="dbV23" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.3 と比較</button>
         <button id="dbV22" type="button" class="db-tool" aria-pressed="false">Ver.2.2</button>
@@ -710,10 +710,16 @@ window.NRRetro=(()=>{
   });
   blit(c,bmp,x,y,w,h);
  }
- function airB(c,x,y,w,bodyH,spikeH,seed=0,heights=null){
-  if(w<=1||bodyH<=1)return;
+ function airBProfile(w,spikeH,seed=0,heights=null){
+  // The renderer and both physics engines MUST share number, width and height.
   const count=Math.max(1,Math.min(6,Math.round(w/76)));
   const pitch=w/count;
+  const tips=Array.from({length:count},(_,k)=>heights?.[k] ?? Math.round(spikeH*(.72+.28*hash(seed*31+k*109+17))));
+  return {count,pitch,tips};
+ }
+ function airB(c,x,y,w,bodyH,spikeH,seed=0,heights=null){
+  if(w<=1||bodyH<=1)return;
+  const {count,pitch,tips}=airBProfile(w,spikeH,seed,heights);
   // The upper surface is the single safe upper-spike obstacle; no separate B style.
   const bmp=cached('airB-425-'+Math.round(w/5)+'-'+Math.round(bodyH/5)+'-'+seed,Math.max(12,Math.round(w/5)),Math.max(5,Math.round(bodyH/5)),(q,W,H)=>{
     q.fillStyle='#1c3145';q.fillRect(0,0,W,H);
@@ -727,12 +733,11 @@ window.NRRetro=(()=>{
   });
   blit(c,bmp,x,y,w,bodyH);
   for(let k=0;k<count;k++){
-   const height=heights?.[k] ?? Math.round(spikeH*(.72+.28*hash(seed*31+k*109+17)));
    const bx=x+k*pitch+pitch*.12;
-   spike(c,bx,y+bodyH-1,pitch*.76,height,true,seed+k*17);
+   spike(c,bx,y+bodyH-1,pitch*.76,tips[k],true,seed+k*17);
   }
  }
- return {floor,wall,cube,spike,slab,airA,airB,airShape,palette};
+ return {floor,wall,cube,spike,slab,airA,airB,airBProfile,airShape,palette};
 })();
 
 /* NUMBER ROLL · procedural hazard stone. One shared renderer for real play & preview.
@@ -1481,21 +1486,20 @@ function hitAirA(o,rc){
 }
 function hitAirB(o,rc,s){
  if(rc.r<=o.x||rc.l>=o.x+o.width)return false;
- const topSafe = s.groundH===o.height && !s.air && rc.b>=o.height-2 && rc.l<o.x+o.width-2 && rc.r>o.x+2;
+ const topSafe=s.groundH===o.height&&!s.air&&rc.b>=o.height-2&&rc.l<o.x+o.width-2&&rc.r>o.x+2;
  if(topSafe)return false;
  const bodyH=Math.max(16,Math.min(22,o.spikeH*.28));
- const root=o.height-bodyH+1;
- // Stone body underside / side contact is dangerous unless the player is already standing on top.
- if(rc.t<o.height-3 && rc.b>o.height-bodyH && rc.r>o.x+2 && rc.l<o.x+o.width-2)return true;
- const spikeCount=4,pitch=o.width/spikeCount;
- for(let j=0;j<spikeCount;j++){
-  const lx=o.x+j*pitch+pitch*.14;
-  const tri=[[lx,root],[lx+pitch*.72,root],[lx+pitch*.36,root-o.spikeH]];
+ const slabBottom=o.height-bodyH;
+ // Solid blue stone: only the upper face is landable; sides and underside hurt.
+ if(rc.t>slabBottom&&rc.b<o.height-2)return true;
+ const profile=NRRetro.airBProfile(o.width,o.spikeH*ZOOM,Math.round(o.x));
+ const root=slabBottom+1/ZOOM; // renderer draws its tip bases at y+bodyH*ZOOM-1px
+ for(let j=0;j<profile.count;j++){
+  const lx=o.x+j*profile.pitch+profile.pitch*.12;
+  const tipH=profile.tips[j]/ZOOM;
+  const tri=[[lx,root],[lx+profile.pitch*.38,root-tipH],[lx+profile.pitch*.76,root]];
   if(triangleHit(tri,rc))return true;
  }
- const sideBand=Math.max(10,o.width*.06);
- const nearSide=(rc.r>o.x&&rc.l<o.x+sideBand)||(rc.r>o.x+o.width-sideBand&&rc.l<o.x+o.width);
- if(nearSide&&rc.t<o.height-2&&rc.b>root-o.spikeH)return true;
  return false;
 }
 function update(dt){if(state.status!=='running')return;const s=state;
@@ -2159,7 +2163,7 @@ new ResizeObserver(resize).observe(stage);progress();setPage(window.location.has
 const items=[
  ['player','プレイヤー','PLAYER CUBE','Ver.4.28：レトロキューブの数字を回転後も正立表示にし、接地位置と影を微調整。ジャンプ・着地の基本動作は維持。'],
  ['spike','地上トゲ','RED RUIN SPIKES','Ver.4.10：地上トゲに隙間を作り、後ろのトゲを少し高く調整。1〜4本の無限走行で難易度を確認。'],
- ['ceiling','上トゲ（上面安全）','PIXEL CEILING / SAFE TOP','幅に応じてトゲの数が変わる上面安全の石足場。短すぎる先端を減らし、高さのランダム性と低い危険配置は維持。'],
+ ['ceiling','上トゲ（上面安全）','PIXEL CEILING / SAFE TOP','Ver.4.29：幅で変わる本数と高さに当たり判定を統一。上面安全・側面と下面危険、ランダムな高さは維持。'],
  ['ground','地面・石床','RUIN STONE FLOOR','Ver.4.0：明るい床上面と青暗い石壁の区別、床の角度と奥行きはVer.3.9を維持。'],
  ['gap','穴・側壁','GAP / SIDE WALL','穴の位置と危険な側壁を、装飾に埋もれず判別できるように。'],
  ['safe','青壁・安全','LANDABLE WALL','Ver.4.18：床と同じ石目と色・控えめな反射を採用。白い天板の厚さを約半分に調整。上面は着地可能。'],
@@ -3269,10 +3273,11 @@ function trialCheck(dt,oldHeight){
    const topLanding=trialOnSurface&&runVelocity<=0&&Math.abs(foot-p.y)<=2.5&&
      trialSurface*RUN_VISUAL_SCALE>=ground-p.y-2.5;
    if(trialRects(box,slab)&&!topLanding)collision=true;
-   const pitch=p.w/4,root=p.y+slabHeight-1,tip=root+o.h-o.slab;
-   for(let i=0;i<4;i++){
-    const lx=p.x+i*pitch+pitch*.12;
-    if(trialPolyHit([[lx,root],[lx+pitch*.38,tip],[lx+pitch*.76,root]],box))collision=true;
+   const profile=NRRetro.airBProfile(p.w,o.h-o.slab,o.id);
+   const root=p.y+slabHeight-1;
+   for(let i=0;i<profile.count;i++){
+    const pitch=profile.pitch,lx=p.x+i*pitch+pitch*.12;
+    if(trialPolyHit([[lx,root],[lx+pitch*.38,root+profile.tips[i]],[lx+pitch*.76,root]],box))collision=true;
    }
   }else if(o.kind==='gate'){
    const openings=trialGateOpening(o,ground);
