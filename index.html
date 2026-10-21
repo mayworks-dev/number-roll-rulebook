@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.4.35 · Danger Stone and Air Spike Visibility</title>
+<title>NUMBER ROLL — Ver.4.36 · Sci-Fi Number Devices</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -432,7 +432,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
 <section id="designBookScreen" class="front-screen db-screen" hidden aria-label="仮設デザイン確認ブック">
   <div class="db-titlebar">
     <button type="button" id="dbBack" class="front-button db-back">‹ HOME</button>
-    <div class="db-head"><div class="db-kicker">NUMBER ROLL · PIXEL VER.4.30</div><h2>デザイン確認ブック</h2></div>
+    <div class="db-head"><div class="db-kicker">NUMBER ROLL · PIXEL VER.4.36</div><h2>デザイン確認ブック</h2></div>
     <div class="db-temporary" aria-hidden="true"></div>
   </div>
   <div class="db-shell">
@@ -446,7 +446,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
       </div>
       <div class="db-toolbar" id="dbToolbar">
-        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.35 危険壁と空中トゲ視認性</button>
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.36 近未来の数字ギミック</button>
         <button id="dbV24" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.4 と比較</button>
         <button id="dbV23" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.3 と比較</button>
         <button id="dbV22" type="button" class="db-tool" aria-pressed="false">Ver.2.2</button>
@@ -1039,6 +1039,150 @@ window.NRWallArt=(()=>{
   if(window.NRRetro)return NRRetro.wall(c,x,y,w,h,safe,seed);if(w<=1||h<=1)return; if(safe)drawSafe(c,x,y,w,h,seed); else drawDanger(c,x,y,w,h,seed)}
  return {draw};
 })();;;
+</script>
+<script>
+/* NUMBER ROLL Ver.4.36 — pixel-art sci-fi numeral devices. Geometries are visual only. */
+window.NRTech = (()=>{
+ const pal={
+  1:{a:'#2eaffb',bright:'#a8f3ff',dark:'#144e85',glow:'rgba(44,172,255,.40)'},
+  2:{a:'#31e6bf',bright:'#c0fff0',dark:'#126b66',glow:'rgba(44,245,198,.38)'},
+  3:{a:'#ffbf38',bright:'#fff2b4',dark:'#8a551e',glow:'rgba(255,194,45,.38)'},
+  4:{a:'#f66fdd',bright:'#ffe0fb',dark:'#8b3c8d',glow:'rgba(246,92,215,.4)'}
+ };
+ const digits={
+  1:['00100','01100','00100','00100','00100','00100','01110'],
+  2:['01110','10001','00001','00010','00100','01000','11111'],
+  3:['11110','00001','00001','01110','00001','00001','11110'],
+  4:['10010','10010','10010','11111','00010','00010','00010']
+ };
+ function R(c,x,y,w,h,color){if(w<=0||h<=0)return;c.fillStyle=color;c.fillRect(Math.round(x),Math.round(y),Math.max(1,Math.round(w)),Math.max(1,Math.round(h)));}
+ function bar(c,x,y,w,h,color,blur=0){c.save();if(blur){c.shadowColor=color;c.shadowBlur=blur;}R(c,x,y,w,h,color);c.restore();}
+ function digit(c,n,cx,cy,size,color){
+  const bits=digits[n]||digits[1],s=Math.max(1,Math.floor(size/7));
+  const dw=5*s,dh=7*s,left=Math.round(cx-dw/2),top=Math.round(cy-dh/2);
+  c.save();for(let yy=0;yy<7;yy++)for(let xx=0;xx<5;xx++)if(bits[yy][xx]==='1')R(c,left+xx*s,top+yy*s,s,s,color);c.restore();
+ }
+ function metal(c,x,y,w,h){
+  if(w<3||h<3)return;
+  R(c,x,y,w,h,'#081828');
+  R(c,x+2,y+2,w-4,h-4,'#1b3148');
+  R(c,x+3,y+3,w-6,Math.min(4,h*.2),'#8baec7');
+  if(h>13)R(c,x+3,y+Math.min(7,h*.32),w-6,Math.max(1,h-Math.min(7,h*.32)-11),'#34526e');
+  R(c,x+Math.max(2,w-6),y+5,3,Math.max(1,h-9),'#101f33');
+  R(c,x+3,y+h-5,Math.max(1,w-6),3,'#12233b');
+ }
+ function lights(c,x,y,w,h,p,step=18){
+  for(let xx=x+7;xx<x+w-6;xx+=step){
+   const ww=Math.min(7,x+w-6-xx);if(ww<2)break;
+   R(c,xx,y,ww,h,p.a);R(c,xx+1,y,Math.max(1,ww-2),Math.max(1,h*.35),p.bright);
+  }
+ }
+ function badge(c,cx,cy,size,n,p){
+  const w=Math.max(12,size),h=Math.max(16,size*1.17),x=cx-w/2,y=cy-h/2;
+  c.save();bar(c,x-1,y-1,w+2,h+2,p.dark,5);
+  metal(c,x,y,w,h);
+  R(c,x+4,y+4,w-8,h-8,'#0a1e34');
+  R(c,x+5,y+5,w-10,2,p.a);
+  if(w>=25)R(c,x+4,y+h-7,w-8,2,p.dark);
+  digit(c,n,cx,cy+1,Math.min((h-11)/1.12,(w-9)*1.27),p.bright);
+  c.restore();
+ }
+ function gate(c,x,y,w,h,n,passTop,passBottom,mode='full'){
+  if(w<7||h<7)return;
+  const p=pal[n]||pal[1],end=y+h;
+  let a=Math.max(y,Math.min(end,passTop)),b=Math.max(a,Math.min(end,passBottom));
+  c.save();c.beginPath();c.rect(x,y,w,h);c.clip();
+  // Metal side pillars / continuous energy barrier (no protrusions beyond the hitbox).
+  metal(c,x,y,w,h);
+  R(c,x+3,y+6,w-6,Math.max(1,h-12),'#071b2a');
+  if(b>a){
+   R(c,x+4,a,w-8,b-a,'#10283b');
+   c.save();c.globalAlpha=.31;R(c,x+w*.33,a,Math.max(1,w*.34),b-a,p.a);c.restore();
+   bar(c,x+3,a+1,Math.max(1,w*.11),Math.max(1,b-a-2),p.a,Math.min(7,w*.16));
+   bar(c,x+w-3-Math.max(1,w*.11),a+1,Math.max(1,w*.11),Math.max(1,b-a-2),p.a,Math.min(7,w*.16));
+   const cy=(a+b)*.5;
+   // A readable number panel stays within a slim physical gate.
+   const badgeW=Math.max(12,Math.min(w-5,w*.74));
+   const badgeH=Math.min(Math.max(20,badgeW*1.18),Math.max(16,b-a-8));
+   R(c,x+(w-badgeW)/2,cy-badgeH/2,badgeW,badgeH,'#102439');
+   R(c,x+(w-badgeW)/2+2,cy-badgeH/2+2,badgeW-4,badgeH-4,p.dark);
+   digit(c,n,x+w/2,cy,Math.min(badgeH*.72,badgeW*1.22),p.bright);
+   bar(c,x+3,a,w-6,Math.min(3,b-a),p.a,3);
+   bar(c,x+3,b-3,w-6,Math.min(3,b-a),p.a,3);
+  }
+  // Locked zones stay visibly dangerous, same ranges as actual collision logic.
+  for(const [lo,hi] of [[y,a],[b,end]]){
+   if(hi-lo<2)continue;
+   R(c,x+4,lo,w-8,hi-lo,'#3a1527');
+   R(c,x+Math.max(5,w*.44),lo,Math.max(2,w*.13),hi-lo,'#8c243a');
+   bar(c,x+3,lo,3,hi-lo,'#f65362',5);
+   bar(c,x+w-6,lo,3,hi-lo,'#f65362',5);
+   for(let yy=lo+7;yy<hi-6;yy+=19)R(c,x+7,yy,Math.max(1,w-14),2,'#9a3a52');
+  }
+  R(c,x+1,y+1,Math.max(2,w-2),3,'#abc4d7');
+  R(c,x+1,end-4,Math.max(2,w-2),3,'#182d47');
+  R(c,x,y,Math.max(2,w*.11),h,'#5c839e');
+  R(c,x+w-Math.max(2,w*.11),y,Math.max(2,w*.11),h,'#537c98');
+  if(w>=52){
+   R(c,x+5,y+11,4,Math.max(2,h-22),'#112c49');
+   R(c,x+w-9,y+11,4,Math.max(2,h-22),'#112c49');
+   if(h>55){for(let yy=y+15;yy<end-12;yy+=40){R(c,x+6,yy,2,7,p.a);R(c,x+w-8,yy,2,7,p.a)}}
+   const capH=Math.min(20,Math.max(9,h*.10));
+   metal(c,x,y,w,capH);lights(c,x,y+Math.max(4,capH*.4),w,3,p,15);
+  }
+  c.restore();
+ }
+ function platform(c,x,y,w,h,n){
+  if(w<15||h<7)return;
+  const p=pal[n]||pal[1];c.save();
+  // Flatter-than-stone metallic levitating deck: all artwork is inside its collider.
+  metal(c,x,y,w,h);
+  R(c,x+5,y+6,w-10,Math.max(2,h-11),'#162941');
+  R(c,x+4,y+2,w-8,Math.min(5,h*.22),'#c0d4e3');
+  bar(c,x+6,y+1,w-12,3,'#b4f0e0',3); // Safe landing surface.
+  const panelW=Math.min(58,Math.max(27,w*.25));
+  const bh=Math.max(12,Math.min(h-9,46));
+  const left=x+(w-panelW)/2,by=y+(h-bh)/2+2;
+  bar(c,left-3,by-3,panelW+6,bh+6,p.dark,5);
+  R(c,left,by,panelW,bh,'#081e32');
+  R(c,left+3,by+3,panelW-6,bh-6,p.dark);
+  digit(c,n,x+w/2,by+bh/2,Math.min(bh*.89,panelW*1.12),p.bright);
+  for(let side=0;side<2;side++){
+   const l=side===0?x+8:x+w-8-Math.min(37,w*.15);
+   const lw=Math.min(37,w*.15);
+   bar(c,l,y+Math.min(10,h*.29),lw,Math.max(2,Math.min(5,h*.20)),p.a,4);
+   for(let i=0;i<3;i++)R(c,l+i*7,y+h-7,Math.min(3,lw/5),3,'#7797b3');
+  }
+  R(c,x+3,y+h-5,w-6,3,'#0b1a2e');
+  c.restore();
+ }
+ function sw(c,x,y,w,h,n,active=false){
+  if(w<14||h<12)return;
+  const p=pal[n]||pal[1];c.save();
+  // Tall, narrow console in the story; compact sensor tile in trial mode.
+  metal(c,x,y,w,h);
+  const rim=Math.max(3,Math.min(8,w*.13));
+  R(c,x+rim,y+rim,w-rim*2,Math.max(3,h-rim*2),'#102137');
+  const diamondH=Math.min(h*.24,w*.44,32);
+  if(h>=50){
+   const cy=y+Math.max(10,h*.16),cx=x+w/2;
+   c.save();c.shadowColor=active?'#83ffe7':p.a;c.shadowBlur=8;
+   c.beginPath();c.moveTo(cx,cy-diamondH/2);c.lineTo(cx+diamondH/2,cy);c.lineTo(cx,cy+diamondH/2);c.lineTo(cx-diamondH/2,cy);c.closePath();
+   c.fillStyle=active?'#94f6da':p.a;c.fill();c.restore();
+   R(c,x+8,Math.round(y+h*.32),Math.max(1,w-16),2,'#4b718f');
+  }
+  const panelW=Math.min(w-12,56),panelH=Math.min(Math.max(17,h*.27),58),panelX=x+(w-panelW)/2;
+  const panelY=y+(h>=50?h*.47:(h-panelH)/2);
+  R(c,panelX-3,panelY-3,panelW+6,panelH+6,'#658aa5');
+  R(c,panelX,panelY,panelW,panelH,'#081a30');
+  R(c,panelX+3,panelY+3,panelW-6,panelH-6,active?'#1a5b53':p.dark);
+  digit(c,n,x+w/2,panelY+panelH/2,Math.min((panelH-7)*.85,panelW*1.07),p.bright);
+  bar(c,x+9,y+h-Math.max(11,h*.12),w-18,3,active?'#8effd5':p.a,4);
+  R(c,x+4,y+h-7,w-8,5,'#0a1628');
+  c.restore();
+ }
+ return {gate,platform,switch:sw,pal,digit};
+})();
 </script>
 <script>
 (()=>{
@@ -1703,7 +1847,7 @@ function update(dt){if(state.status!=='running')return;const s=state;
    // Switch activation, landing on floating spikes or platforms are optional,
    // provided the player reached the goal without hazardous contact.
    // Number gates remain physically screen-spanning, so require a legal pass.
-   if(entries[idx].type==='numberGate'&&s.numberPasses<1){fail('数字の壁の紫色の部分を通ってゴールしよう。');return;}
+   if(entries[idx].type==='numberGate'&&s.numberPasses<1){fail('数字ゲートの発光する部分を通ってゴールしよう。');return;}
    win();return;
  }
  if(s.turn<.20){s.turn=Math.min(.20,s.turn+dt);let e=1-Math.pow(1-s.turn/.20,3);s.angle=s.turnFrom+(s.turnTo-s.turnFrom)*e}else s.angle=s.turnTo;
@@ -1783,44 +1927,15 @@ function drawBlock(o){
 }
 function drawNumberGate(o){
  const x=screenX(o.x),w=o.width,topLimit=-70,bottom=FLOOR;
- const yLow=o.mode==='full'?0:o.lower*NUMBER_GATE_VERTICAL_UNIT;
- const yHigh=o.mode==='full'?Infinity:(o.lower+o.opening)*NUMBER_GATE_VERTICAL_UNIT;
- // Guard the entire vertical screen: only the purple window is traversable.
- function part(worldLow,worldHigh,color,border){
-  const y1=worldHigh===Infinity?topLimit:scrY(worldHigh),y2=scrY(worldLow);
-  const yy=Math.max(topLimit,y1),hh=Math.max(0,Math.min(bottom,y2)-yy);
-  if(!hh)return;
-  ctx.save();ctx.fillStyle=color;ctx.fillRect(x,yy,w,hh);
-  ctx.strokeStyle=border;ctx.lineWidth=2.5;ctx.strokeRect(x,yy,w,hh);
-  ctx.beginPath();ctx.rect(x,yy,w,hh);ctx.clip();
-  for(let k=-hh;k<w+hh;k+=16)stroke(x+k,yy+hh,x+k+hh,yy,border+'45',3);
-  ctx.restore();
- }
- ctx.save();ctx.shadowColor='#ae94ff';ctx.shadowBlur=9;
- if(o.mode!=='full'){
-  if(yLow>0)part(0,yLow,'#4b2036','#ff849b');
-  part(yLow,yHigh,'#34366f','#beb0ff');
-  part(yHigh,Infinity,'#4b2036','#ff849b');
- }else part(0,Infinity,'#34366f','#beb0ff');
- ctx.shadowBlur=0;
- const minY=o.mode==='full'?0:scrY(yHigh),maxY=o.mode==='full'?FLOOR:scrY(yLow);
- const centerY=Math.max(50,Math.min(FLOOR-45,(minY+maxY)/2));
- ctx.font='900 24px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';
- ctx.lineWidth=4;ctx.strokeStyle='#1c2253';ctx.strokeText(String(o.required),x+w/2,centerY);
- ctx.fillStyle='#f1e8ff';ctx.fillText(String(o.required),x+w/2,centerY);
- if(o.mode==='full'){ctx.font='bold 10px system-ui';ctx.fillStyle='#d0c6ff';ctx.fillText('FULL',x+w/2,centerY+27)}
- ctx.restore();
+ const low=o.mode==='full'?0:o.lower*NUMBER_GATE_VERTICAL_UNIT;
+ const high=o.mode==='full'?Infinity:(o.lower+o.opening)*NUMBER_GATE_VERTICAL_UNIT;
+ const passTop=o.mode==='full'?topLimit:scrY(high);
+ const passBottom=o.mode==='full'?bottom:scrY(low);
+ NRTech.gate(ctx,x,topLimit,w,bottom-topLimit,o.required,passTop,passBottom,o.mode);
 }
 function drawNumberPlatform(o){
- const x=screenX(o.x),y=scrY(o.height),w=o.width,h=o.thickness*ZOOM;
- ctx.save();ctx.shadowColor='#ff8499';ctx.shadowBlur=10;
- round(x,y,w,h,5);ctx.fillStyle='#472339';ctx.fill();ctx.lineWidth=2.5;ctx.strokeStyle='#ff8399';ctx.stroke();
- ctx.shadowBlur=0;for(let k=10;k<w;k+=25)stroke(x+k,y+h-3,x+k+12,y+5,'#ff89a452',2);
- ctx.shadowColor='#86fcd1';ctx.shadowBlur=9;stroke(x+3,y+1,x+w-3,y+1,'#7affc8',5);ctx.shadowBlur=0;
- ctx.font='900 25px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.strokeStyle='#2a143e';ctx.lineWidth=4;
- ctx.strokeText(String(o.required),x+w/2,y+h/2+2);ctx.fillStyle='#f4e6ff';ctx.fillText(String(o.required),x+w/2,y+h/2+2);
- ctx.font='bold 11px system-ui';ctx.fillStyle='#b6f8d3';ctx.fillText('LAND '+o.required,x+w/2,y-15);
- ctx.restore();
+ const x=screenX(o.x),y=scrY(o.height);
+ NRTech.platform(ctx,x,y,o.width,o.thickness*ZOOM,o.required);
 }
 function drawSpike(o){
  if(o.switchId&&switchEffectActive(o.switchId)){drawEffectGhost(o,'収納中');return;}
@@ -1909,12 +2024,8 @@ function drawEffectGhost(o,label){
  ctx.fillStyle='#a8ffe0';ctx.font='900 12px system-ui';ctx.textAlign='center';ctx.fillText(label,x+w/2,y-12);ctx.restore();
 }
 function drawDigitSwitch(o){
- const x=screenX(o.x),y=scrY(o.base+o.height),h=o.height*ZOOM,w=o.width,active=!!state.switchTriggered[o.id];
- ctx.save();ctx.shadowColor=active?'#8cffc7':'#e7a6ff';ctx.shadowBlur=16;
- ctx.fillStyle=active?'#164a43aa':'#54336988';ctx.strokeStyle=active?'#79ffca':'#d2a4ff';ctx.lineWidth=2.5;
- round(x,y,w,h,7);ctx.fill();ctx.stroke();ctx.shadowBlur=0;
- ctx.fillStyle=active?'#a7ffdb':'#ffe9ff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 34px system-ui';ctx.fillText(String(o.required),x+w/2,y+h*.5);
- ctx.font='bold 12px system-ui';ctx.fillText(active?'ON':'SWITCH',x+w/2,y-14);ctx.restore();
+ const x=screenX(o.x),y=scrY(o.base+o.height),h=o.height*ZOOM;
+ NRTech.switch(ctx,x,y,o.width,h,o.required,!!state.switchTriggered[o.id]);
 }
 function drawSwitchPlatform(o){
  if(!switchEffectActive(o.switchId)){
@@ -2240,9 +2351,9 @@ const items=[
  ['safe','青壁・安全','LANDABLE WALL','Ver.4.18：床と同じ石目と色・控えめな反射を採用。白い天板の厚さを約半分に調整。上面は着地可能。'],
  ['danger','赤壁・危険','RETRO DANGER WALL','Ver.4.22：Ver.4.21の危険壁をベースに、赤い継ぎ目の明るさと立体感を強化。低い壁でも危険だと分かるよう、両端の赤い発光を追加し、石の周囲にごく弱い赤い反射を入れて走行中の見やすさを改善。上面も側面も危険で、高さは4段階で変化。'],
  ['airA','空中トゲ','FOUR-WAY PIXEL SPIKES','Ver.4.28：正方形と小さな石コアは維持。トゲの赤い輪郭を明瞭化し、全体サイズ・当たり判定は変更なし。全面接触禁止。'],
- ['gate','数字の壁','NUMBER GATE','数字一致で通過。赤い部分は常に危険な認証ゲート。'],
- ['platform','数字足場','NUMBER PLATFORM','指定の数字で上から着地。側面・下面は危険。下抜け可能。'],
- ['switch','数字スイッチ','NUMBER SWITCH','指定数字で触れると対応する仕掛けが作動する。'],
+ ['gate','数字の壁','NUMBER GATE','Ver.4.36：発光する数字パネルと金属フレームの近未来ゲート。指定数字で通過可能、赤い部分は常に危険。'],
+ ['platform','数字足場','NUMBER PLATFORM','Ver.4.36：中央に数字ディスプレイを持つ浮遊式の金属足場。指定数字で上から着地、側面・下面は危険。'],
+ ['switch','数字スイッチ','NUMBER SWITCH','Ver.4.36：数字表示と菱形インジケーターを備えた機械式スイッチ。指定数字で触れると連動先が動作。'],
  ['moving','移動する壁','MOVING WALLS','青と赤の区別を維持したまま、移動方向がわかる。']
 ];
 let pos=0,face=1,improved=true,ruins=true,legacy22=false,legacy23=false,legacy24=false;
@@ -3076,18 +3187,41 @@ function drawAir(safe){
  if(safe)NRRetro.airB(g,420,136,356,37,109,218);
  else NRRetro.airA(g,513,170,101,101);
 }
-function drawGate(){floor(190,361,655,79,!improved);
+function drawGate(){
+ if(improved){
+  NRRetro.floor(g,190,361,655,79,0);
+  nrObstaclePreviewCube(298,361,81);
+  NRTech.gate(g,454,29,136,332,face,29,361,'full');
+  return;
+ }
+ floor(190,361,655,79,!improved);
  const x=454,y=28,w=135,h=335;g.save();g.shadowBlur=20;g.shadowColor='#a67cff6b';g.fillStyle=improved?'#6e56a78a':'#595fa6a0';rr(x,y,w,h,12);g.fill();g.shadowBlur=0;g.strokeStyle='#bda5fe';g.lineWidth=4;g.stroke();g.restore();
  if(improved){g.strokeStyle='#dbc0ff80';g.lineWidth=2;rr(x+18,y+24,w-36,h-48,7);g.stroke();for(let yy=75;yy<335;yy+=37){g.save();g.translate(x+23,yy);g.rotate(Math.PI/4);g.strokeStyle='#c6b1f4b0';g.lineWidth=2;g.strokeRect(0,0,9,9);g.restore()}}
  text(String(face),x+w/2,y+174,114,'#f8ebff',950);
  wall(x,y,w,93,false,!improved);wall(x,y+277,w,59,false,!improved);cube(265,273,78,face,!improved);
 }
-function drawPlatform(){floor(105,359,815,81,!improved);shadow(524,315,205);
+function drawPlatform(){
+ if(improved){
+  NRRetro.floor(g,105,359,815,81,0);
+  nrObstaclePreviewCube(226,359,93);
+  NRTech.platform(g,369,194,294,59,face);
+  return;
+ }
+ floor(105,359,815,81,!improved);shadow(524,315,205);
  const x=367,y=172,w=291,h=112;g.save();g.shadowColor='#101c39b6';g.shadowBlur=17;g.shadowOffsetY=14;
  if(improved){g.fillStyle=gradient(x,y,w,h,[[0,'#8f76cf'],[1,'#3d315f']]);rr(x,y,w,h,12);g.fill();g.strokeStyle='#c6b9ef';g.lineWidth=3;g.stroke()}else{g.fillStyle='#303d71';g.fillRect(x,y,w,h);g.strokeStyle='#a680e1';g.lineWidth=3;g.strokeRect(x,y,w,h)}g.restore();
  if(improved){for(let i=0;i<6;i++)facetSpike(x+i*47+5,y+h+3,41,19,false,true);rr(x+11,y+6,w-22,24,9);g.fillStyle='#aff8da';g.fill();line(x+22,y+14,x+w-24,y+14,'#e8fff9',3);line(x+14,y+h-15,x+w-14,y+h-15,'#f48d9a',3)}else{line(x,y,x+w,y,'#8beac5',8)}
  text(String(face),x+w/2,y+72,73,'#e8e3ff',950);}
-function drawSwitch(){floor(88,353,842,87,!improved);const x=282,y=220,w=237,h=75;
+function drawSwitch(){
+ if(improved){
+  NRRetro.floor(g,88,353,842,87,0);
+  nrObstaclePreviewCube(182,353,83);
+  NRTech.switch(g,322,157,103,196,face,false);
+  NRWallArt.draw(g,695,214,94,139,false,156);
+  g.save();g.strokeStyle='#4ab4e787';g.lineWidth=2;g.setLineDash([6,6]);g.beginPath();g.moveTo(430,249);g.lineTo(677,249);g.stroke();g.restore();
+  return;
+ }
+ floor(88,353,842,87,!improved);const x=282,y=220,w=237,h=75;
  if(improved){g.save();g.shadowColor='#ad98ff80';g.shadowBlur=22;g.fillStyle=gradient(x,y,w,h,[[0,'#7388b2'],[1,'#35436c']]);rr(x,y,w,h,19);g.fill();g.strokeStyle='#a3b9de';g.lineWidth=3;g.stroke();g.restore();g.strokeStyle='#bea1fc';g.lineWidth=10;g.beginPath();g.ellipse(x+w/2,y+20,89,31,0,0,2*Math.PI);g.stroke();g.strokeStyle='#f2dfff';g.lineWidth=2;g.stroke()}else{wall(x,y,w,h,true,true)}
  text(String(face),x+w/2,y+21,42,'#ece1ff',950);
  const xx=722;wall(xx,153,90,200,false,!improved);g.setLineDash([10,10]);line(518,245,703,245,'#c4a3ffb3',4);g.setLineDash([]);text('→',612,221,32,'#b6e5ef',800);}
@@ -3406,18 +3540,12 @@ function trialDrawObjects(){
   else if(o.kind==='airB'){
    NRRetro.airB(g,x,y,w,Math.max(16,Math.min(22,(o.h-o.slab)*.28)),o.h-o.slab,o.id);
   }else if(o.kind==='gate'){
-   const op=trialGateOpening(o,ground);
-   g.save();g.fillStyle='#61468e';g.fillRect(x,ground-223,w,226);
-   g.fillStyle='#191b36';g.fillRect(x+4,op.top,w-8,op.bottom-op.top);
-   g.strokeStyle='#d0b4ff';g.lineWidth=2;g.strokeRect(x,ground-223,w,226);
-   g.strokeStyle='#ff7990';g.lineWidth=2;g.strokeRect(x+4,op.top,w-8,op.bottom-op.top);
-   text(String(o.target),x+w/2,op.top+(op.bottom-op.top)/2,Math.min(33,w*.62),'#faf0ff',900);g.restore();
+   const op=trialGateOpening(o,ground),yy=ground-223;
+   NRTech.gate(g,x,yy,w,226,o.target,op.top,op.bottom,'partial');
   }else if(o.kind==='platform'){
-   g.save();g.fillStyle='#514568';g.fillRect(x,y,w,23);g.strokeStyle='#b5a0cc';g.lineWidth=2;g.strokeRect(x,y,w,23);
-   line(x+3,y+1,x+w-3,y+1,'#a7e6c8',3);text(String(o.target),x+w/2,y+12,23,'#f1e9ff');g.restore();
+   NRTech.platform(g,x,y,w,23,o.target);
   }else if(o.kind==='switch'){
-   g.save();g.fillStyle=o.activated?'#467a6d':'#5a4976';rr(x,ground-74,w,27,5);g.fill();g.strokeStyle=o.activated?'#b2e5d2':'#c7b3e4';g.lineWidth=2;g.stroke();
-   text(String(o.target),x+w/2,ground-60,20,'#f4eaff');g.restore();
+   NRTech.switch(g,x,ground-74,w,27,o.target,!!o.activated);
    if(!o.activated)wall(x+(o.barrierX-o.x),ground-o.barrierH,o.barrierW,o.barrierH,false,false);
   }
  }
@@ -3483,7 +3611,7 @@ function draw(){
 function refresh(){const i=items[pos];const player=i[0]==='player';$('dbName').textContent=i[1];$('dbEnglish').textContent=i[2];$('dbDescription').textContent=i[3];$('dbCounter').textContent=String(pos+1).padStart(2,'0')+' / '+items.length;
  for(const [k,b] of [...$('dbCategories').children].entries()){b.classList.toggle('active',k===pos);b.setAttribute('aria-current',String(k===pos))}
  $('dbNew').classList.toggle('active',improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31));$('dbV24').classList.toggle('active',improved&&legacy24);$('dbV23').classList.toggle('active',improved&&legacy23);$('dbV22').classList.toggle('active',improved&&legacy22);$('dbOld').classList.toggle('active',!improved);$('dbNew').setAttribute('aria-pressed',String(improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31)));$('dbV24').setAttribute('aria-pressed',String(improved&&legacy24));$('dbV23').setAttribute('aria-pressed',String(improved&&legacy23));$('dbV22').setAttribute('aria-pressed',String(improved&&legacy22));$('dbOld').setAttribute('aria-pressed',String(!improved));$('dbV22').hidden=items[pos][0]!=='player';$('dbV23').hidden=items[pos][0]!=='player';$('dbV24').hidden=items[pos][0]!=='player';$('dbGroundBefore').hidden=items[pos][0]!=='ground'||!improved;$('dbGroundBefore').classList.toggle('active',nrFloorCompare31);$('dbGroundBefore').setAttribute('aria-pressed',String(nrFloorCompare31));$('dbGroundBefore').textContent=nrFloorCompare31?'✓ Ver.3.1 石床':'◈ Ver.3.1と比較';
- $('designBookScreen').classList.toggle('db-running',runActive);$('dbRunExit').hidden=!runActive;$('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=false;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.4.2 / 石材と接地面は維持'):'Ver.4.24 / レトロピクセル'):'旧デザイン風（比較用）';
+ $('designBookScreen').classList.toggle('db-running',runActive);$('dbRunExit').hidden=!runActive;$('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=false;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.4.2 / 石材と接地面は維持'):(['gate','platform','switch'].includes(items[pos][0])?'Ver.4.36 / 近未来の数字ギミック':'Ver.4.24 / レトロピクセル')):'旧デザイン風（比較用）';
  try{$('dbMemo').value=localStorage.getItem(memoKey(pos))||''}catch{$('dbMemo').value=''};
  for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
  $('dbExtras').hidden=false;$('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=true;$('dbRun').textContent='▶ 無限走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'選択した障害物がランダムに続きます':'黒背景 / 選択した障害物を無限に練習';$('dbInstruction').textContent=runActive?'画面タップでジャンプ。回転後の向き・接地・横滑りを確認。':player?'背景を消した状態で、数字・回転・接地の見た目を確認できます。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['真正面','正面＋少し奥行き','正面＋奥行き'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
