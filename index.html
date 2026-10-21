@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.4.34 · Basic Gimmick Integration</title>
+<title>NUMBER ROLL — Ver.4.35 · Danger Stone and Air Spike Visibility</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -446,7 +446,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
       </div>
       <div class="db-toolbar" id="dbToolbar">
-        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.34 基本ギミック統合</button>
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.35 危険壁と空中トゲ視認性</button>
         <button id="dbV24" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.4 と比較</button>
         <button id="dbV23" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.3 と比較</button>
         <button id="dbV22" type="button" class="db-tool" aria-pressed="false">Ver.2.2</button>
@@ -471,6 +471,7 @@ window.NRRetro=(()=>{
  const palette={
   stone:['#152637','#20374c','#29445e','#35536e','#496681','#6a88a2','#90abc2'],
   dark:['#111a27','#1a2838','#243245','#303e50','#3d5065','#5e7388','#8194a9'],
+  dangerStone:['#192839','#26384c','#344b62','#476078','#5a738b','#7890a4','#99afbd'],
   red:['#4b101c','#871827','#d52839','#f14448','#ff7770','#ffc0a1'],
   white:['#536d89','#8099b2','#b7cbdc','#d7e5f1','#eff7ff']
  };
@@ -543,7 +544,7 @@ window.NRRetro=(()=>{
  function wall(c,x,y,w,h,safe=true,seed=0){
   if(w<=1||h<=1)return;
   const cell=5,sw=Math.max(6,Math.round(w/cell)),sh=Math.max(5,Math.round(h/cell));
-  const bmp=cached('wall-'+sw+'-'+sh+'-'+safe+'-'+seed,sw,sh,(q,W,H)=>{
+  const bmp=cached('wall-435-'+sw+'-'+sh+'-'+safe+'-'+seed,sw,sh,(q,W,H)=>{
    const base=safe?'#162b3e':'#8b1927';q.fillStyle=base;q.fillRect(0,0,W,H);
    const rows=Math.max(1,Math.round(H/11)),rh=H/rows;
    const cols=Math.max(1,Math.round(W/17)),cw=W/cols;
@@ -554,11 +555,19 @@ window.NRRetro=(()=>{
      const bx=Math.max(0,Math.round(k*cw+shift)+1),right=Math.min(W,Math.round((k+1)*cw+shift));
      const bh=nextY-by-1,bw=right-bx;
      if(bw<3||bh<2)continue;
-     stone(q,bx,by+1,bw,bh,seed+97*r+31*k,safe?'stone':'dark');
+     stone(q,bx,by+1,bw,bh,seed+97*r+31*k,safe?'stone':'dangerStone');
      if(!safe){
-      // Red mortar visible between bricks. Faces remain completely uncracked.
+      // Ver.4.35: brighter blue-gray stone faces, without scratches or cracks.
+      // Their top/left bevels make them read as *solid blocks* beside the hot mortar.
+      q.fillStyle='#7c91a3';q.fillRect(bx+1,by+2,Math.max(1,bw-2),1);
+      if(bh>4){q.fillStyle='#526b82';q.fillRect(bx+1,by+3,1,Math.max(1,bh-5));}
+      if(bw>8&&bh>5){
+       const patchX=bx+3+Math.floor(hash(seed+r*61+k*47+9)*Math.max(1,bw-7));
+       q.fillStyle='#526f86';q.fillRect(patchX,by+Math.min(bh-3,4),2,1);
+      }
+      // Red glowing mortar remains the hazard cue; side-facing stone catches a faint red bounce.
       q.fillStyle='#ec3541';q.fillRect(bx-1,by+1,1,bh);
-      q.fillStyle='#9f1f2b';q.fillRect(bx+1,by+1,1,bh-1);
+      q.fillStyle='#9f3444';q.fillRect(bx+1,by+3,1,Math.max(1,bh-4));
      }
     }
    }
@@ -692,7 +701,7 @@ window.NRRetro=(()=>{
   if(w<=1||h<=1)return;
   // Ver.4.27: four equally short red pixel spikes and a small blue-gray core.
   // Render at a fixed low resolution; no blurred photo sprites or costly textures.
-  const bmp=cached('airA-427-'+Math.round(w/3)+'-'+Math.round(h/3),48,48,(q)=>{
+  const bmp=cached('airA-435-'+Math.round(w/3)+'-'+Math.round(h/3),48,48,(q)=>{
    q.imageSmoothingEnabled=false;
    const sh=airShape(0,0,48,48);
    function polygon(points,color){q.fillStyle=color;q.beginPath();points.forEach(([a,b],i)=>i?q.lineTo(a,b):q.moveTo(a,b));q.closePath();q.fill();}
@@ -709,14 +718,21 @@ window.NRRetro=(()=>{
     const px=Math.round(center[0]+(tipX-center[0])*.71),py=Math.round(center[1]+(tipY-center[1])*.71);
     q.fillRect(px-1,py-1,2,2);
    }
-   const cx=24,cy=24;
-   q.fillStyle='#112436';q.fillRect(17,17,14,14);
-   q.fillStyle='#607a94';q.fillRect(18,18,12,12);
-   q.fillStyle='#86a0b9';q.fillRect(19,19,10,2);
-   q.fillStyle='#334b63';q.fillRect(20,21,9,8);
-   q.fillStyle='#263b50';q.fillRect(22,22,6,6);
-   q.fillStyle='#c0d1dd';q.fillRect(19,19,6,1);
-   q.fillStyle='#152b42';q.fillRect(29,19,1,11);q.fillRect(19,29,11,1);
+   // Ver.4.35: reinforce the small stone core visually without growing
+   // the 28% collision core or enlarging the overall four-spike silhouette.
+   q.fillStyle='#071724';q.fillRect(16,16,16,16);             // clear dark pixel outline
+   q.fillStyle='#7794ad';q.fillRect(17,17,14,14);            // thick cool-stone rim
+   q.fillStyle='#a6bdcc';q.fillRect(18,18,11,2);             // top bevel
+   q.fillStyle='#829fb7';q.fillRect(18,20,2,9);              // left bevel
+   q.fillStyle='#344e68';q.fillRect(20,20,10,10);            // readable front face
+   q.fillStyle='#4a6982';q.fillRect(21,21,7,7);              // brighter interior
+   q.fillStyle='#3b5871';q.fillRect(24,23,4,5);              // fixed stone pixel patch
+   q.fillStyle='#c2d1db';q.fillRect(20,19,4,1);              // small fixed highlight
+   q.fillStyle='#12283c';q.fillRect(29,19,1,11);q.fillRect(19,29,11,1);
+   // Tiny inset red ember identifies the mechanism; not a large glowing star.
+   q.fillStyle='#1c2a39';q.fillRect(22,22,5,5);
+   q.fillStyle='#a72337';q.fillRect(23,23,3,3);
+   q.fillStyle='#ff6a64';q.fillRect(24,23,1,2);
   });
   blit(c,bmp,x,y,w,h);
  }
