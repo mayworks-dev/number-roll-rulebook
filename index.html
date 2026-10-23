@@ -10,7 +10,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
-<title>NUMBER ROLL — Ver.4.36 · Sci-Fi Number Devices</title>
+<title>NUMBER ROLL — Ver.4.37 · Number Gate Passage Fix</title>
 <style>
 :root{color-scheme:dark;--text:#e7f6ff;--muted:#9cb6ca;--line:#2b4b63;--cyan:#57c8ef;--panel:#0c1a2a;--pink:#ff6480}
 *{box-sizing:border-box}html,body{width:100%;height:100%;margin:0;background:#060e18;color:var(--text);font-family:system-ui,-apple-system,"Hiragino Kaku Gothic ProN",Meiryo,sans-serif;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none;overflow:hidden}button{font:inherit;cursor:pointer;-webkit-user-select:none;user-select:none;touch-action:manipulation}button:disabled{opacity:.32;cursor:default}::selection{background:transparent}
@@ -432,7 +432,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
 <section id="designBookScreen" class="front-screen db-screen" hidden aria-label="仮設デザイン確認ブック">
   <div class="db-titlebar">
     <button type="button" id="dbBack" class="front-button db-back">‹ HOME</button>
-    <div class="db-head"><div class="db-kicker">NUMBER ROLL · PIXEL VER.4.36</div><h2>デザイン確認ブック</h2></div>
+    <div class="db-head"><div class="db-kicker">NUMBER ROLL · PIXEL VER.4.37</div><h2>デザイン確認ブック</h2></div>
     <div class="db-temporary" aria-hidden="true"></div>
   </div>
   <div class="db-shell">
@@ -446,7 +446,7 @@ body:not(.mode-story):not(.mode-practice) #app{display:none!important} #app[hidd
         <div class="db-preview-pill" id="dbModeLabel">改良デザイン案</div>
       </div>
       <div class="db-toolbar" id="dbToolbar">
-        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.36 近未来の数字ギミック</button>
+        <button id="dbNew" type="button" class="db-tool active" aria-pressed="true">✧ Ver.4.37 数字ゲート通路改善</button>
         <button id="dbV24" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.4 と比較</button>
         <button id="dbV23" type="button" class="db-tool" aria-pressed="false">◈ Ver.2.3 と比較</button>
         <button id="dbV22" type="button" class="db-tool" aria-pressed="false">Ver.2.2</button>
@@ -1230,11 +1230,11 @@ const airEntries=[
  {n:'A-02',jp:'空中トゲA / 壁と組み合わせ',en:'AIR SPIKE A · WALL COMBO',face:2,type:'airACombo',tip:'壁を越えて着地後、次のジャンプを急がない',desc:'先に青枠の壁を突破し、その先の赤い空中トゲを回避。多段ジャンプを余計に使うと頭上のトゲに当たる。',spec:[['構成','青枠壁＋空中A'],['上面','接触禁止'],['安全な進み方','高度を下げる'],['難易度','中']]},
  {n:'B-02',jp:'上トゲ / 大きな穴',en:'CEILING SPIKES · GAP COMBO',face:2,type:'airBCombo',tip:'上トゲの石面に着地して回復。触れずに渡れればそれもOK',desc:'普通の2段ジャンプだけでは渡りきれない大きな穴。途中の上トゲの安全な石面に着地するとジャンプ回数を回復できる。もし触れずに渡れる別ルートがあれば、それでもクリア。',spec:[['構成','大きな穴＋上トゲ'],['上面','着地できる'],['着地','回数が回復'],['目標','接触せず対岸へ']]}
 ];
-// A number gate fills the entire screen height. Only the numbered interval is passable.
-// Vertical grid units use the rendered player's visible height (SIZE / ZOOM),
-// so a 2-square opening is visibly twice as tall as the player.
+// Numeric gates are finite structures. Pass the colored window at the target digit,
+// or jump above the physical roof. Red locked portions are always hazardous.
+// Vertical grid units match the rendered player's visible height (SIZE / ZOOM).
 const numberEntries=[
- {n:'N-01',jp:'数字の壁 / 全面型',en:'NUMBER GATE · FULL',type:'numberGate',mode:'full',face:1,required:2,initialOpening:2,initialLower:0,tip:'1回ジャンプして上面を2に合わせる',desc:'すべてが数字2の壁。接触する瞬間に上面が2ならすり抜ける。ほかの数字で入ると失敗。壁の途中で数字が変わっても通過判定は維持する。',spec:[['必要数字','2'],['横幅','0.50マス'],['数字部分','画面全体'],['飛び越え','不可能']]},
+ {n:'N-01',jp:'数字の壁 / 全面型',en:'NUMBER GATE · FULL',type:'numberGate',mode:'full',face:1,required:2,initialOpening:2,initialLower:0,tip:'1回ジャンプして上面を2に合わせる',desc:'数字2のゲート。ゲート内部は数字2なら通過できる。上を完全に飛び越えるルートも有効。途中で数字が変わっても通過中の一致判定は維持する。',spec:[['必要数字','2'],['横幅','0.50マス'],['数字部分','画面全体'],['飛び越え','高さが届けばOK']]},
  {n:'N-02',jp:'数字の壁 / 下部型',en:'NUMBER GATE · LOWER',type:'numberGate',mode:'lower',face:2,required:3,initialOpening:2,initialLower:0,tip:'早めに数字3を作り、低い通路を通る',desc:'下2マスが数字3、上は全面危険の赤壁。数字が合っていても上の赤い部分に触れたら失敗。',spec:[['必要数字','3'],['数字部分','下から2マス'],['赤い部分','上は危険'],['縦幅','調整可能']]},
  {n:'N-03',jp:'数字の壁 / 上部型',en:'NUMBER GATE · UPPER',type:'numberGate',mode:'upper',face:3,required:2,initialOpening:2,initialLower:1.75,tip:'3回ジャンプで2を作り、上の数字部分へ',desc:'下は全面危険の赤壁。上の数字2の通路を目指してジャンプする。横に抜けるまで赤い部分には触れられない。',spec:[['必要数字','2'],['数字部分','上部2マス'],['赤い部分','下・上は危険'],['縦幅','調整可能']]},
  {n:'N-04',jp:'数字の壁 / 中央型',en:'NUMBER GATE · MIDDLE',type:'numberGate',mode:'middle',face:2,required:4,initialOpening:2,initialLower:0.75,tip:'2回ジャンプで4を作り、中央の通路へ',desc:'赤い壁に上下を挟まれた数字4の通路。数字と高さの両方を合わせ、通過中も赤い部分を避けよう。',spec:[['必要数字','4'],['数字部分','中央2マス'],['赤い部分','上下とも危険'],['縦幅','調整可能']]}
@@ -1279,7 +1279,12 @@ const COLORS={1:['#4fc3f7','#123d55'],2:['#94df84','#204e2b'],3:['#ffbc68','#5c3
 const GRID_UNIT=64; // 横1マス = 64ゲーム単位
 // Ver.4.8: consistent lift on jumps 2–4. Keep the first takeoff, gravity and run speed.
 const GRAVITY=1850, JUMP=810, AIR_JUMP=740, SPEED=285, ZOOM=.49, SIZE=64, VH=540, FLOOR=426;
-const NUMBER_GATE_VERTICAL_UNIT=SIZE/ZOOM; // number gate: 1 visual-square of height; declaration initialized after SIZE
+const NUMBER_GATE_VERTICAL_UNIT=SIZE/ZOOM; // 1 visual cube per vertical unit
+// Ver.4.37: numeric gates are finite obstacles. Flying over their physical top is a legal route.
+// Tall upper-window settings may still demand a higher jump than the player can perform.
+function gateRoofWorld(o){
+ return o.mode==='full'?430:Math.max(430,(o.lower+o.opening)*NUMBER_GATE_VERTICAL_UNIT+20);
+}
 let idx=0, W=960, scale=1, dpr=1,last=0, state,objs=[],goal=0,cleared=[],silent=false;
 let uiMode="home", storyNumber=1,doorPage=0,screenBeforeSettings="home";
 const STORY_INDEX=[22,0,23,4,8,30,34,38];
@@ -1592,7 +1597,7 @@ function restoreGap(){
 function setPage(n){idx=Math.max(0,Math.min(entries.length-1,n));const p=entries[idx];$('number').textContent=p.n;$('jp').textContent=p.jp;$('en').textContent=p.en;$('tip').textContent=p.tip;$('description').textContent=p.desc;$('specs').innerHTML=p.spec.map(([k,v])=>`<div class="spec"><span>${k}</span><b>${v}</b></div>`).join('');$('prev').disabled=idx===0;$('next').disabled=idx===entries.length-1;refreshCalibrationBar();refreshWallBar();refreshGapBar();refreshNumberBar();refreshPlatformBar();refreshSwitchBar();refreshMotionBar();$('comboBanner').hidden=p.type!=='combo';createLevel();newState();showResult('ready');draw();}
 function start(){newState();state.status='running';hideResult();ui();}
 function retry(){start()}
-function showResult(kind){const box=$('result');box.classList.add('show');$('resultNext').hidden=(kind!=='win'||idx===entries.length-1);$('retry').textContent=kind==='ready'?'▶ スタート':'↻ リトライ';$('resultTitle').className='result-title '+(kind==='win'?'win':kind==='lose'?'lose':'');if(kind==='ready'){$('resultTitle').textContent='練習 '+entries[idx].n;$('resultCaption').textContent='障害物を避けてGOALへ！ '+entries[idx].tip+'。';}else if(kind==='win'){$('resultTitle').textContent='✓ CLEAR!';$('resultCaption').textContent=entries[idx].type==='calibration'?`トゲ${spikeCounts[idx]}個（${(spikeCounts[idx]*SPIKE_PITCH/GRID_UNIT).toFixed(2)}マス）を突破！ 今回のジャンプ操作：${state.totalJumps}回。長さを変更して再挑戦できます。`:entries[idx].type==='wallCalibration'?`高さ ${(wallSettings[idx-calibrationEntries.length].height/GRID_UNIT).toFixed(2)}マス / 幅 ${(wallSettings[idx-calibrationEntries.length].width/GRID_UNIT).toFixed(1)}マスを${state.totalJumps}回のジャンプで突破！ 調整して再挑戦できます。`:entries[idx].type==='gapCalibration'?`幅 ${(gapSettings[idx-calibrationEntries.length-wallEntries.length-baseEntries.length]/GRID_UNIT).toFixed(2)}マスの穴を${state.totalJumps}回のジャンプで突破！ 穴の幅を調整して再挑戦できます。`:entries[idx].type==='combo'?`複数の障害物を突破！ ジャンプ${state.totalJumps}回、数字の変化や着地も確認しよう。`:entries[idx].type==='motionWall'?state.motionLandings>0?`動く青枠に${state.motionLandings}回着地してクリア！ 足場と一緒に運ばれた移動も確認しよう。`:`動く壁を接触せずに突破！ 上を飛び越える攻略もOK。`:entries[idx].type==='digitSwitch'?state.switchActivations>0?`数字${entries[idx].required}のスイッチを起動し、仕掛けを突破！ 効果時間も調整できます。`:`スイッチを使わず、障害物を安全に突破！ 回避ルートでもクリアです。`:entries[idx].type==='numberPlatform'?state.platformLandings>0?`数字${entries[idx].required}の足場に着地してクリア！ ジャンプ回数が回復しました。`:`数字${entries[idx].required}の足場の下を、触れずに通過してクリア！` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の壁を突破！ 数字の一致と赤い部分への接触を確認しよう。`:entries[idx].type.startsWith('airB')?state.airBLandings>0?`上トゲの安全面に${state.airBLandings}回着地してクリア！ ジャンプ回数が回復します。`:`上トゲに着地せず、接触を避けてクリア！ 回避ルートもOKです。`:'障害物「'+entries[idx].jp+'」を突破！ 同じコースを再挑戦することもできます。';}else if(kind==='paused'){$('resultTitle').textContent='Ⅱ 一時停止';$('resultCaption').textContent='再開すると同じ位置からプレイできます。';$('retry').textContent='▶ 再開';}else{$('resultTitle').textContent='GAME OVER';$('resultCaption').textContent=state.cause||'もう一度ジャンプのタイミングを試してみよう。';};storyResult(kind);}
+function showResult(kind){const box=$('result');box.classList.add('show');$('resultNext').hidden=(kind!=='win'||idx===entries.length-1);$('retry').textContent=kind==='ready'?'▶ スタート':'↻ リトライ';$('resultTitle').className='result-title '+(kind==='win'?'win':kind==='lose'?'lose':'');if(kind==='ready'){$('resultTitle').textContent='練習 '+entries[idx].n;$('resultCaption').textContent='障害物を避けてGOALへ！ '+entries[idx].tip+'。';}else if(kind==='win'){$('resultTitle').textContent='✓ CLEAR!';$('resultCaption').textContent=entries[idx].type==='calibration'?`トゲ${spikeCounts[idx]}個（${(spikeCounts[idx]*SPIKE_PITCH/GRID_UNIT).toFixed(2)}マス）を突破！ 今回のジャンプ操作：${state.totalJumps}回。長さを変更して再挑戦できます。`:entries[idx].type==='wallCalibration'?`高さ ${(wallSettings[idx-calibrationEntries.length].height/GRID_UNIT).toFixed(2)}マス / 幅 ${(wallSettings[idx-calibrationEntries.length].width/GRID_UNIT).toFixed(1)}マスを${state.totalJumps}回のジャンプで突破！ 調整して再挑戦できます。`:entries[idx].type==='gapCalibration'?`幅 ${(gapSettings[idx-calibrationEntries.length-wallEntries.length-baseEntries.length]/GRID_UNIT).toFixed(2)}マスの穴を${state.totalJumps}回のジャンプで突破！ 穴の幅を調整して再挑戦できます。`:entries[idx].type==='combo'?`複数の障害物を突破！ ジャンプ${state.totalJumps}回、数字の変化や着地も確認しよう。`:entries[idx].type==='motionWall'?state.motionLandings>0?`動く青枠に${state.motionLandings}回着地してクリア！ 足場と一緒に運ばれた移動も確認しよう。`:`動く壁を接触せずに突破！ 上を飛び越える攻略もOK。`:entries[idx].type==='digitSwitch'?state.switchActivations>0?`数字${entries[idx].required}のスイッチを起動し、仕掛けを突破！ 効果時間も調整できます。`:`スイッチを使わず、障害物を安全に突破！ 回避ルートでもクリアです。`:entries[idx].type==='numberPlatform'?state.platformLandings>0?`数字${entries[idx].required}の足場に着地してクリア！ ジャンプ回数が回復しました。`:`数字${entries[idx].required}の足場の下を、触れずに通過してクリア！` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の壁を突破！ 指定数字で通過する方法も、飛び越える方法もOK。`:entries[idx].type.startsWith('airB')?state.airBLandings>0?`上トゲの安全面に${state.airBLandings}回着地してクリア！ ジャンプ回数が回復します。`:`上トゲに着地せず、接触を避けてクリア！ 回避ルートもOKです。`:'障害物「'+entries[idx].jp+'」を突破！ 同じコースを再挑戦することもできます。';}else if(kind==='paused'){$('resultTitle').textContent='Ⅱ 一時停止';$('resultCaption').textContent='再開すると同じ位置からプレイできます。';$('retry').textContent='▶ 再開';}else{$('resultTitle').textContent='GAME OVER';$('resultCaption').textContent=state.cause||'もう一度ジャンプのタイミングを試してみよう。';};storyResult(kind);}
 function storyResult(kind){
  if(uiMode!=='story')return;
  $('resultHome').style.display='inline-flex';
@@ -1631,7 +1636,7 @@ function ui(){const s=state;if(!s)return;let left=s.air?Math.max(0,s.limit-s.use
   const rem=s.effectTimers[timerId]||0;
   $('switchTimer').textContent=rem>0?rem.toFixed(1)+'秒':s.switchTriggered[timerId]?'終了':'未起動';
   $('switchTimer').style.color=rem>0?'#8dffd4':'#ffc1d6';
- }$('actionHint').textContent=s.status==='running'?(s.y<0&&objs.some(o=>o.type==='gap')?'落下中！ ↑ ジャンプで復帰':entries[idx].type.startsWith('airB')?`上トゲ着地 ${s.airBLandings}回 / 回避もOK`:entries[idx].type==='motionWall'?`壁が${entries[idx].axis==='y'?'上下':'左右'}に移動中！ 青枠なら上に着地OK`:entries[idx].type==='digitSwitch'?`数字${entries[idx].required}で起動／回避できれば起動不要`:entries[idx].type==='numberPlatform'?`数字${entries[idx].required}で着地／下を避けて通過もOK` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の部分を通り抜けよう`:'画面タップでジャンプ'):s.status==='paused'?'一時停止中':s.status==='won'?'クリア！':s.status==='lost'?'もう一度挑戦': 'まずはスタート';// Ver.4.33: in chained obstacle training, briefly explain the remaining budget and its refill.
+ }$('actionHint').textContent=s.status==='running'?(s.y<0&&objs.some(o=>o.type==='gap')?'落下中！ ↑ ジャンプで復帰':entries[idx].type.startsWith('airB')?`上トゲ着地 ${s.airBLandings}回 / 回避もOK`:entries[idx].type==='motionWall'?`壁が${entries[idx].axis==='y'?'上下':'左右'}に移動中！ 青枠なら上に着地OK`:entries[idx].type==='digitSwitch'?`数字${entries[idx].required}で起動／回避できれば起動不要`:entries[idx].type==='numberPlatform'?`数字${entries[idx].required}で着地／下を避けて通過もOK` : entries[idx].type==='numberGate'?`数字${entries[idx].required}の光る通路か、ゲートの上を越えよう`:'画面タップでジャンプ'):s.status==='paused'?'一時停止中':s.status==='won'?'クリア！':s.status==='lost'?'もう一度挑戦': 'まずはスタート';// Ver.4.33: in chained obstacle training, briefly explain the remaining budget and its refill.
  // Only the existing hint line changes; gameplay timing, jump height, collision and HUD layout do not.
  if(s.status==='running'){
   const chainPractice=entries[idx].type==='combo'||entries[idx].type==='wallCalibration'||entries[idx].type==='calibration';
@@ -1798,13 +1803,15 @@ function update(dt){if(state.status!=='running')return;const s=state;
    }
    continue;
   }
+  // Entire cube is above the finite roof: passing over is safe, regardless of number.
+  // rc.b is the player's bottom (world units).
+  if(rc.b>=gateRoofWorld(o))continue;
   const bottom=o.mode==='full'?-Infinity:o.lower*NUMBER_GATE_VERTICAL_UNIT;
   const top=o.mode==='full'?Infinity:(o.lower+o.opening)*NUMBER_GATE_VERTICAL_UNIT;
-  // The colored numbered window is safe only when the *whole* player fits.
-  // No invisible collision forgiveness inside red parts.
-  if(rc.b<bottom||rc.t>top){fail('数字の壁の赤い部分に接触！ 数字だけでなく高さも合わせよう。');return;}
+  // The WHOLE cube must fit the lit window. The red area remains lethal.
+  if(rc.b<bottom||rc.t>top){fail('数字ゲートの赤い部分に接触！ 数字と高さを合わせるか、上を飛び越えよう。');return;}
   if(!s.numberLocks[o.id]){
-   if(s.face!==o.required){fail('数字が不一致！ この壁は「'+o.required+'」で通過しよう。');return;}
+   if(s.face!==o.required){fail('数字が不一致！ ゲートの中は数字'+o.required+'で通過。上を飛び越えるルートもOK。');return;}
    s.numberLocks[o.id]=true;
   }
  }
@@ -1846,8 +1853,7 @@ function update(dt){if(state.status!=='running')return;const s=state;
    // Gameplay-wide rule: successful physical traversal is a clear.
    // Switch activation, landing on floating spikes or platforms are optional,
    // provided the player reached the goal without hazardous contact.
-   // Number gates remain physically screen-spanning, so require a legal pass.
-   if(entries[idx].type==='numberGate'&&s.numberPasses<1){fail('数字ゲートの発光する部分を通ってゴールしよう。');return;}
+   // Ver.4.37: clearing above a numeric gate is also a valid route.
    win();return;
  }
  if(s.turn<.20){s.turn=Math.min(.20,s.turn+dt);let e=1-Math.pow(1-s.turn/.20,3);s.angle=s.turnFrom+(s.turnTo-s.turnFrom)*e}else s.angle=s.turnTo;
@@ -1926,7 +1932,7 @@ function drawBlock(o){
  NRWallArt.draw(ctx,x,y,w,h,!o.lethal,Math.round(o.originX??o.x));
 }
 function drawNumberGate(o){
- const x=screenX(o.x),w=o.width,topLimit=-70,bottom=FLOOR;
+ const x=screenX(o.x),w=o.width,topLimit=scrY(gateRoofWorld(o)),bottom=FLOOR;
  const low=o.mode==='full'?0:o.lower*NUMBER_GATE_VERTICAL_UNIT;
  const high=o.mode==='full'?Infinity:(o.lower+o.opening)*NUMBER_GATE_VERTICAL_UNIT;
  const passTop=o.mode==='full'?topLimit:scrY(high);
@@ -2351,7 +2357,7 @@ const items=[
  ['safe','青壁・安全','LANDABLE WALL','Ver.4.18：床と同じ石目と色・控えめな反射を採用。白い天板の厚さを約半分に調整。上面は着地可能。'],
  ['danger','赤壁・危険','RETRO DANGER WALL','Ver.4.22：Ver.4.21の危険壁をベースに、赤い継ぎ目の明るさと立体感を強化。低い壁でも危険だと分かるよう、両端の赤い発光を追加し、石の周囲にごく弱い赤い反射を入れて走行中の見やすさを改善。上面も側面も危険で、高さは4段階で変化。'],
  ['airA','空中トゲ','FOUR-WAY PIXEL SPIKES','Ver.4.28：正方形と小さな石コアは維持。トゲの赤い輪郭を明瞭化し、全体サイズ・当たり判定は変更なし。全面接触禁止。'],
- ['gate','数字の壁','NUMBER GATE','Ver.4.36：発光する数字パネルと金属フレームの近未来ゲート。指定数字で通過可能、赤い部分は常に危険。'],
+ ['gate','数字の壁','NUMBER GATE','Ver.4.37：近未来ゲートの見た目を維持し、中央窓を通りやすく調整。内部は数字を合わせ、上を完全に飛び越えるルートも有効。'],
  ['platform','数字足場','NUMBER PLATFORM','Ver.4.36：中央に数字ディスプレイを持つ浮遊式の金属足場。指定数字で上から着地、側面・下面は危険。'],
  ['switch','数字スイッチ','NUMBER SWITCH','Ver.4.36：数字表示と菱形インジケーターを備えた機械式スイッチ。指定数字で触れると連動先が動作。'],
  ['moving','移動する壁','MOVING WALLS','青と赤の区別を維持したまま、移動方向がわかる。']
@@ -3491,9 +3497,26 @@ function trialCheck(dt,oldHeight){
     if(trialPolyHit([[lx,root],[lx+pitch*.38,root+profile.tips[i]],[lx+pitch*.76,root]],box))collision=true;
    }
   }else if(o.kind==='gate'){
-   const openings=trialGateOpening(o,ground);
-   if(box.x+box.w>p.x&&box.x<p.x+p.w&&
-      (face!==o.target||box.y<openings.top||box.y+box.h>openings.bottom))collision=true;
+   const touchingX=box.x+box.w>p.x&&box.x<p.x+p.w;
+   if(!touchingX){
+    // Reset whenever the cube has fully exited the frame.
+    o.numberEntryLocked=false;
+   }else{
+    const openings=trialGateOpening(o,ground);
+    const gateTop=ground-223; // matching the metal frame drawn in trialDrawObjects
+    const aboveRoof=box.y+box.h<=gateTop+.5;
+    // Jumping completely over the top is a legitimate alternative route.
+    if(!aboveRoof){
+     const fitsWindow=box.y>=openings.top-.5&&box.y+box.h<=openings.bottom+.5;
+     if(!fitsWindow)collision=true;
+     else if(!o.numberEntryLocked){
+      // Match the required number on ENTERING the opening, not on every
+      // frame of traversal. Mid-gate cube rotation cannot revoke entry.
+      if(face!==o.target)collision=true;
+      else o.numberEntryLocked=true;
+     }
+    }
+   }
   }else if(o.kind==='switch'){
    const marker={x:p.x,y:ground-74,w:o.w,h:27};
    if(face===o.target&&trialRects(box,marker))o.activated=true;
@@ -3504,8 +3527,10 @@ function trialCheck(dt,oldHeight){
  if(runHeight< -160||collision)trialFail();
 }
 function trialGateOpening(o,ground){
- const depth=o.variant===0?215:o.variant===1?118:110;
- const bottom=o.variant===2?ground-50:ground+3;
+ // Central lane must fit the *whole* moving cube throughout the crossing.
+ // Keep a visible locked (red) segment both above and below the lit aperture.
+ const depth=o.variant===0?215:o.variant===1?118:153;
+ const bottom=o.variant===2?ground-26:ground+3;
  return {top:bottom-depth,bottom};
 }
 function trialUpdate(dt,oldHeight){
@@ -3611,7 +3636,7 @@ function draw(){
 function refresh(){const i=items[pos];const player=i[0]==='player';$('dbName').textContent=i[1];$('dbEnglish').textContent=i[2];$('dbDescription').textContent=i[3];$('dbCounter').textContent=String(pos+1).padStart(2,'0')+' / '+items.length;
  for(const [k,b] of [...$('dbCategories').children].entries()){b.classList.toggle('active',k===pos);b.setAttribute('aria-current',String(k===pos))}
  $('dbNew').classList.toggle('active',improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31));$('dbV24').classList.toggle('active',improved&&legacy24);$('dbV23').classList.toggle('active',improved&&legacy23);$('dbV22').classList.toggle('active',improved&&legacy22);$('dbOld').classList.toggle('active',!improved);$('dbNew').setAttribute('aria-pressed',String(improved&&!legacy22&&!legacy23&&!legacy24&&!(items[pos][0]==='ground'&&nrFloorCompare31)));$('dbV24').setAttribute('aria-pressed',String(improved&&legacy24));$('dbV23').setAttribute('aria-pressed',String(improved&&legacy23));$('dbV22').setAttribute('aria-pressed',String(improved&&legacy22));$('dbOld').setAttribute('aria-pressed',String(!improved));$('dbV22').hidden=items[pos][0]!=='player';$('dbV23').hidden=items[pos][0]!=='player';$('dbV24').hidden=items[pos][0]!=='player';$('dbGroundBefore').hidden=items[pos][0]!=='ground'||!improved;$('dbGroundBefore').classList.toggle('active',nrFloorCompare31);$('dbGroundBefore').setAttribute('aria-pressed',String(nrFloorCompare31));$('dbGroundBefore').textContent=nrFloorCompare31?'✓ Ver.3.1 石床':'◈ Ver.3.1と比較';
- $('designBookScreen').classList.toggle('db-running',runActive);$('dbRunExit').hidden=!runActive;$('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=false;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.4.2 / 石材と接地面は維持'):(['gate','platform','switch'].includes(items[pos][0])?'Ver.4.36 / 近未来の数字ギミック':'Ver.4.24 / レトロピクセル')):'旧デザイン風（比較用）';
+ $('designBookScreen').classList.toggle('db-running',runActive);$('dbRunExit').hidden=!runActive;$('designBookScreen').classList.toggle('player-focus',player);$('dbToolbar').hidden=player;$('dbPlayerActions').hidden=false;$('dbNotes').hidden=player;$('dbFooter').hidden=player;$('dbCounter').hidden=player;$('dbModeLabel').hidden=player;$('dbPreviewLabel').hidden=player;$('dbBackground').textContent='背景：黒';$('dbModeLabel').textContent=improved?(legacy22?'Ver.2.2 / 比較用':legacy23?'Ver.2.3 / 比較用':legacy24?'Ver.2.4 / 比較用':items[pos][0]==='ground'?(nrFloorCompare31?'Ver.3.1 / 旧石床':'Ver.4.2 / 石材と接地面は維持'):(['gate','platform','switch'].includes(items[pos][0])?'Ver.4.37 / 数字ゲート通路改善':'Ver.4.24 / レトロピクセル')):'旧デザイン風（比較用）';
  try{$('dbMemo').value=localStorage.getItem(memoKey(pos))||''}catch{$('dbMemo').value=''};
  for(const b of $('dbDigits').children)b.setAttribute('aria-pressed',String(Number(b.dataset.digit)===face));
  $('dbExtras').hidden=false;$('dbDigits').hidden=player&&runActive;$('dbDigitLabel').hidden=player&&runActive;$('dbRotate').hidden=player&&runActive;$('dbRunJump').hidden=true;$('dbRun').textContent='▶ 無限走行テスト';$('dbRun').classList.toggle('running',runActive);$('dbRun').setAttribute('aria-pressed',String(runActive));$('dbRunInfo').textContent=runActive?'選択した障害物がランダムに続きます':'黒背景 / 選択した障害物を無限に練習';$('dbInstruction').textContent=runActive?'画面タップでジャンプ。回転後の向き・接地・横滑りを確認。':player?'背景を消した状態で、数字・回転・接地の見た目を確認できます。':'仮設のデザイン確認ページです。';$('dbPreviewLabel').innerHTML=runActive?'<span></span> FLAT RUN / PHYSICS CHECK':'<span></span> DESIGN PREVIEW / TEMP';$('dbPreview').classList.toggle('is-running',runActive);$('dbRotate').disabled=!!cubeRoll;const viewText=['真正面','正面＋少し奥行き','正面＋奥行き'];$('dbView').textContent='視点：'+viewText[cameraView];$('dbView').hidden=!player||!improved||runActive;draw();}
